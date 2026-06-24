@@ -10,7 +10,8 @@
 ## M2: RK3588 Baseline
 
 - Harden SSH on `orange-rk3588`.
-- Run the built-in RKNN demo.
+- Resolve built-in RKNN demo runtime libraries.
+- Prefer a headless RKNN Lite demo over the built-in MiniGUI camera-preview demo.
 - Record first latency, memory, and temperature baseline.
 - Decide Docker device mappings for RKNN/RGA/Mali access.
 
@@ -39,4 +40,3 @@
 - Add benchmark result format.
 - Capture latency, throughput, memory, disk, and temperature.
 - Add repeatable smoke tests for all three boards.
-
