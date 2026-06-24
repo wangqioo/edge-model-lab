@@ -12,6 +12,7 @@
 - Harden SSH on `orange-rk3588`.
 - Resolve built-in RKNN demo runtime libraries.
 - Prefer a headless RKNN Lite demo over the built-in MiniGUI camera-preview demo.
+- Generate or obtain a RK3588-compatible RKNN model artifact.
 - Record first latency, memory, and temperature baseline.
 - Decide Docker device mappings for RKNN/RGA/Mali access.
 
