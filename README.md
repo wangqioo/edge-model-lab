@@ -40,6 +40,7 @@ Planned phase 1 interface:
 ./scripts/edgectl health all
 ./scripts/edgectl health orange-rk3588
 ./scripts/edgectl models --platform rk3588
+./scripts/edgectl rknn-bootstrap linaro-rk3576
 ./scripts/edgectl rknn-smoke orange-rk3588 rk3588_mobilenet_v2_lite2
 ```
 

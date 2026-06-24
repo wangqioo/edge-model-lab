@@ -4,6 +4,7 @@ import argparse
 import sys
 
 from .assets import asset_exists, asset_size_label, load_assets
+from .bootstrap import bootstrap_rknn_lite
 from .config import Device, load_devices
 from .health import print_health
 from .rknn import run_rknn_smoke
@@ -80,6 +81,8 @@ def run(argv: list[str] | None = None) -> int:
         default=None,
         help="Python interpreter on the target device",
     )
+    bootstrap_parser = subparsers.add_parser("rknn-bootstrap", help="Install the minimal RKNN Lite Python runtime on a device")
+    bootstrap_parser.add_argument("target", help="Device id or 'all'")
 
     args = parser.parse_args(argv)
     devices = load_devices()
@@ -112,6 +115,17 @@ def run(argv: list[str] | None = None) -> int:
         if not asset:
             parser.error(f"Unknown asset: {args.asset}")
         return run_rknn_smoke(device, asset, args.python)
+
+    if args.command == "rknn-bootstrap":
+        if args.target == "all":
+            exit_code = 0
+            for device in devices.values():
+                exit_code = max(exit_code, bootstrap_rknn_lite(device))
+            return exit_code
+        device = devices.get(args.target)
+        if not device:
+            parser.error(f"Unknown device: {args.target}")
+        return bootstrap_rknn_lite(device)
 
     parser.error(f"Unknown command: {args.command}")
     return 2

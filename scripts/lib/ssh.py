@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+from pathlib import Path
 
 from .config import Device
 
@@ -64,4 +65,37 @@ def run_ssh(
     except subprocess.TimeoutExpired:
         return 124, f"Timed out after {timeout_seconds}s\n"
 
+    return completed.returncode, completed.stdout + completed.stderr
+
+
+def run_scp_to_device(device: Device, local_path: Path, remote_path: str) -> tuple[int, str]:
+    command = [
+        "scp",
+        "-P",
+        str(device.port),
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "ConnectTimeout=8",
+        "-o",
+        "PreferredAuthentications=password",
+        "-o",
+        "PubkeyAuthentication=no",
+        "-o",
+        "NumberOfPasswordPrompts=1",
+        str(local_path),
+        f"{device.user}@{device.host}:{remote_path}",
+    ]
+
+    env = os.environ.copy()
+    if device.password_env:
+        password = os.environ.get(device.password_env)
+        if password:
+            sshpass = shutil.which("sshpass")
+            if not sshpass:
+                return 127, f"sshpass is required because {device.password_env} is set in local config\n"
+            command = [sshpass, "-e", *command]
+            env["SSHPASS"] = password
+
+    completed = subprocess.run(command, check=False, capture_output=True, env=env, text=True)
     return completed.returncode, completed.stdout + completed.stderr

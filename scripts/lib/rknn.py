@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .assets import ModelAsset
 from .config import Device
-from .ssh import run_ssh
+from .ssh import run_scp_to_device, run_ssh
 
 
 REMOTE_BASE = "/tmp/edge-model-lab-smoke"
@@ -61,36 +61,6 @@ def _extract_asset(asset: ModelAsset, output_dir: Path) -> Path:
     return source
 
 
-def _scp_to_device(device: Device, local_path: Path, remote_path: str) -> tuple[int, str]:
-    command = [
-        "scp",
-        "-P",
-        str(device.port),
-        "-o",
-        "StrictHostKeyChecking=no",
-        "-o",
-        "ConnectTimeout=8",
-        str(local_path),
-        f"{device.user}@{device.host}:{remote_path}",
-    ]
-
-    import os
-    import shutil
-
-    env = os.environ.copy()
-    if device.password_env:
-        password = os.environ.get(device.password_env)
-        if password:
-            sshpass = shutil.which("sshpass")
-            if not sshpass:
-                return 127, f"sshpass is required because {device.password_env} is set in local config\n"
-            command = [sshpass, "-e", *command]
-            env["SSHPASS"] = password
-
-    completed = subprocess.run(command, check=False, capture_output=True, env=env, text=True)
-    return completed.returncode, completed.stdout + completed.stderr
-
-
 def run_rknn_smoke(device: Device, asset: ModelAsset, python_bin: str | None) -> int:
     if asset.kind != "rknn":
         print(f"Asset {asset.id} is {asset.kind}, not rknn")
@@ -117,7 +87,7 @@ def run_rknn_smoke(device: Device, asset: ModelAsset, python_bin: str | None) ->
             print(mkdir_output.rstrip())
             return mkdir_code
 
-        scp_code, scp_output = _scp_to_device(device, local_model, remote_model)
+        scp_code, scp_output = run_scp_to_device(device, local_model, remote_model)
         if scp_code != 0:
             print(scp_output.rstrip())
             return scp_code

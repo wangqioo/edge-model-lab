@@ -20,8 +20,9 @@
 ## M3: Python Runtime Baseline
 
 - Define common Python venv layout.
-- Install minimal runtime packages on each board.
-- Verify RKNN Lite import and sample inference on all three boards.
+- [x] Define common Python venv layout.
+- [x] Install minimal runtime packages on each board.
+- [x] Verify RKNN Lite import and RKNN runtime initialization on all three boards.
 - Record runtime package versions.
 
 ## M4: RK3576 Systemd Service
