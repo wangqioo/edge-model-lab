@@ -10,9 +10,10 @@
 ## M2: RK3588 Baseline
 
 - Harden SSH on `orange-rk3588`.
-- Resolve built-in RKNN demo runtime libraries.
-- Prefer a headless RKNN Lite demo over the built-in MiniGUI camera-preview demo.
-- Generate or obtain a RK3588-compatible RKNN model artifact.
+- [x] Resolve built-in RKNN demo runtime libraries.
+- [x] Prefer a headless RKNN Lite demo over the built-in MiniGUI camera-preview demo.
+- [x] Generate or obtain a RK3588-compatible RKNN model artifact.
+- [x] Verify RKNN Lite can load and initialize a RK3588 model on the board.
 - Record first latency, memory, and temperature baseline.
 - Decide Docker device mappings for RKNN/RGA/Mali access.
 
@@ -20,7 +21,7 @@
 
 - Define common Python venv layout.
 - Install minimal runtime packages on each board.
-- Verify RKNN Lite import and sample inference.
+- Verify RKNN Lite import and sample inference on all three boards.
 - Record runtime package versions.
 
 ## M4: RK3576 Systemd Service

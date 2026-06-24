@@ -1,0 +1,104 @@
+assets:
+  rk3588_mobilenet_v2_lite2:
+    kind: rknn
+    platform: rk3588
+    workload: image-classification
+    source: vendor-rknn-toolkit2-lite2-example
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/RKNPU/rknn-toolkit2.zip
+    archive_member: rknn-toolkit2/rknn-toolkit-lite2/examples/dynamic_shape/mobilenet_v2_for_rk3588.rknn
+    size_bytes: 5719052
+    smoke_input: synthetic
+    notes:
+      - Good first RK3588 RKNN Lite runtime smoke model.
+
+  rk3576_mobilenet_v2_lite2:
+    kind: rknn
+    platform: rk3576
+    workload: image-classification
+    source: vendor-rknn-toolkit2-lite2-example
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/RKNPU/rknn-toolkit2.zip
+    archive_member: rknn-toolkit2/rknn-toolkit-lite2/examples/dynamic_shape/mobilenet_v2_for_rk3576.rknn
+    size_bytes: 5827212
+    smoke_input: synthetic
+    notes:
+      - Good first RK3576 RKNN Lite runtime smoke model.
+
+  rk3588_resnet18_lite2:
+    kind: rknn
+    platform: rk3588
+    workload: image-classification
+    source: vendor-rknn-toolkit2-lite2-example
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/RKNPU/rknn-toolkit2.zip
+    archive_member: rknn-toolkit2/rknn-toolkit-lite2/examples/resnet18/resnet18_for_rk3588.rknn
+    size_bytes: 11990743
+    smoke_input: synthetic
+    notes:
+      - Secondary RK3588 classification smoke model.
+
+  rk3576_resnet18_lite2:
+    kind: rknn
+    platform: rk3576
+    workload: image-classification
+    source: vendor-rknn-toolkit2-lite2-example
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/RKNPU/rknn-toolkit2.zip
+    archive_member: rknn-toolkit2/rknn-toolkit-lite2/examples/resnet18/resnet18_for_rk3576.rknn
+    size_bytes: 11948375
+    smoke_input: synthetic
+    notes:
+      - Secondary RK3576 classification smoke model.
+
+  k7_rk3576_yolov5s_demo:
+    kind: rknn
+    platform: rk3576
+    workload: object-detection
+    source: kickpi-k7-yolov5-linux-demo
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/Linux_rknn_yolov5/rknn_yolov5_demo_Linux_rk3576.zip
+    archive_member: rknn_yolov5_demo_Linux_rk3576/model/RK3576/yolov5s-640-640.rknn
+    size_bytes: 8197828
+    smoke_input: vendor-bus-jpg
+    notes:
+      - Demo archive also includes executable binaries, librknnrt, librga, MPP, labels, and bus.jpg.
+
+  taishan_rk3576_qwen3_vl_2b_vision:
+    kind: rknn
+    platform: rk3576
+    workload: vision-language-encoder
+    source: lckfb-taishanpi-ai-app
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/Qwen3-VL-2B-Instruct/2025-12-31/qwen3-vl_vision_rk3576.rknn
+    size_bytes: null
+    smoke_input: vendor-app
+    notes:
+      - Pairs with qwen3-vl-2b-instruct_w8a8_rk3576.rkllm in the same directory.
+
+  taishan_rk3576_qwen3_vl_2b_llm:
+    kind: rkllm
+    platform: rk3576
+    workload: vision-language-llm
+    source: lckfb-taishanpi-ai-app
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/Qwen3-VL-2B-Instruct/2025-12-31/qwen3-vl-2b-instruct_w8a8_rk3576.rkllm
+    size_bytes: null
+    smoke_input: vendor-app
+    notes:
+      - Candidate for later RKLLM validation after basic RKNN smoke tests.
+
+  taishan_yolo11n_onnx:
+    kind: onnx
+    platform: portable
+    workload: object-detection
+    source: lckfb-taishanpi-ai-app
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/YOLO11/yolo11n.onnx
+    size_bytes: null
+    smoke_input: conversion-source
+    notes:
+      - Candidate source for later RK3588/RK3576 conversion pipeline.
+
+  taishan_yolov8n_onnx:
+    kind: onnx
+    platform: portable
+    workload: object-detection
+    source: lckfb-taishanpi-ai-app
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/YOLOv8/yolov8n.onnx
+    size_bytes: null
+    smoke_input: conversion-source
+    notes:
+      - Candidate source for later RK3588/RK3576 conversion pipeline.

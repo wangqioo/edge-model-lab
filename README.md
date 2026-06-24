@@ -10,11 +10,13 @@ The Mac at `/Users/wq` is the control machine. The boards are deployment targets
 
 ## Current Phase
 
-Phase 1 is project foundation:
+Phase 1 foundation is in place, and Phase 2 RK3588 baseline is underway:
 
 - Preserve device audit reports and raw logs.
 - Maintain a machine-readable device inventory.
 - Build a local `edgectl` command for listing and health-checking devices.
+- Register local vendor RKNN/RKLLM/ONNX assets without committing large model blobs.
+- Run minimum RKNN Lite smoke tests on target boards.
 - Keep passwords and secrets out of the project.
 
 ## Layout
@@ -37,7 +39,11 @@ Planned phase 1 interface:
 ./scripts/edgectl list
 ./scripts/edgectl health all
 ./scripts/edgectl health orange-rk3588
+./scripts/edgectl models --platform rk3588
+./scripts/edgectl rknn-smoke orange-rk3588 rk3588_mobilenet_v2_lite2
 ```
+
+`models/assets.yaml` stores metadata and local source paths for vendor assets. Large `.rknn`, `.rkllm`, `.onnx`, and `.pt` files stay in the original data directories.
 
 ## Security
 
