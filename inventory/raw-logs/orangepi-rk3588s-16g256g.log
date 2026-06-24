@@ -1,0 +1,1095 @@
+
+===== AUDIT_CONTEXT =====
+2026-06-25T01:04:14+08:00
+hostname=orangepi5plus
+user=uid=1000(orangepi) gid=1000(orangepi) groups=1000(orangepi),5(tty),6(disk),20(dialout),27(sudo),29(audio),44(video),46(plugdev),60(games),100(users),102(input),107(netdev),999(systemd-journal)
+pwd=/home/orangepi
+
+===== OS_RELEASE =====
+$ sh -c cat /etc/os-release 2>/dev/null || lsb_release -a 2>/dev/null || true
+PRETTY_NAME="Orange Pi 1.2.0 Bookworm"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+
+===== UNAME =====
+$ uname -a
+Linux orangepi5plus 6.1.43-rockchip-rk3588 #1.2.0 SMP Thu Nov 21 12:08:24 CST 2024 aarch64 GNU/Linux
+
+===== HOSTNAMECTL =====
+$ hostnamectl
+ Static hostname: orangepi5plus
+       Icon name: computer
+      Machine ID: 3088d9f90d3844708d0cfe3c7fb29725
+         Boot ID: 2dcffb8a42b04183b549c00ee6305ca0
+Operating System: Orange Pi 1.2.0 Bookworm
+          Kernel: Linux 6.1.43-rockchip-rk3588
+    Architecture: arm64
+
+===== UPTIME =====
+$ uptime
+ 01:04:14 up 2 days, 16 min,  2 users,  load average: 0.28, 0.22, 0.15
+
+===== KERNEL_CMDLINE =====
+$ sh -c cat /proc/cmdline 2>/dev/null
+root=UUID=4dc2e574-da3e-4e9a-a2ca-069f190e375c rootwait rootfstype=ext4 splash=verbose console=ttyS2,1500000 console=tty1 consoleblank=0 loglevel=1 ubootpart=1a4e21d5-2b41-a74a-aeeb-5d6f67e57c61 usb-storage.quirks= cma=128M  cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
+
+===== CPU_LSCPU =====
+$ lscpu
+Architecture:                    aarch64
+CPU op-mode(s):                  32-bit, 64-bit
+Byte Order:                      Little Endian
+CPU(s):                          8
+On-line CPU(s) list:             0-7
+Vendor ID:                       ARM
+Model name:                      Cortex-A55
+Model:                           0
+Thread(s) per core:              1
+Core(s) per socket:              4
+Socket(s):                       1
+Stepping:                        r2p0
+CPU(s) scaling MHz:              79%
+CPU max MHz:                     1800.0000
+CPU min MHz:                     408.0000
+BogoMIPS:                        48.00
+Flags:                           fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+Model name:                      Cortex-A76
+Model:                           0
+Thread(s) per core:              1
+Core(s) per socket:              4
+Socket(s):                       1
+Stepping:                        r4p0
+CPU(s) scaling MHz:              27%
+CPU max MHz:                     2256.0000
+CPU min MHz:                     408.0000
+BogoMIPS:                        48.00
+Flags:                           fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+L1d cache:                       384 KiB (8 instances)
+L1i cache:                       384 KiB (8 instances)
+L2 cache:                        2.5 MiB (8 instances)
+L3 cache:                        3 MiB (1 instance)
+Vulnerability Itlb multihit:     Not affected
+Vulnerability L1tf:              Not affected
+Vulnerability Mds:               Not affected
+Vulnerability Meltdown:          Not affected
+Vulnerability Mmio stale data:   Not affected
+Vulnerability Retbleed:          Not affected
+Vulnerability Spec store bypass: Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:        Mitigation; __user pointer sanitization
+Vulnerability Spectre v2:        Vulnerable: Unprivileged eBPF enabled
+Vulnerability Srbds:             Not affected
+Vulnerability Tsx async abort:   Not affected
+
+===== CPU_PROCINFO =====
+$ sh -c cat /proc/cpuinfo
+processor	: 0
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 1
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 2
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 3
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 4
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 0
+
+processor	: 5
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 0
+
+processor	: 6
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 0
+
+processor	: 7
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 0
+
+Serial		: a4c0ed1ed0cdb2fe
+
+===== CPU_FREQ =====
+$ sh -c for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_* /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_*; do [ -r "$f" ] && printf "%s=" "$f" && cat "$f"; done
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq=1416000
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq=1800000
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq=1008000
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq=1800000
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq=1800000
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq=1008000
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq=1008000
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq=1800000
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq=1008000
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_cur_freq=1008000
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq=1800000
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq=1008000
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 2208000 2256000 
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq=1200000
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq=2256000
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq=408000
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 2208000 2256000 
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_cur_freq=600000
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq=2256000
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_min_freq=408000
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 2208000 2256000 
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_cur_freq=600000
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_max_freq=2256000
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_min_freq=408000
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 2208000 2256000 
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_cur_freq=600000
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_max_freq=2256000
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq=408000
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq=1800000
+/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq=1800000
+/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_transition_latency=84000
+/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_cur_freq=1800000
+/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq=1800000
+/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_transition_latency=84000
+/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_cur_freq=1800000
+/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq=1800000
+/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_transition_latency=84000
+/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_cur_freq=1800000
+/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq=1800000
+/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_transition_latency=84000
+/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_cur_freq=600000
+/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq=2256000
+/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_transition_latency=324000
+/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_cur_freq=1200000
+/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq=2256000
+/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_transition_latency=324000
+/sys/devices/system/cpu/cpu6/cpufreq/cpuinfo_cur_freq=600000
+/sys/devices/system/cpu/cpu6/cpufreq/cpuinfo_max_freq=2256000
+/sys/devices/system/cpu/cpu6/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu6/cpufreq/cpuinfo_transition_latency=324000
+/sys/devices/system/cpu/cpu7/cpufreq/cpuinfo_cur_freq=600000
+/sys/devices/system/cpu/cpu7/cpufreq/cpuinfo_max_freq=2256000
+/sys/devices/system/cpu/cpu7/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu7/cpufreq/cpuinfo_transition_latency=324000
+
+===== CPU_GOVERNORS =====
+$ sh -c for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do [ -r "$f" ] && printf "%s=" "$f" && cat "$f"; done
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_governor=ondemand
+
+===== MEMORY =====
+$ sh -c free -h; printf "\n/proc/meminfo:\n"; cat /proc/meminfo
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       423Mi        14Gi        15Mi       653Mi        14Gi
+Swap:          7.7Gi          0B       7.7Gi
+
+/proc/meminfo:
+MemTotal:       16090328 kB
+MemFree:        15164740 kB
+MemAvailable:   15657068 kB
+Buffers:           52556 kB
+Cached:           535916 kB
+SwapCached:            0 kB
+Active:           282532 kB
+Inactive:         361396 kB
+Active(anon):       1272 kB
+Inactive(anon):    70480 kB
+Active(file):     281260 kB
+Inactive(file):   290916 kB
+Unevictable:       14400 kB
+Mlocked:               0 kB
+SwapTotal:       8045160 kB
+SwapFree:        8045160 kB
+Dirty:               268 kB
+Writeback:             0 kB
+AnonPages:         69904 kB
+Mapped:            84616 kB
+Shmem:             16296 kB
+KReclaimable:      80404 kB
+Slab:             139720 kB
+SReclaimable:      80404 kB
+SUnreclaim:        59316 kB
+KernelStack:        4160 kB
+PageTables:         2424 kB
+SecPageTables:         0 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:    16090324 kB
+Committed_AS:     470388 kB
+VmallocTotal:   259653632 kB
+VmallocUsed:       60152 kB
+VmallocChunk:          0 kB
+Percpu:             4096 kB
+CmaTotal:         131072 kB
+CmaAllocated:       9104 kB
+CmaReleased:      121968 kB
+CmaFree:          121968 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+Hugetlb:               0 kB
+
+===== SWAP =====
+$ swapon --show
+sh: 15: swapon: not found
+
+===== ZRAM =====
+$ sh -c zramctl 2>/dev/null || true; ls -la /sys/block/zram* 2>/dev/null || true
+lrwxrwxrwx 1 root root 0 Jan  1  2021 /sys/block/zram0 -> ../devices/virtual/block/zram0
+lrwxrwxrwx 1 root root 0 Nov 21  2024 /sys/block/zram1 -> ../devices/virtual/block/zram1
+
+===== BLOCK_DEVICES =====
+$ lsblk -a -o NAME,MAJ:MIN,RM,SIZE,RO,TYPE,FSTYPE,LABEL,MOUNTPOINTS,MODEL,SERIAL
+NAME         MAJ:MIN RM   SIZE RO TYPE FSTYPE LABEL    MOUNTPOINTS  MODEL SERIAL
+ram0           1:0    0     4M  0 disk                                    
+loop0          7:0    0     0B  0 loop                                    
+loop1          7:1    0     0B  0 loop                                    
+loop2          7:2    0     0B  0 loop                                    
+loop3          7:3    0     0B  0 loop                                    
+loop4          7:4    0     0B  0 loop                                    
+loop5          7:5    0     0B  0 loop                                    
+loop6          7:6    0     0B  0 loop                                    
+loop7          7:7    0     0B  0 loop                                    
+mtdblock0     31:0    0    16M  0 disk                                    
+mmcblk0      179:0    0   233G  0 disk                                    0x296136f3
+├─mmcblk0p1  179:1    0     1G  0 part vfat   opi_boot /boot              
+└─mmcblk0p2  179:2    0 229.6G  0 part ext4   opi_root /var/log.hdd       
+                                                       /                  
+mmcblk0boot0 179:32   0     4M  1 disk                                    
+mmcblk0boot1 179:64   0     4M  1 disk                                    
+zram0        254:0    0   7.7G  0 disk                 [SWAP]             
+zram1        254:1    0   200M  0 disk                 /var/log           
+
+===== FILESYSTEMS =====
+$ df -hT
+Filesystem     Type      Size  Used Avail Use% Mounted on
+udev           devtmpfs  7.7G  8.0K  7.7G   1% /dev
+tmpfs          tmpfs     1.6G  1.9M  1.6G   1% /run
+/dev/mmcblk0p2 ext4      226G  2.3G  222G   2% /
+tmpfs          tmpfs     7.7G     0  7.7G   0% /dev/shm
+tmpfs          tmpfs     5.0M   24K  5.0M   1% /run/lock
+tmpfs          tmpfs     7.7G   20K  7.7G   1% /tmp
+/dev/mmcblk0p1 vfat     1022M  107M  916M  11% /boot
+/dev/zram1     ext4      188M   32M  142M  19% /var/log
+tmpfs          tmpfs     1.6G     0  1.6G   0% /run/user/1000
+
+===== MOUNTS =====
+$ findmnt
+TARGET                                                  SOURCE                   FSTYPE     OPTIONS
+/                                                       /dev/mmcblk0p2           ext4       rw,noatime,errors=remount-ro,commit=600
+├─/sys                                                  sysfs                    sysfs      rw,nosuid,nodev,noexec,relatime
+│ ├─/sys/kernel/security                                securityfs               securityfs rw,nosuid,nodev,noexec,relatime
+│ ├─/sys/fs/cgroup                                      cgroup2                  cgroup2    rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot
+│ ├─/sys/fs/pstore                                      pstore                   pstore     rw,nosuid,nodev,noexec,relatime
+│ ├─/sys/fs/bpf                                         bpf                      bpf        rw,nosuid,nodev,noexec,relatime,mode=700
+│ ├─/sys/kernel/debug                                   debugfs                  debugfs    rw,nosuid,nodev,noexec,relatime
+│ │ └─/sys/kernel/debug/tracing                         tracefs                  tracefs    rw,nosuid,nodev,noexec,relatime
+│ ├─/sys/kernel/tracing                                 tracefs                  tracefs    rw,nosuid,nodev,noexec,relatime
+│ ├─/sys/kernel/config                                  configfs                 configfs   rw,nosuid,nodev,noexec,relatime
+│ └─/sys/fs/fuse/connections                            fusectl                  fusectl    rw,nosuid,nodev,noexec,relatime
+├─/proc                                                 proc                     proc       rw,nosuid,nodev,noexec,relatime
+├─/dev                                                  udev                     devtmpfs   rw,nosuid,relatime,size=7971596k,nr_inodes=1992899,mode=755
+│ ├─/dev/pts                                            devpts                   devpts     rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000
+│ ├─/dev/shm                                            tmpfs                    tmpfs      rw,nosuid,nodev
+│ ├─/dev/hugepages                                      hugetlbfs                hugetlbfs  rw,relatime,pagesize=2M
+│ ├─/dev/mqueue                                         mqueue                   mqueue     rw,nosuid,nodev,noexec,relatime
+│ └─/dev/usb-ffs/adb                                    adb                      functionfs rw,relatime
+├─/run                                                  tmpfs                    tmpfs      rw,nosuid,nodev,noexec,relatime,size=1609036k,mode=755
+│ ├─/run/lock                                           tmpfs                    tmpfs      rw,nosuid,nodev,noexec,relatime,size=5120k
+│ ├─/run/credentials/systemd-sysctl.service             ramfs                    ramfs      ro,nosuid,nodev,noexec,relatime,mode=700
+│ ├─/run/credentials/systemd-sysusers.service           ramfs                    ramfs      ro,nosuid,nodev,noexec,relatime,mode=700
+│ ├─/run/credentials/systemd-tmpfiles-setup-dev.service ramfs                    ramfs      ro,nosuid,nodev,noexec,relatime,mode=700
+│ ├─/run/rpc_pipefs                                     sunrpc                   rpc_pipefs rw,relatime
+│ ├─/run/credentials/systemd-tmpfiles-setup.service     ramfs                    ramfs      ro,nosuid,nodev,noexec,relatime,mode=700
+│ └─/run/user/1000                                      tmpfs                    tmpfs      rw,nosuid,nodev,relatime,size=1609032k,nr_inodes=402258,mode=700,uid=1000,gid=1000
+├─/tmp                                                  tmpfs                    tmpfs      rw,nosuid,relatime
+├─/boot                                                 /dev/mmcblk0p1           vfat       rw,relatime,fmask=0022,dmask=0022,codepage=936,iocharset=utf8,shortname=mixed,errors=remount-ro
+├─/var/log.hdd                                          /dev/mmcblk0p2[/var/log] ext4       rw,noatime,errors=remount-ro,commit=600
+└─/var/log                                              /dev/zram1               ext4       rw,relatime,discard
+
+===== MMC =====
+$ sh -c for f in /sys/block/mmcblk*/device/{name,type,cid,csd,date,fwrev,hwrev,manfid,oemid,serial}; do [ -r "$f" ] && printf "%s=" "$f" && cat "$f"; done
+
+===== NVME =====
+$ sh -c command -v nvme >/dev/null && nvme list || true
+
+===== USB =====
+$ sh -c lsusb -t 2>/dev/null; printf "\n"; lsusb 2>/dev/null
+/:  Bus 08.Port 1: Dev 1, Class=root_hub, Driver=xhci-hcd/1p, 5000M
+/:  Bus 07.Port 1: Dev 1, Class=root_hub, Driver=xhci-hcd/1p, 480M
+/:  Bus 06.Port 1: Dev 1, Class=root_hub, Driver=ehci-platform/1p, 480M
+/:  Bus 05.Port 1: Dev 1, Class=root_hub, Driver=ohci-platform/1p, 12M
+/:  Bus 04.Port 1: Dev 1, Class=root_hub, Driver=ohci-platform/1p, 12M
+/:  Bus 03.Port 1: Dev 1, Class=root_hub, Driver=ehci-platform/1p, 480M
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=xhci-hcd/1p, 5000M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=xhci-hcd/1p, 480M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M
+        |__ Port 1: Dev 3, If 0, Class=Wireless, Driver=btusb, 12M
+        |__ Port 1: Dev 3, If 1, Class=Wireless, Driver=btusb, 12M
+
+Bus 002 Device 002: ID 05e3:0620 Genesys Logic, Inc. GL3523 Hub
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 003: ID 0bda:b85b Realtek Semiconductor Corp. Bluetooth Radio
+Bus 001 Device 002: ID 05e3:0610 Genesys Logic, Inc. Hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 008 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 007 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 005 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 006 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 004 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+===== PCI =====
+$ sh -c lspci -nn 2>/dev/null || true
+0002:20:00.0 PCI bridge [0604]: Rockchip Electronics Co., Ltd RK3588 [1d87:3588] (rev 01)
+0002:21:00.0 Network controller [0280]: Realtek Semiconductor Co., Ltd. RTL8852BE PCIe 802.11ax Wireless Network Controller [10ec:b852]
+0003:30:00.0 PCI bridge [0604]: Rockchip Electronics Co., Ltd RK3588 [1d87:3588] (rev 01)
+0003:31:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8125 2.5GbE Controller [10ec:8125] (rev 05)
+0004:40:00.0 PCI bridge [0604]: Rockchip Electronics Co., Ltd RK3588 [1d87:3588] (rev 01)
+0004:41:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8125 2.5GbE Controller [10ec:8125] (rev 05)
+
+===== I2C_SPI_GPIO_DEVICES =====
+$ sh -c ls -la /dev/i2c* /dev/spidev* /dev/gpiochip* 2>/dev/null || true
+crw------- 1 root root 254,  0 Nov 21  2024 /dev/gpiochip0
+crw------- 1 root root 254,  1 Nov 21  2024 /dev/gpiochip1
+crw------- 1 root root 254,  2 Nov 21  2024 /dev/gpiochip2
+crw------- 1 root root 254,  3 Nov 21  2024 /dev/gpiochip3
+crw------- 1 root root 254,  4 Nov 21  2024 /dev/gpiochip4
+crw------- 1 root root 254,  5 Nov 21  2024 /dev/gpiochip5
+crw-rw---- 1 root i2c   89,  0 Nov 21  2024 /dev/i2c-0
+crw-rw---- 1 root i2c   89,  1 Nov 21  2024 /dev/i2c-1
+crw-rw---- 1 root i2c   89, 10 Nov 21  2024 /dev/i2c-10
+crw-rw---- 1 root i2c   89, 11 Nov 21  2024 /dev/i2c-11
+crw-rw---- 1 root i2c   89,  3 Nov 21  2024 /dev/i2c-3
+crw-rw---- 1 root i2c   89,  6 Nov 21  2024 /dev/i2c-6
+crw-rw---- 1 root i2c   89,  7 Nov 21  2024 /dev/i2c-7
+crw-rw---- 1 root i2c   89,  9 Nov 21  2024 /dev/i2c-9
+
+===== VIDEO_AUDIO_DEVICES =====
+$ sh -c ls -la /dev/video* /dev/media* /dev/dri* /dev/snd* 2>/dev/null || true
+-rw-rw---- 1 root video  71 Nov 21  2024 /dev/video-dec0
+-rw-rw---- 1 root video   4 Nov 21  2024 /dev/video-enc0
+
+/dev/dri:
+total 0
+drwxr-xr-x   2 root root        120 Jan  1  2021 .
+drwxr-xr-x  16 root root       3880 Jun 23 01:11 ..
+crw-rw----+  1 root video  226,   0 Jun 23 00:53 card0
+crw-rw----+  1 root video  226,   1 Nov 21  2024 card1
+crw-rw----+  1 root render 226, 128 Nov 21  2024 renderD128
+crw-rw----+  1 root render 226, 129 Nov 21  2024 renderD129
+
+/dev/snd:
+total 0
+drwxr-xr-x   3 root root      280 Jun 23 01:11 .
+drwxr-xr-x  16 root root     3880 Jun 23 01:11 ..
+drwxr-xr-x   2 root root      120 Jun 23 01:11 by-path
+crw-rw----+  1 root audio 116,  3 Nov 21  2024 controlC0
+crw-rw----+  1 root audio 116,  5 Nov 21  2024 controlC1
+crw-rw----+  1 root audio 116,  7 Nov 21  2024 controlC2
+crw-rw----+  1 root audio 116, 10 Nov 21  2024 controlC3
+crw-rw----+  1 root audio 116,  2 Nov 21  2024 pcmC0D0p
+crw-rw----+  1 root audio 116,  4 Nov 21  2024 pcmC1D0p
+crw-rw----+  1 root audio 116,  6 Nov 21  2024 pcmC2D0p
+crw-rw----+  1 root audio 116,  9 Nov 21  2024 pcmC3D0c
+crw-rw----+  1 root audio 116,  8 Nov 21  2024 pcmC3D0p
+crw-rw----+  1 root audio 116,  1 Nov 21  2024 seq
+crw-rw----+  1 root audio 116, 33 Nov 21  2024 timer
+
+===== ACCELERATOR_DEVICES =====
+$ sh -c ls -la /dev/rknn* /dev/dma_heap* /dev/mali* /dev/galcore* /dev/npu* /dev/vpu* /dev/hevc* /dev/rga* /dev/ion* /dev/ump* 2>/dev/null || true
+crw-rw---- 1 root video 10, 122 Nov 21  2024 /dev/mali0
+crw-rw---- 1 root video 10, 124 Nov 21  2024 /dev/rga
+
+/dev/dma_heap:
+total 0
+drwxr-xr-x  2 root root      80 Jan  1  1970 .
+drwxr-xr-x 16 root root    3880 Jun 23 01:11 ..
+crw-------  1 root root  251, 1 Nov 21  2024 reserved
+crw-rw----  1 root video 251, 0 Nov 21  2024 system
+
+===== RK_SYSFS =====
+$ sh -c find /sys -maxdepth 4 \( -iname "*npu*" -o -iname "*rknpu*" -o -iname "*mali*" -o -iname "*rga*" -o -iname "*vpu*" -o -iname "*hevc*" \) 2>/dev/null | head -200
+/sys/kernel/slab/va-region-slab-mali0
+/sys/class/devlink/platform:fdb60f00.iommu--platform:fdb60000.rga
+/sys/class/devlink/platform:fd8d8000.power-management:power-controller--platform:fdb70000.rga
+/sys/class/devlink/platform:fdb70f00.iommu--platform:fdb70000.rga
+/sys/class/devlink/i2c:1-0042--platform:fdab0000.npu
+/sys/class/devlink/platform:fd8d8000.power-management:power-controller--platform:fdb60000.rga
+/sys/class/devlink/platform:firmware:scmi--platform:fdab0000.npu
+/sys/class/devlink/platform:fd8d8000.power-management:power-controller--platform:fdb80000.rga
+/sys/class/devlink/platform:fdab9000.iommu--platform:fdab0000.npu
+/sys/class/devlink/regulator:regulator.39--platform:fdab0000.npu
+/sys/class/devlink/platform:fd8d8000.power-management:power-controller--platform:fdab0000.npu
+/sys/class/misc/mali0
+/sys/class/misc/uinput
+/sys/class/misc/rga
+/sys/class/devfreq/fdab0000.npu
+/sys/class/input
+/sys/class/input/input7
+/sys/class/input/input5
+/sys/class/input/input3
+/sys/class/input/input1
+/sys/class/input/input6
+/sys/class/input/input4
+/sys/class/input/input2
+/sys/class/input/input0
+/sys/devices/platform/fdab0000.npu
+/sys/devices/platform/rknpu_dev.14.auto
+/sys/devices/platform/fdb70000.rga
+/sys/devices/platform/adc-keys/input
+/sys/devices/platform/febf0030.pwm/input
+/sys/devices/platform/fdb60f00.iommu/consumer:platform:fdb60000.rga
+/sys/devices/platform/fdb60000.rga
+/sys/devices/platform/fdb80000.rga
+/sys/devices/platform/firmware:scmi/consumer:platform:fdab0000.npu
+/sys/devices/platform/es8388-sound/input
+/sys/devices/platform/fdab9000.iommu/consumer:platform:fdab0000.npu
+/sys/devices/platform/fdb70f00.iommu/consumer:platform:fdb70000.rga
+/sys/devices/genpd:0:fdab0000.npu
+/sys/devices/virtual/devlink/platform:fdb60f00.iommu--platform:fdb60000.rga
+/sys/devices/virtual/devlink/platform:fd8d8000.power-management:power-controller--platform:fdb70000.rga
+/sys/devices/virtual/devlink/platform:fdb70f00.iommu--platform:fdb70000.rga
+/sys/devices/virtual/devlink/i2c:1-0042--platform:fdab0000.npu
+/sys/devices/virtual/devlink/platform:fd8d8000.power-management:power-controller--platform:fdb60000.rga
+/sys/devices/virtual/devlink/platform:firmware:scmi--platform:fdab0000.npu
+/sys/devices/virtual/devlink/platform:fd8d8000.power-management:power-controller--platform:fdb80000.rga
+/sys/devices/virtual/devlink/platform:fdab9000.iommu--platform:fdab0000.npu
+/sys/devices/virtual/devlink/regulator:regulator.39--platform:fdab0000.npu
+/sys/devices/virtual/devlink/platform:fd8d8000.power-management:power-controller--platform:fdab0000.npu
+/sys/devices/virtual/misc/uinput
+/sys/devices/virtual/misc/rga
+/sys/devices/genpd:1:fdab0000.npu
+/sys/devices/genpd:2:fdab0000.npu
+/sys/bus/platform/devices/fdab0000.npu
+/sys/bus/platform/devices/rknpu_dev.14.auto
+/sys/bus/platform/devices/fdb70000.rga
+/sys/bus/platform/devices/fdb60000.rga
+/sys/bus/platform/devices/fdb80000.rga
+/sys/bus/platform/drivers/mali-utgard
+/sys/bus/platform/drivers/mali
+/sys/bus/platform/drivers/rockchip-rga
+/sys/bus/platform/drivers/rga3_core0
+/sys/bus/platform/drivers/rga2
+/sys/bus/platform/drivers/RKNPU
+/sys/bus/platform/drivers/rga3_core1
+/sys/bus/genpd/devices/genpd:0:fdab0000.npu
+/sys/bus/genpd/devices/genpd:1:fdab0000.npu
+/sys/bus/genpd/devices/genpd:2:fdab0000.npu
+/sys/firmware/devicetree/base/rga@fdb70000
+/sys/firmware/devicetree/base/rga@fdb80000
+/sys/firmware/devicetree/base/npu-opp-table
+/sys/firmware/devicetree/base/rga@fdb60000
+/sys/firmware/devicetree/base/npu@fdab0000
+/sys/module/snd_seq_midi/parameters/input_buffer_size
+/sys/module/mali
+/sys/module/mali/parameters/mali_dedicated_mem_size
+/sys/module/mali/parameters/mali_max_job_runtime
+/sys/module/mali/parameters/mali_max_pp_cores_group_1
+/sys/module/mali/parameters/mali_mem_swap_out_threshold_value
+/sys/module/mali/parameters/mali_debug_level
+/sys/module/mali/parameters/mali_l2_max_reads
+/sys/module/mali/parameters/mali_dedicated_mem_start
+/sys/module/mali/parameters/mali_shared_mem_size
+/sys/module/mali/parameters/mali_max_pp_cores_group_2
+/sys/module/rockchip_rga
+/sys/module/rknpu
+
+===== DEVICE_TREE_MODEL =====
+$ sh -c tr "\0" "\n" </proc/device-tree/model 2>/dev/null; printf "\ncompatible:\n"; tr "\0" "\n" </proc/device-tree/compatible 2>/dev/null
+RK3588 OPi 5 Plus
+
+compatible:
+rockchip,rk3588-orangepi-5-plus
+rockchip,rk3588
+
+===== THERMAL =====
+$ sh -c for z in /sys/class/thermal/thermal_zone*; do [ -d "$z" ] || continue; printf "%s " "$z"; [ -r "$z/type" ] && printf "type=%s " "$(cat "$z/type")"; [ -r "$z/temp" ] && awk "{printf \"temp_c=%.1f\", \$1/1000}" "$z/temp"; printf "\n"; done
+/sys/class/thermal/thermal_zone0 type=soc-thermal temp_c=35.2
+/sys/class/thermal/thermal_zone1 type=bigcore0-thermal temp_c=36.1
+/sys/class/thermal/thermal_zone2 type=bigcore1-thermal temp_c=36.1
+/sys/class/thermal/thermal_zone3 type=littlecore-thermal temp_c=36.1
+/sys/class/thermal/thermal_zone4 type=center-thermal temp_c=35.2
+/sys/class/thermal/thermal_zone5 type=gpu-thermal temp_c=35.2
+/sys/class/thermal/thermal_zone6 type=npu-thermal temp_c=35.2
+
+===== POWER_SUPPLY =====
+$ sh -c for d in /sys/class/power_supply/*; do [ -d "$d" ] || continue; echo "--- $d"; for f in "$d"/*; do [ -f "$f" ] && [ -r "$f" ] && printf "%s=%s\n" "$(basename "$f")" "$(cat "$f" 2>/dev/null)"; done; done
+--- /sys/class/power_supply/tcpm-source-psy-6-0022
+current_max=0
+current_now=0
+online=0
+type=USB
+uevent=POWER_SUPPLY_NAME=tcpm-source-psy-6-0022
+POWER_SUPPLY_TYPE=USB
+POWER_SUPPLY_USB_TYPE=[C] PD PD_PPS
+POWER_SUPPLY_ONLINE=0
+POWER_SUPPLY_VOLTAGE_MIN=0
+POWER_SUPPLY_VOLTAGE_MAX=0
+POWER_SUPPLY_VOLTAGE_NOW=0
+POWER_SUPPLY_CURRENT_MAX=0
+POWER_SUPPLY_CURRENT_NOW=0
+usb_type=[C] PD PD_PPS
+voltage_max=0
+voltage_min=0
+voltage_now=0
+
+===== NETWORK_INTERFACES =====
+$ ip -details address
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00 promiscuity 0  allmulti 0 minmtu 0 maxmtu 0 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 524280 tso_max_segs 65535 gro_max_size 65536 
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: enP3p49s0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether c0:74:2b:ff:2d:36 brd ff:ff:ff:ff:ff:ff promiscuity 0  allmulti 0 minmtu 68 maxmtu 9194 numtxqueues 1 numrxqueues 1 gso_max_size 64000 gso_max_segs 64 tso_max_size 64000 tso_max_segs 64 gro_max_size 65536 parentbus pci parentdev 0003:31:00.0 
+3: enP4p65s0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether c0:74:2b:ff:2d:37 brd ff:ff:ff:ff:ff:ff promiscuity 0  allmulti 0 minmtu 68 maxmtu 9194 numtxqueues 1 numrxqueues 1 gso_max_size 64000 gso_max_segs 64 tso_max_size 64000 tso_max_segs 64 gro_max_size 65536 parentbus pci parentdev 0004:41:00.0 
+4: wlP2p33s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 1c:79:2d:aa:d2:ff brd ff:ff:ff:ff:ff:ff promiscuity 0  allmulti 0 minmtu 256 maxmtu 2304 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 parentbus pci parentdev 0002:21:00.0 
+    inet 192.168.1.52/24 brd 192.168.1.255 scope global dynamic noprefixroute wlP2p33s0
+       valid_lft 85624sec preferred_lft 85624sec
+    inet6 2408:820c:8faf:b670:df4b:a555:204f:8658/64 scope global dynamic noprefixroute 
+       valid_lft 258850sec preferred_lft 172450sec
+    inet6 fe80::57ac:bfa7:d400:5782/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+
+===== NETWORK_ROUTES =====
+$ ip route
+default via 192.168.1.1 dev wlP2p33s0 proto dhcp src 192.168.1.52 metric 600 
+192.168.1.0/24 dev wlP2p33s0 proto kernel scope link src 192.168.1.52 metric 600 
+
+===== NETWORK_LINKS =====
+$ sh -c for i in /sys/class/net/*; do [ -d "$i" ] || continue; n=$(basename "$i"); printf "%s: " "$n"; [ -r "$i/operstate" ] && printf "state=%s " "$(cat "$i/operstate")"; [ -r "$i/speed" ] && printf "speed=%sMbps " "$(cat "$i/speed" 2>/dev/null)"; [ -r "$i/duplex" ] && printf "duplex=%s " "$(cat "$i/duplex" 2>/dev/null)"; [ -r "$i/address" ] && printf "mac=%s" "$(cat "$i/address")"; printf "\n"; done
+enP3p49s0: state=down speed=-1Mbps duplex=unknown mac=c0:74:2b:ff:2d:36
+enP4p65s0: state=down speed=-1Mbps duplex=unknown mac=c0:74:2b:ff:2d:37
+lo: state=unknown speed=Mbps duplex= mac=00:00:00:00:00:00
+wlP2p33s0: state=up speed=Mbps duplex= mac=1c:79:2d:aa:d2:ff
+
+===== LISTENING_PORTS =====
+$ sh -c ss -tulpn 2>/dev/null || netstat -tulpn 2>/dev/null || true
+Netid State  Recv-Q Send-Q               Local Address:Port Peer Address:PortProcess
+udp   UNCONN 0      0                          0.0.0.0:53        0.0.0.0:*          
+udp   UNCONN 0      0                          0.0.0.0:111       0.0.0.0:*          
+udp   UNCONN 0      0                        127.0.0.1:323       0.0.0.0:*          
+udp   UNCONN 0      0                                *:53              *:*          
+udp   UNCONN 0      0                                *:111             *:*          
+udp   UNCONN 0      0                            [::1]:323             *:*          
+udp   UNCONN 0      0      [fe80::57ac:bfa7:d400:5782]:546             *:*          
+tcp   LISTEN 0      0                          0.0.0.0:5555      0.0.0.0:*          
+tcp   LISTEN 0      0                        127.0.0.1:5037      0.0.0.0:*          
+tcp   LISTEN 0      0                          0.0.0.0:111       0.0.0.0:*          
+tcp   LISTEN 0      0                          0.0.0.0:22        0.0.0.0:*          
+tcp   LISTEN 0      0                          0.0.0.0:53        0.0.0.0:*          
+tcp   LISTEN 0      0                                *:111             *:*          
+tcp   LISTEN 0      0                                *:22              *:*          
+tcp   LISTEN 0      0                                *:53              *:*          
+
+===== SYSTEMD =====
+$ sh -c systemctl --version 2>/dev/null; printf "\nfailed units:\n"; systemctl --failed --no-pager 2>/dev/null; printf "\nrunning services sample:\n"; systemctl list-units --type=service --state=running --no-pager 2>/dev/null | head -120
+systemd 252 (252.31-1~deb12u1)
++PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified
+
+failed units:
+  UNIT                  LOAD   ACTIVE SUB    DESCRIPTION
+● smartmontools.service loaded failed failed Self Monitoring and Reporting Technology (SMART) Daemon
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+1 loaded units listed.
+
+running services sample:
+  UNIT                         LOAD   ACTIVE SUB     DESCRIPTION
+  bluetooth.service            loaded active running Bluetooth service
+  chrony.service               loaded active running chrony, an NTP client/server
+  containerd.service           loaded active running containerd container runtime
+  cron.service                 loaded active running Regular background program processing daemon
+  dbus.service                 loaded active running D-Bus System Message Bus
+  dnsmasq.service              loaded active running dnsmasq - A lightweight DHCP and caching DNS server
+  frpc.service                 loaded active running FRP Client
+  getty@tty1.service           loaded active running Getty on tty1
+  haveged.service              loaded active running Entropy Daemon based on the HAVEGE algorithm
+  NetworkManager.service       loaded active running Network Manager
+  polkit.service               loaded active running Authorization Manager
+  rpcbind.service              loaded active running RPC bind portmap service
+  rsyslog.service              loaded active running System Logging Service
+  serial-getty@ttyFIQ0.service loaded active running Serial Getty on ttyFIQ0
+  ssh.service                  loaded active running OpenBSD Secure Shell server
+  systemd-hostnamed.service    loaded active running Hostname Service
+  systemd-journald.service     loaded active running Journal Service
+  systemd-logind.service       loaded active running User Login Management
+  systemd-udevd.service        loaded active running Rule-based Manager for Device Events and Files
+  unattended-upgrades.service  loaded active running Unattended Upgrades Shutdown
+  usbdevice.service            loaded active running Manage USB device functions
+  user@1000.service            loaded active running User Manager for UID 1000
+  vnstat.service               loaded active running vnStat network traffic monitor
+  wpa_supplicant.service       loaded active running WPA supplicant
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+24 loaded units listed.
+
+===== PROCESSES_TOP =====
+$ sh -c ps aux --sort=-%mem | head -30; printf "\nCPU sorted:\n"; ps aux --sort=-%cpu | head -30
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root        1706  0.1  0.2 2081976 37440 ?       Ssl  Jun23   5:10 /usr/bin/containerd
+root        1696  0.0  0.1 112004 21064 ?        Ssl  Jun23   0:00 /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal
+root        1621  0.0  0.1 262544 19500 ?        Ssl  Jun23   1:24 /usr/sbin/NetworkManager --no-daemon
+root        6689  0.1  0.1 1242040 18764 ?       Ssl  Jun23   4:09 /usr/local/bin/frpc -c /opt/frp/frpc.toml
+root           1  0.0  0.0 170028 13064 ?        Ss   Jun23   1:12 /sbin/init
+root        1623  0.0  0.0  17172 10584 ?        Ss   Jun23   0:03 /sbin/wpa_supplicant -u -s -O DIR=/run/wpa_supplicant GROUP=netdev
+orangepi    2625  0.0  0.0  19432 10172 ?        Ss   Jun23   0:00 /lib/systemd/systemd --user
+root      397842  5.9  0.0  19328  9900 ?        Ss   01:04   0:00 sshd: orangepi [priv]
+root        2346  0.0  0.0  16328  8688 ?        Ss   Jun23   0:10 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+root         967  0.0  0.0  49872  8516 ?        Ss   Jun23   0:57 /lib/systemd/systemd-journald
+root        1605  0.0  0.0  50132  7460 ?        Ss   Jun23   0:33 /lib/systemd/systemd-logind
+polkitd    86463  0.0  0.0 235312  7132 ?        Ssl  Jun23   0:11 /usr/lib/polkit-1/polkitd --no-debug
+root      397982  4.8  0.0  16640  6824 ?        Ss   01:04   0:00 /lib/systemd/systemd-hostnamed
+root         416  0.0  0.0  24780  6456 ?        Ss   Jun23   0:00 /lib/systemd/systemd-udevd
+orangepi  397972  2.7  0.0  19588  6396 ?        S    01:04   0:00 sshd: orangepi@notty
+root        1568  0.0  0.0  13260  5820 ?        Ss   Jun23   0:00 /usr/libexec/bluetooth/bluetoothd
+orangepi    2641  0.0  0.0   8248  5104 tty1     S+   Jun23   0:00 -bash
+orangepi    2642  0.0  0.0   8116  4812 ttyFIQ0  S+   Jun23   0:00 -bash
+orangepi    2626  0.0  0.0 171656  4712 ?        S    Jun23   0:00 (sd-pam)
+root         973  0.0  0.0   8100  4672 ?        Ss   Jun23   0:07 /usr/sbin/haveged --Foreground --verbose=1
+root        1591  0.0  0.0 222120  4360 ?        Ssl  Jun23   0:10 /usr/sbin/rsyslogd -n -iNONE
+message+    1574  0.0  0.0   8644  4100 ?        Ss   Jun23   1:33 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+orangepi  398191  300  0.0  11416  3900 ?        R    01:04   0:00 ps aux --sort=-%mem
+root        2373  0.0  0.0  10360  3572 ttyFIQ0  Ss   Jun23   0:00 /bin/login -f
+vnstat      1699  0.0  0.0   4716  3292 ?        Ss   Jun23   1:03 /usr/sbin/vnstatd -n
+root        2372  0.0  0.0   7352  3164 tty1     Ss   Jun23   0:00 /bin/login -f
+_chrony     1719  0.0  0.0  11108  3076 ?        S    Jun23   0:00 /usr/sbin/chronyd -F 1
+_chrony     1703  0.0  0.0  19300  2980 ?        S    Jun23   0:00 /usr/sbin/chronyd -F 1
+root        1571  0.0  0.0   6688  2548 ?        Ss   Jun23   0:01 /usr/sbin/cron -f
+
+CPU sorted:
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+orangepi  398193  200  0.0  11416  3908 ?        R    01:04   0:00 ps aux --sort=-%cpu
+root      397842  5.8  0.0  19328  9900 ?        Ss   01:04   0:00 sshd: orangepi [priv]
+root         516  4.8  0.0      0     0 ?        S    Jun23 140:55 [irq/171-rtw89_pci]
+root      397982  4.5  0.0  16640  6824 ?        Ss   01:04   0:00 /lib/systemd/systemd-hostnamed
+orangepi  397972  2.7  0.0  19588  6396 ?        S    01:04   0:00 sshd: orangepi@notty
+orangepi  397973  1.6  0.0   2316   816 ?        Ss   01:04   0:00 sh -s
+root      394454  0.2  0.0      0     0 ?        I    00:52   0:01 [kworker/5:0-events]
+root      387968  0.1  0.0      0     0 ?        I    00:05   0:06 [kworker/5:3-pm]
+root        1706  0.1  0.2 2081976 37440 ?       Ssl  Jun23   5:10 /usr/bin/containerd
+root        6689  0.1  0.1 1242040 18764 ?       Ssl  Jun23   4:09 /usr/local/bin/frpc -c /opt/frp/frpc.toml
+root      394451  0.1  0.0      0     0 ?        I    00:51   0:00 [kworker/6:0-events_freezable]
+root      395539  0.0  0.0      0     0 ?        I    00:58   0:00 [kworker/u16:3-devfreq_wq]
+root      392104  0.0  0.0      0     0 ?        I    00:35   0:01 [kworker/6:4-pm]
+root      392791  0.0  0.0      0     0 ?        I    00:40   0:01 [kworker/u16:4-events_freezable_power_]
+root      391271  0.0  0.0      0     0 ?        I    00:28   0:01 [kworker/u16:0-devfreq_wq]
+root      396781  0.0  0.0      0     0 ?        I    01:03   0:00 [kworker/3:0-events]
+root      385800  0.0  0.0      0     0 ?        I    Jun24   0:02 [kworker/u16:2-devfreq_wq]
+message+    1574  0.0  0.0   8644  4100 ?        Ss   Jun23   1:33 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+root        1621  0.0  0.1 262544 19500 ?        Ssl  Jun23   1:24 /usr/sbin/NetworkManager --no-daemon
+root           1  0.0  0.0 170028 13064 ?        Ss   Jun23   1:12 /sbin/init
+root      394591  0.0  0.0      0     0 ?        I    00:52   0:00 [kworker/0:1-events]
+root      397288  0.0  0.0      0     0 ?        I<   01:03   0:00 [kworker/u17:0-rtw89_tx_wq]
+vnstat      1699  0.0  0.0   4716  3292 ?        Ss   Jun23   1:03 /usr/sbin/vnstatd -n
+root         967  0.0  0.0  49872  8516 ?        Ss   Jun23   0:57 /lib/systemd/systemd-journald
+root      394871  0.0  0.0      0     0 ?        I    00:55   0:00 [kworker/0:3-pm]
+root      396477  0.0  0.0      0     0 ?        I    01:01   0:00 [kworker/1:3-events]
+root      392239  0.0  0.0      0     0 ?        I    00:35   0:00 [kworker/7:1-mm_percpu_wq]
+root        1605  0.0  0.0  50132  7460 ?        Ss   Jun23   0:33 /lib/systemd/systemd-logind
+root      393906  0.0  0.0      0     0 ?        I    00:47   0:00 [kworker/0:0-pm]
+
+===== DMESG_ERRORS =====
+$ sh -c dmesg -T 2>/dev/null | egrep -i "error|fail|warn|npu|rknn|mali|rga|vpu|thermal|thrott|oom" | tail -200 || true
+[Wed Jun 24 21:38:04 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 21:38:04 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 21:38:08 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 21:38:08 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 21:38:08 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 21:38:32 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 21:38:32 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 21:38:32 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 21:40:44 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 21:40:44 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 21:40:44 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 21:41:05 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 21:41:05 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 21:41:05 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 21:41:11 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 21:41:11 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 21:41:11 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 21:43:32 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 21:43:32 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 21:43:32 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 21:50:42 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 21:50:42 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 21:50:42 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:03:15 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:03:15 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:03:15 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:03:40 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:03:40 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:03:40 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:06:38 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:06:38 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:06:38 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:06:46 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:06:46 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:06:46 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:11:01 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:11:01 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:11:01 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:12:46 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:12:46 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:12:46 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:17:17 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:17:17 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:17:17 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:23:09 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:23:09 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:23:09 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:27:02 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:27:02 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:27:02 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:31:42 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:31:42 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:31:42 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:57:55 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:57:55 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:57:55 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 22:58:36 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 22:58:36 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 22:58:36 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:06:43 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:06:43 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:06:43 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:09:44 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:09:44 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:09:44 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:20:55 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:20:55 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:20:55 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:23:53 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:23:53 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:23:53 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:25:30 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:25:30 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:25:30 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:25:38 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:25:38 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:25:38 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:25:43 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:25:43 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:25:43 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:25:52 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:25:52 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:25:52 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:26:41 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:26:41 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:26:41 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:27:08 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:27:08 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:27:08 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:30:22 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:30:22 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:30:22 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:32:29 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:32:29 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:32:29 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:35:45 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:35:45 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:35:45 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:35:50 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:35:50 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:35:50 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:39:24 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:39:24 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:39:24 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:49:23 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:49:23 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:49:23 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Wed Jun 24 23:54:33 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Wed Jun 24 23:54:33 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Wed Jun 24 23:54:33 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Thu Jun 25 00:00:16 2026] systemd-journald[967]: Failed to write entry to /var/log/journal/3088d9f90d3844708d0cfe3c7fb29725/system.journal (30 items, 700 bytes), rotating before retrying: Bad message
+[Thu Jun 25 00:02:38 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Thu Jun 25 00:02:38 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Thu Jun 25 00:02:38 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Thu Jun 25 00:05:02 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Thu Jun 25 00:05:02 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Thu Jun 25 00:05:02 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Thu Jun 25 00:34:30 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Thu Jun 25 00:34:30 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Thu Jun 25 00:34:30 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Thu Jun 25 00:56:22 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Thu Jun 25 00:56:22 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Thu Jun 25 00:56:22 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+[Thu Jun 25 01:00:58 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1000
+[Thu Jun 25 01:00:58 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1001
+[Thu Jun 25 01:00:58 2026] rtw89_8852be 0002:21:00.0: SER catches error: 0x1002
+
+===== PACKAGE_MANAGERS =====
+$ sh -c command -v apt && apt --version; command -v dpkg && dpkg --print-architecture; command -v rpm && rpm --version; command -v pacman && pacman --version; true
+/usr/bin/apt
+apt 2.6.1 (arm64)
+/usr/bin/dpkg
+arm64
+
+===== APT_SOURCES =====
+$ sh -c find /etc/apt -maxdepth 3 -type f \( -name "*.list" -o -name "*.sources" \) -print -exec sed -n "1,160p" {} \; 2>/dev/null
+/etc/apt/sources.list
+deb http://repo.huaweicloud.com/debian bookworm main contrib non-free non-free-firmware
+#deb-src http://repo.huaweicloud.com/debian bookworm main contrib non-free non-free-firmware
+
+deb http://repo.huaweicloud.com/debian bookworm-updates main contrib non-free non-free-firmware
+#deb-src http://repo.huaweicloud.com/debian bookworm-updates main contrib non-free non-free-firmware
+
+deb http://repo.huaweicloud.com/debian bookworm-backports main contrib non-free non-free-firmware
+#deb-src http://repo.huaweicloud.com/debian bookworm-backports main contrib non-free non-free-firmware
+
+/etc/apt/sources.list.d/docker.list
+deb [arch=arm64] https://repo.huaweicloud.com/docker-ce/linux/debian bookworm stable
+
+===== INSTALLED_PACKAGES_DPKG =====
+$ sh -c dpkg-query -W -f="${binary:Package}\t${Version}\t${Architecture}\n" 2>/dev/null | sort | head -1000 || true
+sh: 1: Bad substitution
+
+===== COMPILERS_AND_BUILD =====
+$ sh -c for c in gcc g++ clang clang++ cmake make ninja meson pkg-config git curl wget unzip tar; do if command -v "$c" >/dev/null 2>&1; then printf "\n## %s\n" "$c"; "$c" --version 2>&1 | head -5; fi; done
+
+## gcc
+gcc (Debian 12.2.0-14) 12.2.0
+Copyright (C) 2022 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+## g++
+g++ (Debian 12.2.0-14) 12.2.0
+Copyright (C) 2022 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+## make
+GNU Make 4.3
+Built for aarch64-unknown-linux-gnu
+Copyright (C) 1988-2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+
+## git
+git version 2.39.5
+
+## curl
+curl 7.88.1 (aarch64-unknown-linux-gnu) libcurl/7.88.1 OpenSSL/3.0.15 zlib/1.2.13 brotli/1.0.9 zstd/1.5.4 libidn2/2.3.3 libpsl/0.21.2 (+libidn2/2.3.3) libssh2/1.10.0 nghttp2/1.52.0 librtmp/2.3 OpenLDAP/2.5.13
+Release-Date: 2023-02-20, security patched: 7.88.1-10+deb12u8
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp
+Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM NTLM_WB PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
+
+## wget
+GNU Wget 1.21.3 built on linux-gnu.
+
+-cares +digest -gpgme +https +ipv6 +iri +large-file -metalink +nls 
++ntlm +opie +psl +ssl/gnutls 
+
+
+## unzip
+caution:  both -n and -o specified; ignoring -o
+UnZip 6.00 of 20 April 2009, by Debian. Original by Info-ZIP.
+
+Usage: unzip [-Z] [-opts[modifiers]] file[.zip] [list] [-x xlist] [-d exdir]
+  Default action is to extract files in list, except those in xlist, to exdir;
+
+## tar
+tar (GNU tar) 1.34
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+===== PYTHON =====
+$ sh -c for p in python3 python; do if command -v "$p" >/dev/null 2>&1; then printf "\n## %s\n" "$p"; "$p" --version 2>&1; "$p" - <<'PY' 2>/dev/null
+import sys, platform, site
+print("executable=", sys.executable)
+print("platform=", platform.platform())
+print("paths=", sys.path[:8])
+try:
+    print("sitepackages=", site.getsitepackages())
+except Exception as e:
+    print("sitepackages_error=", e)
+PY
+fi; done; for p in pip3 pip; do if command -v "$p" >/dev/null 2>&1; then printf "\n## %s\n" "$p"; "$p" --version; "$p" list 2>/dev/null | head -300; fi; done
+
+## python3
+Python 3.11.2
+executable= /usr/bin/python3
+platform= Linux-6.1.43-rockchip-rk3588-aarch64-with-glibc2.36
+paths= ['', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages']
+sitepackages= ['/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages', '/usr/lib/python3.11/dist-packages']
+
+## python
+Python 3.11.2
+executable= /usr/bin/python
+platform= Linux-6.1.43-rockchip-rk3588-aarch64-with-glibc2.36
+paths= ['', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages']
+sitepackages= ['/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages', '/usr/lib/python3.11/dist-packages']
+
+## pip3
+pip 23.0.1 from /usr/lib/python3/dist-packages/pip (python 3.11)
+Package             Version
+------------------- -----------
+blinker             1.5
+cryptography        38.0.4
+dbus-python         1.3.2
+distro              1.8.0
+distro-info         1.5+deb12u1
+httplib2            0.20.4
+iotop               0.6
+lazr.restfulclient  0.14.5
+lazr.uri            1.0.6
+oauthlib            3.2.2
+pip                 23.0.1
+PyGObject           3.42.2
+PyJWT               2.6.0
+pyparsing           3.0.9
+python-apt          2.6.0
+setuptools          66.1.1
+six                 1.16.0
+unattended-upgrades 0.1
+wadllib             1.3.6
+wheel               0.38.4
+
+## pip
+pip 23.0.1 from /usr/lib/python3/dist-packages/pip (python 3.11)
+Package             Version
+------------------- -----------
+blinker             1.5
+cryptography        38.0.4
+dbus-python         1.3.2
+distro              1.8.0
+distro-info         1.5+deb12u1
+httplib2            0.20.4
+iotop               0.6
+lazr.restfulclient  0.14.5
+lazr.uri            1.0.6
+oauthlib            3.2.2
+pip                 23.0.1
+PyGObject           3.42.2
+PyJWT               2.6.0
+pyparsing           3.0.9
+python-apt          2.6.0
+setuptools          66.1.1
+six                 1.16.0
+unattended-upgrades 0.1
+wadllib             1.3.6
+wheel               0.38.4
+
+===== ML_RUNTIMES =====
+$ sh -c for c in rknn-toolkit-lite2 rknn_server rknn_transfer_proxy npu-smi clinfo vulkaninfo glxinfo ffmpeg gst-inspect-1.0 onnxruntime_test benchmark_model; do if command -v "$c" >/dev/null 2>&1; then printf "\n## %s\n" "$c"; "$c" --version 2>&1 | head -80; fi; done; python3 - <<'PY' 2>/dev/null
+mods=["rknnlite","rknn","onnxruntime","torch","tensorflow","tflite_runtime","numpy","cv2","PIL"]
+for m in mods:
+    try:
+        mod=__import__(m)
+        print(m, getattr(mod, "__version__", "import_ok"))
+    except Exception as e:
+        print(m, "missing_or_error:", e)
+PY
+
+## rknn_server

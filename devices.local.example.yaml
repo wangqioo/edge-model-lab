@@ -1,0 +1,14 @@
+# Copy this file to devices.local.yaml if a local override is needed.
+# Do not commit devices.local.yaml.
+#
+# Prefer SSH keys. If password fallback is temporarily needed, store it only
+# in this ignored local file or environment variables.
+
+auth:
+  orange-rk3588:
+    password_env: EDGE_ORANGE_RK3588_PASSWORD
+  linaro-rk3576:
+    password_env: EDGE_LINARO_RK3576_PASSWORD
+  lckfb-rk3576:
+    password_env: EDGE_LCKFB_RK3576_PASSWORD
+

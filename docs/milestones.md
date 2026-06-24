@@ -1,0 +1,42 @@
+# Edge Model Lab Milestones
+
+## M1: Project Foundation
+
+- Preserve reports and raw logs.
+- Create device inventory.
+- Implement `edgectl list`.
+- Implement read-only `edgectl health`.
+
+## M2: RK3588 Baseline
+
+- Harden SSH on `orange-rk3588`.
+- Run the built-in RKNN demo.
+- Record first latency, memory, and temperature baseline.
+- Decide Docker device mappings for RKNN/RGA/Mali access.
+
+## M3: Python Runtime Baseline
+
+- Define common Python venv layout.
+- Install minimal runtime packages on each board.
+- Verify RKNN Lite import and sample inference.
+- Record runtime package versions.
+
+## M4: RK3576 Systemd Service
+
+- Create a minimal Python inference service.
+- Deploy via systemd on `linaro-rk3576`.
+- Repeat on `lckfb-rk3576`.
+- Record memory and thermal behavior.
+
+## M5: RK3588 Docker Compose Service
+
+- Package the minimal inference service in a Docker image.
+- Deploy with Docker Compose on `orange-rk3588`.
+- Verify NPU/RGA/GPU access from inside the container.
+
+## M6: Benchmarks And Regression Checks
+
+- Add benchmark result format.
+- Capture latency, throughput, memory, disk, and temperature.
+- Add repeatable smoke tests for all three boards.
+
