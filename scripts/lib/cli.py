@@ -6,6 +6,7 @@ import sys
 from .assets import asset_exists, asset_size_label, load_assets
 from .bootstrap import bootstrap_rknn_lite
 from .config import Device, load_devices
+from .deploy import bench_all, bench_device, deploy_all, deploy_device
 from .health import print_health
 from .rknn import run_rknn_smoke
 from .rknn_service import bench_rknn_service, deploy_rknn_service
@@ -97,6 +98,10 @@ def run(argv: list[str] | None = None) -> int:
     logs_parser.add_argument("device", help="Device id")
     logs_parser.add_argument("unit", nargs="?", default=DEFAULT_UNIT, help="systemd unit name")
     logs_parser.add_argument("--lines", type=int, default=80, help="Number of journal lines")
+    deploy_parser = subparsers.add_parser("deploy", help="Deploy the current project to a device or all devices")
+    deploy_parser.add_argument("target", help="Device id or 'all'")
+    bench_parser = subparsers.add_parser("bench", help="Run the current project's benchmarks on a device or all devices")
+    bench_parser.add_argument("target", help="Device id or 'all'")
     rknn_service_parser = subparsers.add_parser("rknn-service-deploy", help="Deploy the RK3576 Python RKNN inference service")
     rknn_service_parser.add_argument("device", help="Device id")
     rknn_bench_parser = subparsers.add_parser("rknn-service-bench", help="Run a synthetic benchmark against the RK3576 Python RKNN inference service")
@@ -169,6 +174,22 @@ def run(argv: list[str] | None = None) -> int:
         if not device:
             parser.error(f"Unknown device: {args.device}")
         return print_service_logs(device, args.unit, args.lines)
+
+    if args.command == "deploy":
+        if args.target == "all":
+            return deploy_all()
+        device = devices.get(args.target)
+        if not device:
+            parser.error(f"Unknown device: {args.target}")
+        return deploy_device(device)
+
+    if args.command == "bench":
+        if args.target == "all":
+            return bench_all()
+        device = devices.get(args.target)
+        if not device:
+            parser.error(f"Unknown device: {args.target}")
+        return bench_device(device)
 
     if args.command == "rknn-service-deploy":
         device = devices.get(args.device)

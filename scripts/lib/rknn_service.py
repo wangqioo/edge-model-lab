@@ -22,6 +22,34 @@ REMOTE_UNIT = "/etc/systemd/system/edge-rknn-python.service"
 SERVICE_URL = "http://127.0.0.1:18080"
 
 
+BENCH_REMOTE_SCRIPT = r"""
+set -eu
+COUNT="$1"
+
+snapshot() {
+  LABEL="$1"
+  echo "## ${LABEL}"
+  awk '/MemTotal|MemAvailable/ { print }' /proc/meminfo
+  printf 'loadavg='
+  cat /proc/loadavg
+  for z in /sys/class/thermal/thermal_zone*; do
+    [ -d "$z" ] || continue
+    type="$(cat "$z/type" 2>/dev/null || true)"
+    temp="$(cat "$z/temp" 2>/dev/null || true)"
+    if [ -n "$temp" ]; then
+      awk -v zone="$z" -v typ="$type" -v raw="$temp" 'BEGIN { printf "%s type=%s temp_c=%.1f\n", zone, typ, raw / 1000 }'
+    fi
+  done
+}
+
+snapshot "before"
+echo "## benchmark"
+curl -fsS "http://127.0.0.1:18080/bench/synthetic?count=${COUNT}"
+echo
+snapshot "after"
+"""
+
+
 def deploy_rknn_service(device: Device) -> int:
     if device.platform != "rk3576":
         print(f"RKNN Python service deploy targets rk3576, device {device.id} is {device.platform}")
@@ -115,9 +143,13 @@ def bench_rknn_service(device: Device, count: int) -> int:
         print("count must be <= 200")
         return 2
 
-    command = f"curl -fsS {shlex.quote(SERVICE_URL + f'/bench/synthetic?count={count}')}"
     print(f"===== RKNN Python service bench {device.id} count={count} =====")
-    code, output = run_ssh(device, command, timeout_seconds=max(30, count * 3))
+    code, output = run_ssh(
+        device,
+        f"sh -s -- {shlex.quote(str(count))}",
+        timeout_seconds=max(30, count * 3),
+        stdin=BENCH_REMOTE_SCRIPT,
+    )
     if output:
         print(output.rstrip())
     return code

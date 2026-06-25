@@ -15,6 +15,9 @@ def run_ssh(
     timeout_seconds: int = 20,
     stdin: str | None = None,
 ) -> tuple[int, str]:
+    if device.password_env and not os.environ.get(device.password_env):
+        return 126, f"missing required environment variable: {device.password_env}\n"
+
     command = [
         "ssh",
         "-p",
@@ -33,31 +36,30 @@ def run_ssh(
     env = os.environ.copy()
     if device.password_env:
         password = os.environ.get(device.password_env)
-        if password:
-            sshpass = shutil.which("sshpass")
-            if not sshpass:
-                return 127, f"sshpass is required because {device.password_env} is set in local config\n"
-            command = [
-                sshpass,
-                "-e",
-                "ssh",
-                "-p",
-                str(device.port),
-                "-o",
-                "StrictHostKeyChecking=no",
-                "-o",
-                "ConnectTimeout=8",
-                "-o",
-                "PreferredAuthentications=password",
-                "-o",
-                "PubkeyAuthentication=no",
-                "-o",
-                "NumberOfPasswordPrompts=1",
-                f"{device.user}@{device.host}",
-            ]
-            if remote_command:
-                command.append(remote_command)
-            env["SSHPASS"] = password
+        sshpass = shutil.which("sshpass")
+        if not sshpass:
+            return 127, f"sshpass is required because {device.password_env} is set in local config\n"
+        command = [
+            sshpass,
+            "-e",
+            "ssh",
+            "-p",
+            str(device.port),
+            "-o",
+            "StrictHostKeyChecking=no",
+            "-o",
+            "ConnectTimeout=8",
+            "-o",
+            "PreferredAuthentications=password",
+            "-o",
+            "PubkeyAuthentication=no",
+            "-o",
+            "NumberOfPasswordPrompts=1",
+            f"{device.user}@{device.host}",
+        ]
+        if remote_command:
+            command.append(remote_command)
+        env["SSHPASS"] = password
 
     try:
         completed = subprocess.run(
