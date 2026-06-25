@@ -8,7 +8,7 @@ from .bootstrap import bootstrap_rknn_lite
 from .config import Device, load_devices
 from .health import print_health
 from .rknn import run_rknn_smoke
-from .rknn_service import deploy_rknn_service
+from .rknn_service import bench_rknn_service, deploy_rknn_service
 from .services import DEFAULT_UNIT, print_service_logs, print_service_status
 from .yolo import run_yolo_deploy, run_yolo_smoke
 
@@ -99,6 +99,9 @@ def run(argv: list[str] | None = None) -> int:
     logs_parser.add_argument("--lines", type=int, default=80, help="Number of journal lines")
     rknn_service_parser = subparsers.add_parser("rknn-service-deploy", help="Deploy the RK3576 Python RKNN inference service")
     rknn_service_parser.add_argument("device", help="Device id")
+    rknn_bench_parser = subparsers.add_parser("rknn-service-bench", help="Run a synthetic benchmark against the RK3576 Python RKNN inference service")
+    rknn_bench_parser.add_argument("device", help="Device id")
+    rknn_bench_parser.add_argument("--count", type=int, default=20, help="Number of synthetic inferences")
 
     args = parser.parse_args(argv)
     devices = load_devices()
@@ -172,6 +175,12 @@ def run(argv: list[str] | None = None) -> int:
         if not device:
             parser.error(f"Unknown device: {args.device}")
         return deploy_rknn_service(device)
+
+    if args.command == "rknn-service-bench":
+        device = devices.get(args.device)
+        if not device:
+            parser.error(f"Unknown device: {args.device}")
+        return bench_rknn_service(device, args.count)
 
     parser.error(f"Unknown command: {args.command}")
     return 2

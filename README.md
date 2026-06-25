@@ -47,6 +47,7 @@ Planned phase 1 interface:
 ./scripts/edgectl yolo-smoke linaro-rk3576
 ./scripts/edgectl yolo-deploy linaro-rk3576
 ./scripts/edgectl rknn-service-deploy linaro-rk3576
+./scripts/edgectl rknn-service-bench linaro-rk3576 --count 20
 ./scripts/edgectl service-status linaro-rk3576 edge-rknn-python.service
 ./scripts/edgectl logs linaro-rk3576 edge-rknn-python.service --lines 80
 ```

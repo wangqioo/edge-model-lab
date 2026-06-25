@@ -19,6 +19,7 @@ REMOTE_TMP = "/tmp/edge-model-lab-rknn-service"
 REMOTE_APP_DIR = "/opt/edge/apps/rknn_service"
 REMOTE_MODEL = "/opt/edge/models/rk3576_resnet18_lite2.rknn"
 REMOTE_UNIT = "/etc/systemd/system/edge-rknn-python.service"
+SERVICE_URL = "http://127.0.0.1:18080"
 
 
 def deploy_rknn_service(device: Device) -> int:
@@ -101,6 +102,22 @@ echo
 """
     print(f"===== RKNN Python service deploy {device.id} =====")
     code, output = run_ssh(device, "sh -s", timeout_seconds=240, stdin=remote_script)
+    if output:
+        print(output.rstrip())
+    return code
+
+
+def bench_rknn_service(device: Device, count: int) -> int:
+    if count < 1:
+        print("count must be >= 1")
+        return 2
+    if count > 200:
+        print("count must be <= 200")
+        return 2
+
+    command = f"curl -fsS {shlex.quote(SERVICE_URL + f'/bench/synthetic?count={count}')}"
+    print(f"===== RKNN Python service bench {device.id} count={count} =====")
+    code, output = run_ssh(device, command, timeout_seconds=max(30, count * 3))
     if output:
         print(output.rstrip())
     return code

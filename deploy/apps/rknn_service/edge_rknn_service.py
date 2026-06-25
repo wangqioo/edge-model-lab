@@ -7,9 +7,37 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 import numpy as np
 from rknnlite.api import RKNNLite
+
+
+def parse_count(raw_count: str | None, default: int = 10, minimum: int = 1, maximum: int = 200) -> int:
+    if raw_count is None:
+        return default
+    try:
+        count = int(raw_count)
+    except ValueError:
+        return minimum
+    return max(minimum, min(maximum, count))
+
+
+def summarize_latencies(latencies_ms: list[float]) -> dict[str, float | int]:
+    sorted_latencies = sorted(latencies_ms)
+
+    def percentile(percent: float) -> float:
+        index = int(((len(sorted_latencies) - 1) * percent) + 0.999999)
+        return round(sorted_latencies[index], 3)
+
+    return {
+        "count": len(sorted_latencies),
+        "min_ms": round(sorted_latencies[0], 3),
+        "avg_ms": round(sum(sorted_latencies) / len(sorted_latencies), 3),
+        "p50_ms": percentile(0.50),
+        "p95_ms": percentile(0.95),
+        "max_ms": round(sorted_latencies[-1], 3),
+    }
 
 
 class RknnService:
@@ -59,6 +87,21 @@ class RknnService:
             "output_count": len(outputs) if outputs is not None else 0,
         }
 
+    def bench_synthetic(self, count: int) -> dict[str, Any]:
+        latencies_ms = []
+        output_shapes = []
+        for _ in range(count):
+            result = self.infer_synthetic()
+            if not result["ok"]:
+                return {"ok": False, "error": "inference returned no outputs"}
+            latencies_ms.append(float(result["elapsed_ms"]))
+            output_shapes = result["output_shapes"]
+        return {
+            "ok": True,
+            "output_shapes": output_shapes,
+            **summarize_latencies(latencies_ms),
+        }
+
 
 def make_handler(service: RknnService) -> type[BaseHTTPRequestHandler]:
     class Handler(BaseHTTPRequestHandler):
@@ -74,12 +117,21 @@ def make_handler(service: RknnService) -> type[BaseHTTPRequestHandler]:
             self.wfile.write(body)
 
         def do_GET(self) -> None:
-            if self.path == "/health":
+            parsed = urlparse(self.path)
+            if parsed.path == "/health":
                 self._json(200, service.health())
                 return
-            if self.path == "/infer/synthetic":
+            if parsed.path == "/infer/synthetic":
                 try:
                     self._json(200, service.infer_synthetic())
+                except Exception as exc:
+                    self._json(500, {"ok": False, "error": f"{type(exc).__name__}: {exc}"})
+                return
+            if parsed.path == "/bench/synthetic":
+                try:
+                    query = parse_qs(parsed.query)
+                    count = parse_count(query.get("count", [None])[0])
+                    self._json(200, service.bench_synthetic(count))
                 except Exception as exc:
                     self._json(500, {"ok": False, "error": f"{type(exc).__name__}: {exc}"})
                 return
