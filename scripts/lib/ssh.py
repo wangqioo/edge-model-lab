@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import shlex
 from pathlib import Path
 
 from .config import Device
@@ -99,3 +100,15 @@ def run_scp_to_device(device: Device, local_path: Path, remote_path: str) -> tup
 
     completed = subprocess.run(command, check=False, capture_output=True, env=env, text=True)
     return completed.returncode, completed.stdout + completed.stderr
+
+
+def run_remote_sudo(
+    device: Device,
+    remote_command: str,
+    timeout_seconds: int = 20,
+) -> tuple[int, str]:
+    password = ""
+    if device.password_env:
+        password = os.environ.get(device.password_env, "")
+    command = f"sudo -S -p '' sh -lc {shlex.quote(remote_command)}"
+    return run_ssh(device, command, timeout_seconds=timeout_seconds, stdin=(password + "\n") if password else None)

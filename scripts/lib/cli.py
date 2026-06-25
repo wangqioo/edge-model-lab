@@ -8,6 +8,7 @@ from .bootstrap import bootstrap_rknn_lite
 from .config import Device, load_devices
 from .health import print_health
 from .rknn import run_rknn_smoke
+from .services import DEFAULT_UNIT, print_service_logs, print_service_status
 from .yolo import run_yolo_deploy, run_yolo_smoke
 
 
@@ -88,6 +89,13 @@ def run(argv: list[str] | None = None) -> int:
     yolo_parser.add_argument("device", help="Device id")
     deploy_yolo_parser = subparsers.add_parser("yolo-deploy", help="Install the RK3576 YOLOv5 demo under /opt/edge and start the systemd smoke unit")
     deploy_yolo_parser.add_argument("device", help="Device id")
+    status_parser = subparsers.add_parser("service-status", help="Show systemd service status on a device")
+    status_parser.add_argument("device", help="Device id")
+    status_parser.add_argument("unit", nargs="?", default=DEFAULT_UNIT, help="systemd unit name")
+    logs_parser = subparsers.add_parser("logs", help="Show systemd journal logs for a service on a device")
+    logs_parser.add_argument("device", help="Device id")
+    logs_parser.add_argument("unit", nargs="?", default=DEFAULT_UNIT, help="systemd unit name")
+    logs_parser.add_argument("--lines", type=int, default=80, help="Number of journal lines")
 
     args = parser.parse_args(argv)
     devices = load_devices()
@@ -143,6 +151,18 @@ def run(argv: list[str] | None = None) -> int:
         if not device:
             parser.error(f"Unknown device: {args.device}")
         return run_yolo_deploy(device)
+
+    if args.command == "service-status":
+        device = devices.get(args.device)
+        if not device:
+            parser.error(f"Unknown device: {args.device}")
+        return print_service_status(device, args.unit)
+
+    if args.command == "logs":
+        device = devices.get(args.device)
+        if not device:
+            parser.error(f"Unknown device: {args.device}")
+        return print_service_logs(device, args.unit, args.lines)
 
     parser.error(f"Unknown command: {args.command}")
     return 2
