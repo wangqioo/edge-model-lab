@@ -43,6 +43,7 @@ Planned phase 1 interface:
 ./scripts/edgectl rknn-bootstrap linaro-rk3576
 ./scripts/edgectl rknn-smoke orange-rk3588 rk3588_mobilenet_v2_lite2
 ./scripts/edgectl yolo-smoke linaro-rk3576
+./scripts/edgectl yolo-deploy linaro-rk3576
 ```
 
 `models/assets.yaml` stores metadata and local source paths for vendor assets. Large `.rknn`, `.rkllm`, `.onnx`, and `.pt` files stay in the original data directories.

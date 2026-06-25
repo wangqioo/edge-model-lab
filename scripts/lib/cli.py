@@ -8,7 +8,7 @@ from .bootstrap import bootstrap_rknn_lite
 from .config import Device, load_devices
 from .health import print_health
 from .rknn import run_rknn_smoke
-from .yolo import run_yolo_smoke
+from .yolo import run_yolo_deploy, run_yolo_smoke
 
 
 def _print_device_table(devices: dict[str, Device]) -> None:
@@ -86,6 +86,8 @@ def run(argv: list[str] | None = None) -> int:
     bootstrap_parser.add_argument("target", help="Device id or 'all'")
     yolo_parser = subparsers.add_parser("yolo-smoke", help="Run the K7 RK3576 YOLOv5 vendor demo")
     yolo_parser.add_argument("device", help="Device id")
+    deploy_yolo_parser = subparsers.add_parser("yolo-deploy", help="Install the RK3576 YOLOv5 demo under /opt/edge and start the systemd smoke unit")
+    deploy_yolo_parser.add_argument("device", help="Device id")
 
     args = parser.parse_args(argv)
     devices = load_devices()
@@ -135,6 +137,12 @@ def run(argv: list[str] | None = None) -> int:
         if not device:
             parser.error(f"Unknown device: {args.device}")
         return run_yolo_smoke(device)
+
+    if args.command == "yolo-deploy":
+        device = devices.get(args.device)
+        if not device:
+            parser.error(f"Unknown device: {args.device}")
+        return run_yolo_deploy(device)
 
     parser.error(f"Unknown command: {args.command}")
     return 2

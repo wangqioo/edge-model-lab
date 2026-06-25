@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shlex
 import shutil
 import subprocess
@@ -13,9 +14,12 @@ from .ssh import run_scp_to_device, run_ssh
 YOLO_ARCHIVE = Path(
     "/Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/Linux_rknn_yolov5/rknn_yolov5_demo_Linux_rk3576.zip"
 )
+YOLO_SERVICE_FILE = Path(__file__).resolve().parents[2] / "deploy/systemd/rk3576/edge-rknn-yolo-smoke.service"
 YOLO_DIR_NAME = "rknn_yolov5_demo_Linux_rk3576"
 YOLO_ASSET_ID = "k7_rk3576_yolov5s_demo"
 REMOTE_BASE = "/tmp/edge-model-lab-yolo"
+REMOTE_APP_DIR = "/opt/edge/apps/rknn_yolov5_demo"
+REMOTE_SERVICE_PATH = "/etc/systemd/system/edge-rknn-yolo-smoke.service"
 
 
 def _extract_demo(output_dir: Path) -> Path:
@@ -152,6 +156,81 @@ LD_LIBRARY_PATH={shlex.quote(remote_dir)}/lib ./rknn_yolov5_demo model/RK3576/yo
 """
     print(f"===== YOLO smoke {device.id} {YOLO_ASSET_ID} =====")
     code, output = run_ssh(device, remote_command, timeout_seconds=120)
+    if output:
+        print(output.rstrip())
+    return code
+
+
+def run_yolo_deploy(device: Device) -> int:
+    if device.platform != "rk3576":
+        print(f"YOLO deploy targets rk3576, device {device.id} is {device.platform}")
+        return 2
+
+    remote_tmp_demo = f"{REMOTE_BASE}/{YOLO_ASSET_ID}"
+    with tempfile.TemporaryDirectory(prefix="edge-yolo-deploy-") as temp_name:
+        temp_dir = Path(temp_name)
+        try:
+            demo_dir = _extract_demo(temp_dir)
+        except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+            print(f"failed to extract YOLO demo: {exc}")
+            return 2
+
+        upload_code, upload_output = _upload_demo(device, demo_dir, remote_tmp_demo)
+        if upload_code != 0:
+            print(upload_output.rstrip())
+            return upload_code
+
+        unit_code, unit_output = run_ssh(
+            device,
+            f"mkdir -p {shlex.quote(REMOTE_BASE)}",
+            timeout_seconds=20,
+        )
+        if unit_code != 0:
+            print(unit_output.rstrip())
+            return unit_code
+
+        unit_upload_code, unit_upload_output = run_scp_to_device(
+            device,
+            YOLO_SERVICE_FILE,
+            f"{REMOTE_BASE}/edge-rknn-yolo-smoke.service",
+        )
+        if unit_upload_code != 0:
+            print(unit_upload_output.rstrip())
+            return unit_upload_code
+
+    sudo_password = ""
+    if device.password_env:
+        sudo_password = os.environ.get(device.password_env, "")
+    remote_script = f"""
+set -eu
+SUDO_PASSWORD={shlex.quote(sudo_password)}
+DEMO_SRC={shlex.quote(remote_tmp_demo)}
+UNIT_SRC={shlex.quote(f"{REMOTE_BASE}/edge-rknn-yolo-smoke.service")}
+
+run_sudo() {{
+  printf '%s\\n' "$SUDO_PASSWORD" | sudo -S -p '' "$@"
+}}
+
+echo "## edge-user"
+if ! id -u edge >/dev/null 2>&1; then
+  run_sudo useradd --system --home-dir /opt/edge --create-home --shell /usr/sbin/nologin edge
+fi
+if id -nG edge | tr ' ' '\\n' | grep -qx video; then :; else run_sudo usermod -aG video edge; fi
+if id -nG edge | tr ' ' '\\n' | grep -qx render; then :; else run_sudo usermod -aG render edge; fi
+
+echo "## install-files"
+run_sudo install -d -o edge -g edge /opt/edge /opt/edge/apps /opt/edge/models /opt/edge/logs /opt/edge/run {shlex.quote(REMOTE_APP_DIR)}
+run_sudo cp -a "$DEMO_SRC"/. {shlex.quote(REMOTE_APP_DIR)}/
+run_sudo chown -R edge:edge /opt/edge
+run_sudo install -m 0644 "$UNIT_SRC" {shlex.quote(REMOTE_SERVICE_PATH)}
+
+echo "## systemd"
+run_sudo systemctl daemon-reload
+run_sudo systemctl start edge-rknn-yolo-smoke.service
+run_sudo systemctl status --no-pager edge-rknn-yolo-smoke.service
+"""
+    print(f"===== YOLO deploy {device.id} {YOLO_ASSET_ID} =====")
+    code, output = run_ssh(device, "sh -s", timeout_seconds=180, stdin=remote_script)
     if output:
         print(output.rstrip())
     return code
