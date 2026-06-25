@@ -27,6 +27,8 @@
 
 ## M4: RK3576 Systemd Service
 
+- [x] Create first RK3576 systemd skeleton.
+- [x] Run vendor YOLOv5 RK3576 demo on both RK3576 boards.
 - Create a minimal Python inference service.
 - Deploy via systemd on `linaro-rk3576`.
 - Repeat on `lckfb-rk3576`.
