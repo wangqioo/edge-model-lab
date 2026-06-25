@@ -47,6 +47,12 @@ def run_ssh(
                 "StrictHostKeyChecking=no",
                 "-o",
                 "ConnectTimeout=8",
+                "-o",
+                "PreferredAuthentications=password",
+                "-o",
+                "PubkeyAuthentication=no",
+                "-o",
+                "NumberOfPasswordPrompts=1",
                 f"{device.user}@{device.host}",
             ]
             if remote_command:

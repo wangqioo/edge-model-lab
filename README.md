@@ -10,13 +10,15 @@ The Mac at `/Users/wq` is the control machine. The boards are deployment targets
 
 ## Current Phase
 
-Phase 1 foundation is in place, and Phase 2 RK3588 baseline is underway:
+Phase 1 foundation is in place, and Phase 2 runtime baselines are underway:
 
 - Preserve device audit reports and raw logs.
 - Maintain a machine-readable device inventory.
 - Build a local `edgectl` command for listing and health-checking devices.
 - Register local vendor RKNN/RKLLM/ONNX assets without committing large model blobs.
 - Run minimum RKNN Lite smoke tests on target boards.
+- Deploy the RK3576 YOLOv5 vendor demo as a systemd one-shot smoke unit.
+- Deploy a RK3576 Python RKNN HTTP service for long-running inference validation.
 - Keep passwords and secrets out of the project.
 
 ## Layout
@@ -44,6 +46,9 @@ Planned phase 1 interface:
 ./scripts/edgectl rknn-smoke orange-rk3588 rk3588_mobilenet_v2_lite2
 ./scripts/edgectl yolo-smoke linaro-rk3576
 ./scripts/edgectl yolo-deploy linaro-rk3576
+./scripts/edgectl rknn-service-deploy linaro-rk3576
+./scripts/edgectl service-status linaro-rk3576 edge-rknn-python.service
+./scripts/edgectl logs linaro-rk3576 edge-rknn-python.service --lines 80
 ```
 
 `models/assets.yaml` stores metadata and local source paths for vendor assets. Large `.rknn`, `.rkllm`, `.onnx`, and `.pt` files stay in the original data directories.
