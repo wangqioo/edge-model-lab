@@ -1,0 +1,17 @@
+[Unit]
+Description=Edge RKNN Python inference service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/edge/apps/rknn_service
+ExecStart=__EDGE_VENV_PYTHON__ /opt/edge/apps/rknn_service/edge_rknn_service.py --model __EDGE_MODEL_PATH__ --host 127.0.0.1 --port 18080
+Restart=on-failure
+RestartSec=3
+User=__EDGE_SERVICE_USER__
+Group=__EDGE_SERVICE_USER__
+SupplementaryGroups=video render
+
+[Install]
+WantedBy=multi-user.target

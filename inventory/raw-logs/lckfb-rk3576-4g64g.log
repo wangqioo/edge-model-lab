@@ -1,0 +1,1155 @@
+
+===== AUDIT_CONTEXT =====
+2026-06-25T01:01:37+08:00
+hostname=TaishanPi-3M
+user=uid=1000(lckfb) gid=1000(lckfb) groups=1000(lckfb),4(adm),6(disk),20(dialout),24(cdrom),27(sudo),29(audio),30(dip),44(video),46(plugdev),50(staff),100(users),101(input),103(kvm),104(render),108(netdev),109(bluetooth),999(systemd-journal),1001(pulse-access)
+pwd=/home/lckfb
+
+===== OS_RELEASE =====
+$ sh -c cat /etc/os-release 2>/dev/null || lsb_release -a 2>/dev/null || true
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+BUILD_INFO="root@ubuntu22 Thu May 14 16:12:08 CST 2026"
+ID_LIKE="debian"
+RK_BUILD_INFO="root@ubuntu22 Thu May 14 16:12:25 CST 2026"
+
+===== UNAME =====
+$ uname -a
+Linux TaishanPi-3M 6.1.99 #10 SMP Wed May 13 20:56:05 CST 2026 aarch64 GNU/Linux
+
+===== HOSTNAMECTL =====
+$ hostnamectl
+ Static hostname: TaishanPi-3M
+       Icon name: computer
+      Machine ID: a2d67db69ddc4b2a8716aaeb3f7abcb6
+         Boot ID: 97995a9cfa3145fbb105f3f92ab97015
+Operating System: Debian GNU/Linux 12 (bookworm)
+          Kernel: Linux 6.1.99
+    Architecture: arm64
+
+===== UPTIME =====
+$ uptime
+ 01:01:37 up 1 day, 23:32,  1 user,  load average: 0.00, 0.00, 0.00
+
+===== KERNEL_CMDLINE =====
+$ sh -c cat /proc/cmdline 2>/dev/null
+storagemedia=emmc androidboot.storagemedia=emmc androidboot.mode=normal  androidboot.verifiedbootstate=orange rw rootwait earlycon=uart8250,mmio32,0x2ad40000 console=ttyFIQ0 root=PARTUUID=614e0000-0000 rcupdate.rcu_expedited=1 rcu_nocbs=all #-05/14/2026 androidboot.fwver=ddr-v1.09-2f85f4b2d4,bl31-v1.14,bl32-v1.05,uboot-3fcd713
+
+===== CPU_LSCPU =====
+$ lscpu
+Architecture:                         aarch64
+CPU op-mode(s):                       32-bit, 64-bit
+Byte Order:                           Little Endian
+CPU(s):                               8
+On-line CPU(s) list:                  0-7
+Vendor ID:                            ARM
+Model name:                           Cortex-A53
+Model:                                4
+Thread(s) per core:                   1
+Core(s) per socket:                   4
+Socket(s):                            1
+Stepping:                             r0p4
+CPU(s) scaling MHz:                   40%
+CPU max MHz:                          2016.0000
+CPU min MHz:                          408.0000
+BogoMIPS:                             2000.00
+Flags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+Model name:                           Cortex-A72
+Model:                                0
+Thread(s) per core:                   1
+Core(s) per socket:                   4
+Socket(s):                            1
+Stepping:                             r1p0
+CPU(s) scaling MHz:                   18%
+CPU max MHz:                          2208.0000
+CPU min MHz:                          408.0000
+BogoMIPS:                             2000.00
+Flags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+Vulnerability Gather data sampling:   Not affected
+Vulnerability Itlb multihit:          Not affected
+Vulnerability L1tf:                   Not affected
+Vulnerability Mds:                    Not affected
+Vulnerability Meltdown:               Not affected
+Vulnerability Mmio stale data:        Not affected
+Vulnerability Reg file data sampling: Not affected
+Vulnerability Retbleed:               Not affected
+Vulnerability Spec rstack overflow:   Not affected
+Vulnerability Spec store bypass:      Not affected
+Vulnerability Spectre v1:             Mitigation; __user pointer sanitization
+Vulnerability Spectre v2:             Mitigation; CSV2, BHB
+Vulnerability Srbds:                  Not affected
+Vulnerability Tsx async abort:        Not affected
+
+===== CPU_PROCINFO =====
+$ sh -c cat /proc/cpuinfo
+processor	: 0
+BogoMIPS	: 2000.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 1
+BogoMIPS	: 2000.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 2
+BogoMIPS	: 2000.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 3
+BogoMIPS	: 2000.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 4
+BogoMIPS	: 2000.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd08
+CPU revision	: 0
+
+processor	: 5
+BogoMIPS	: 2000.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd08
+CPU revision	: 0
+
+processor	: 6
+BogoMIPS	: 2000.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd08
+CPU revision	: 0
+
+processor	: 7
+BogoMIPS	: 2000.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd08
+CPU revision	: 0
+
+Serial		: a8a773b73afddb78
+
+===== CPU_FREQ =====
+$ sh -c for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_* /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_*; do [ -r "$f" ] && printf "%s=" "$f" && cat "$f"; done
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq=1200000
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq=2016000
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq=1008000
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq=1416000
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq=2016000
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq=1008000
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_cur_freq=1008000
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq=2016000
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq=1008000
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_cur_freq=1008000
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq=2016000
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq=1200000
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 2208000 
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq=1008000
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq=2208000
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq=408000
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 2208000 
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_cur_freq=1008000
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq=2208000
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_min_freq=408000
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 2208000 
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_cur_freq=1008000
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_max_freq=2208000
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_min_freq=408000
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_available_frequencies=408000 600000 816000 1008000 1200000 1416000 1608000 1800000 2016000 2208000 
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_available_governors=interactive conservative ondemand userspace powersave performance schedutil 
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_cur_freq=1608000
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_driver=cpufreq-dt
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_max_freq=2208000
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq=408000
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_setspeed=<unsupported>
+/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq=2016000
+/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_transition_latency=59000
+/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq=2016000
+/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_transition_latency=59000
+/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq=2016000
+/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_transition_latency=59000
+/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq=2016000
+/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_transition_latency=59000
+/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq=2208000
+/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_transition_latency=59000
+/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq=2208000
+/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_transition_latency=59000
+/sys/devices/system/cpu/cpu6/cpufreq/cpuinfo_max_freq=2208000
+/sys/devices/system/cpu/cpu6/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu6/cpufreq/cpuinfo_transition_latency=59000
+/sys/devices/system/cpu/cpu7/cpufreq/cpuinfo_max_freq=2208000
+/sys/devices/system/cpu/cpu7/cpufreq/cpuinfo_min_freq=408000
+/sys/devices/system/cpu/cpu7/cpufreq/cpuinfo_transition_latency=59000
+
+===== CPU_GOVERNORS =====
+$ sh -c for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do [ -r "$f" ] && printf "%s=" "$f" && cat "$f"; done
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu4/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu5/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu6/cpufreq/scaling_governor=ondemand
+/sys/devices/system/cpu/cpu7/cpufreq/scaling_governor=ondemand
+
+===== MEMORY =====
+$ sh -c free -h; printf "\n/proc/meminfo:\n"; cat /proc/meminfo
+               total        used        free      shared  buff/cache   available
+Mem:           3.8Gi       546Mi       2.8Gi       2.5Mi       535Mi       3.3Gi
+Swap:             0B          0B          0B
+
+/proc/meminfo:
+MemTotal:        3989876 kB
+MemFree:         2945168 kB
+MemAvailable:    3431276 kB
+Buffers:           67892 kB
+Cached:           423228 kB
+SwapCached:            0 kB
+Active:           218960 kB
+Inactive:         613572 kB
+Active(anon):       1396 kB
+Inactive(anon):   350300 kB
+Active(file):     217564 kB
+Inactive(file):   263272 kB
+Unevictable:       18380 kB
+Mlocked:           18348 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:               340 kB
+Writeback:             4 kB
+AnonPages:        359780 kB
+Mapped:           204956 kB
+Shmem:              2596 kB
+KReclaimable:      57080 kB
+Slab:             111288 kB
+SReclaimable:      57080 kB
+SUnreclaim:        54208 kB
+KernelStack:        6296 kB
+PageTables:         9544 kB
+SecPageTables:         0 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     1994936 kB
+Committed_AS:    1912960 kB
+VmallocTotal:   259653632 kB
+VmallocUsed:       14416 kB
+VmallocChunk:          0 kB
+Percpu:             2848 kB
+CmaTotal:          16384 kB
+CmaAllocated:       4284 kB
+CmaReleased:       12100 kB
+CmaFree:           12100 kB
+
+===== SWAP =====
+$ swapon --show
+sh: 15: swapon: not found
+
+===== ZRAM =====
+$ sh -c zramctl 2>/dev/null || true; ls -la /sys/block/zram* 2>/dev/null || true
+lrwxrwxrwx 1 root root 0 Jun 23 03:07 /sys/block/zram0 -> ../devices/virtual/block/zram0
+
+===== BLOCK_DEVICES =====
+$ lsblk -a -o NAME,MAJ:MIN,RM,SIZE,RO,TYPE,FSTYPE,LABEL,MOUNTPOINTS,MODEL,SERIAL
+NAME         MAJ:MIN RM  SIZE RO TYPE FSTYPE LABEL    MOUNTPOINTS MODEL SERIAL
+ram0           1:0    0    4M  0 disk                                   
+loop0          7:0    0    0B  0 loop                                   
+loop1          7:1    0    0B  0 loop                                   
+loop2          7:2    0    0B  0 loop                                   
+loop3          7:3    0    0B  0 loop                                   
+loop4          7:4    0    0B  0 loop                                   
+loop5          7:5    0    0B  0 loop                                   
+loop6          7:6    0    0B  0 loop                                   
+loop7          7:7    0    0B  0 loop                                   
+mmcblk0      179:0    0 57.8G  0 disk                                   0xaa33fe7c
+├─mmcblk0p1  179:1    0    4M  0 part                                   
+├─mmcblk0p2  179:2    0    4M  0 part                                   
+├─mmcblk0p3  179:3    0   64M  0 part                                   
+├─mmcblk0p4  179:4    0  128M  0 part                                   
+├─mmcblk0p5  179:5    0   32M  0 part                                   
+├─mmcblk0p6  179:6    0  128M  0 part ext4   oem      /oem              
+├─mmcblk0p7  179:7    0    1G  0 part ext4   userdata /userdata         
+└─mmcblk0p8  179:8    0 56.4G  0 part ext4            /                 
+mmcblk0boot0 179:32   0    4M  1 disk                                   0xaa33fe7c
+mmcblk0boot1 179:64   0    4M  1 disk                                   0xaa33fe7c
+zram0        254:0    0    0B  0 disk                                   
+
+===== FILESYSTEMS =====
+$ df -hT
+Filesystem     Type      Size  Used Avail Use% Mounted on
+/dev/root      ext4       56G  3.7G   50G   7% /
+devtmpfs       devtmpfs  1.9G  8.0K  1.9G   1% /dev
+tmpfs          tmpfs     2.0G     0  2.0G   0% /dev/shm
+tmpfs          tmpfs     780M  2.0M  778M   1% /run
+tmpfs          tmpfs     5.0M   16K  5.0M   1% /run/lock
+/dev/mmcblk0p6 ext4      104M   12M   84M  13% /oem
+/dev/mmcblk0p7 ext4      944M  292K  886M   1% /userdata
+tmpfs          tmpfs     390M   36K  390M   1% /run/user/1000
+
+===== MOUNTS =====
+$ findmnt
+TARGET                                                  SOURCE         FSTYPE     OPTIONS
+/                                                       /dev/mmcblk0p8 ext4       rw,relatime
+├─/dev                                                  devtmpfs       devtmpfs   rw,relatime,size=1982616k,nr_inodes=495654,mode=755
+│ ├─/dev/shm                                            tmpfs          tmpfs      rw,nosuid,nodev,noexec
+│ ├─/dev/pts                                            devpts         devpts     rw,relatime,gid=5,mode=620,ptmxmode=666
+│ ├─/dev/mqueue                                         mqueue         mqueue     rw,nosuid,nodev,noexec,relatime
+│ └─/dev/usb-ffs/adb                                    adb            functionfs rw,relatime
+├─/proc                                                 proc           proc       rw,relatime
+├─/sys                                                  sysfs          sysfs      rw,relatime
+│ ├─/sys/kernel/security                                securityfs     securityfs rw,nosuid,nodev,noexec,relatime
+│ ├─/sys/fs/cgroup                                      cgroup2        cgroup2    rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot
+│ ├─/sys/fs/pstore                                      pstore         pstore     rw,relatime
+│ ├─/sys/fs/bpf                                         bpf            bpf        rw,nosuid,nodev,noexec,relatime,mode=700
+│ ├─/sys/kernel/debug                                   debugfs        debugfs    rw,relatime
+│ ├─/sys/kernel/tracing                                 tracefs        tracefs    rw,nosuid,nodev,noexec,relatime
+│ ├─/sys/fs/fuse/connections                            fusectl        fusectl    rw,nosuid,nodev,noexec,relatime
+│ └─/sys/kernel/config                                  configfs       configfs   rw,nosuid,nodev,noexec,relatime
+├─/run                                                  tmpfs          tmpfs      rw,nosuid,nodev,size=797976k,nr_inodes=819200,mode=755
+│ ├─/run/lock                                           tmpfs          tmpfs      rw,nosuid,nodev,noexec,relatime,size=5120k
+│ ├─/run/credentials/systemd-sysctl.service             ramfs          ramfs      ro,nosuid,nodev,noexec,relatime,mode=700
+│ ├─/run/credentials/systemd-sysusers.service           ramfs          ramfs      ro,nosuid,nodev,noexec,relatime,mode=700
+│ ├─/run/credentials/systemd-tmpfiles-setup-dev.service ramfs          ramfs      ro,nosuid,nodev,noexec,relatime,mode=700
+│ ├─/run/credentials/systemd-tmpfiles-setup.service     ramfs          ramfs      ro,nosuid,nodev,noexec,relatime,mode=700
+│ └─/run/user/1000                                      tmpfs          tmpfs      rw,nosuid,nodev,relatime,size=398984k,nr_inodes=99746,mode=700,uid=1000,gid=1000
+├─/oem                                                  /dev/mmcblk0p6 ext4       rw,relatime
+└─/userdata                                             /dev/mmcblk0p7 ext4       rw,relatime
+
+===== MMC =====
+$ sh -c for f in /sys/block/mmcblk*/device/{name,type,cid,csd,date,fwrev,hwrev,manfid,oemid,serial}; do [ -r "$f" ] && printf "%s=" "$f" && cat "$f"; done
+
+===== NVME =====
+$ sh -c command -v nvme >/dev/null && nvme list || true
+
+===== USB =====
+$ sh -c lsusb -t 2>/dev/null; printf "\n"; lsusb 2>/dev/null
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=xhci-hcd/1p, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=xhci-hcd/1p, 480M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/7p, 480M
+
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 002: ID 1a40:0201 Terminus Technology Inc. FE 2.1 7-port Hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+===== PCI =====
+$ sh -c lspci -nn 2>/dev/null || true
+
+===== I2C_SPI_GPIO_DEVICES =====
+$ sh -c ls -la /dev/i2c* /dev/spidev* /dev/gpiochip* 2>/dev/null || true
+crw------- 1 root root 254,  0 Jun 26  2025 /dev/gpiochip0
+crw------- 1 root root 254,  1 Jun 26  2025 /dev/gpiochip1
+crw------- 1 root root 254,  2 Jun 26  2025 /dev/gpiochip2
+crw------- 1 root root 254,  3 Jun 26  2025 /dev/gpiochip3
+crw------- 1 root root 254,  4 Jun 26  2025 /dev/gpiochip4
+crw------- 1 root root 254,  5 Jun 26  2025 /dev/gpiochip5
+crw-rw---- 1 root i2c   89,  1 Jun 26  2025 /dev/i2c-1
+crw-rw---- 1 root i2c   89, 10 Jun 26  2025 /dev/i2c-10
+crw-rw---- 1 root i2c   89, 11 Jun 26  2025 /dev/i2c-11
+crw-rw---- 1 root i2c   89,  2 Jun 26  2025 /dev/i2c-2
+crw-rw---- 1 root i2c   89,  3 Jun 26  2025 /dev/i2c-3
+crw-rw---- 1 root i2c   89,  4 Jun 26  2025 /dev/i2c-4
+crw-rw---- 1 root i2c   89,  5 Jun 26  2025 /dev/i2c-5
+crw-rw---- 1 root i2c   89,  6 Jun 26  2025 /dev/i2c-6
+crw-rw---- 1 root i2c   89,  7 Jun 26  2025 /dev/i2c-7
+crw-rw---- 1 root i2c   89,  8 Jun 26  2025 /dev/i2c-8
+crw------- 1 root root 153,  0 Jun 26  2025 /dev/spidev1.0
+crw------- 1 root root 153,  1 Jun 26  2025 /dev/spidev1.1
+
+===== VIDEO_AUDIO_DEVICES =====
+$ sh -c ls -la /dev/video* /dev/media* /dev/dri* /dev/snd* 2>/dev/null || true
+crw-rw----+ 1 root video 249,  0 Jun 26  2025 /dev/media0
+crw-rw----+ 1 root video 249,  1 Jun 26  2025 /dev/media1
+crw-rw----+ 1 root video 249,  2 Jun 26  2025 /dev/media2
+crw-rw----+ 1 root video 249,  3 Jun 26  2025 /dev/media3
+crw-rw----+ 1 root video 249,  4 Jun 26  2025 /dev/media4
+crw-rw----+ 1 root video 249,  5 Jun 26  2025 /dev/media5
+crw-rw----+ 1 root video 249,  6 Jun 26  2025 /dev/media6
+crw-rw----+ 1 root video 249,  7 Jun 26  2025 /dev/media7
+crw-rw----+ 1 root video 249,  8 Jun 26  2025 /dev/media8
+-rw-rw----  1 root video       4 Jun 26  2025 /dev/video-dec0
+-rw-rw----  1 root video       4 Jun 26  2025 /dev/video-enc0
+crw-rw----+ 1 root video  81,  0 Jun 26  2025 /dev/video0
+crw-rw----+ 1 root video  81,  1 Jun 26  2025 /dev/video1
+crw-rw----+ 1 root video  81, 10 Jun 26  2025 /dev/video10
+crw-rw----+ 1 root video  81, 11 Jun 26  2025 /dev/video11
+crw-rw----+ 1 root video  81, 12 Jun 26  2025 /dev/video12
+crw-rw----+ 1 root video  81, 13 Jun 26  2025 /dev/video13
+crw-rw----+ 1 root video  81, 14 Jun 26  2025 /dev/video14
+crw-rw----+ 1 root video  81, 15 Jun 26  2025 /dev/video15
+crw-rw----+ 1 root video  81, 16 Jun 26  2025 /dev/video16
+crw-rw----+ 1 root video  81, 17 Jun 26  2025 /dev/video17
+crw-rw----+ 1 root video  81, 18 Jun 26  2025 /dev/video18
+crw-rw----+ 1 root video  81, 19 Jun 26  2025 /dev/video19
+crw-rw----+ 1 root video  81,  2 Jun 26  2025 /dev/video2
+crw-rw----+ 1 root video  81, 20 Jun 26  2025 /dev/video20
+crw-rw----+ 1 root video  81, 21 Jun 26  2025 /dev/video21
+crw-rw----+ 1 root video  81, 22 Jun 26  2025 /dev/video22
+crw-rw----+ 1 root video  81, 23 Jun 26  2025 /dev/video23
+crw-rw----+ 1 root video  81, 24 Jun 26  2025 /dev/video24
+crw-rw----+ 1 root video  81, 25 Jun 26  2025 /dev/video25
+crw-rw----+ 1 root video  81, 26 Jun 26  2025 /dev/video26
+crw-rw----+ 1 root video  81, 27 Jun 26  2025 /dev/video27
+crw-rw----+ 1 root video  81, 28 Jun 26  2025 /dev/video28
+crw-rw----+ 1 root video  81, 29 Jun 26  2025 /dev/video29
+crw-rw----+ 1 root video  81,  3 Jun 26  2025 /dev/video3
+crw-rw----+ 1 root video  81, 30 Jun 26  2025 /dev/video30
+crw-rw----+ 1 root video  81, 31 Jun 26  2025 /dev/video31
+crw-rw----+ 1 root video  81, 32 Jun 26  2025 /dev/video32
+crw-rw----+ 1 root video  81, 33 Jun 26  2025 /dev/video33
+crw-rw----+ 1 root video  81, 34 Jun 26  2025 /dev/video34
+crw-rw----+ 1 root video  81, 35 Jun 26  2025 /dev/video35
+crw-rw----+ 1 root video  81, 36 Jun 26  2025 /dev/video36
+crw-rw----+ 1 root video  81, 37 Jun 26  2025 /dev/video37
+crw-rw----+ 1 root video  81, 38 Jun 26  2025 /dev/video38
+crw-rw----+ 1 root video  81, 39 Jun 26  2025 /dev/video39
+crw-rw----+ 1 root video  81,  4 Jun 26  2025 /dev/video4
+crw-rw----+ 1 root video  81, 40 Jun 26  2025 /dev/video40
+crw-rw----+ 1 root video  81, 41 Jun 26  2025 /dev/video41
+crw-rw----+ 1 root video  81, 42 Jun 26  2025 /dev/video42
+crw-rw----+ 1 root video  81, 43 Jun 26  2025 /dev/video43
+crw-rw----+ 1 root video  81, 44 Jun 26  2025 /dev/video44
+crw-rw----+ 1 root video  81, 45 Jun 26  2025 /dev/video45
+crw-rw----+ 1 root video  81, 46 Jun 26  2025 /dev/video46
+crw-rw----+ 1 root video  81, 47 Jun 26  2025 /dev/video47
+crw-rw----+ 1 root video  81, 48 Jun 26  2025 /dev/video48
+crw-rw----+ 1 root video  81, 49 Jun 26  2025 /dev/video49
+crw-rw----+ 1 root video  81,  5 Jun 26  2025 /dev/video5
+crw-rw----+ 1 root video  81, 50 Jun 26  2025 /dev/video50
+crw-rw----+ 1 root video  81, 51 Jun 26  2025 /dev/video51
+crw-rw----+ 1 root video  81, 52 Jun 26  2025 /dev/video52
+crw-rw----+ 1 root video  81, 53 Jun 26  2025 /dev/video53
+crw-rw----+ 1 root video  81, 54 Jun 26  2025 /dev/video54
+crw-rw----+ 1 root video  81, 55 Jun 26  2025 /dev/video55
+crw-rw----+ 1 root video  81, 56 Jun 26  2025 /dev/video56
+crw-rw----+ 1 root video  81, 57 Jun 26  2025 /dev/video57
+crw-rw----+ 1 root video  81, 58 Jun 26  2025 /dev/video58
+crw-rw----+ 1 root video  81, 59 Jun 26  2025 /dev/video59
+crw-rw----+ 1 root video  81,  6 Jun 26  2025 /dev/video6
+crw-rw----+ 1 root video  81, 60 Jun 26  2025 /dev/video60
+crw-rw----+ 1 root video  81, 61 Jun 26  2025 /dev/video61
+crw-rw----+ 1 root video  81, 62 Jun 26  2025 /dev/video62
+crw-rw----+ 1 root video  81, 63 Jun 26  2025 /dev/video63
+crw-rw----+ 1 root video  81, 64 Jun 26  2025 /dev/video64
+crw-rw----+ 1 root video  81, 66 Jun 26  2025 /dev/video65
+crw-rw----+ 1 root video  81, 67 Jun 26  2025 /dev/video66
+crw-rw----+ 1 root video  81, 68 Jun 26  2025 /dev/video67
+crw-rw----+ 1 root video  81, 69 Jun 26  2025 /dev/video68
+crw-rw----+ 1 root video  81, 71 Jun 26  2025 /dev/video69
+crw-rw----+ 1 root video  81,  7 Jun 26  2025 /dev/video7
+crw-rw----+ 1 root video  81, 72 Jun 26  2025 /dev/video70
+crw-rw----+ 1 root video  81, 73 Jun 26  2025 /dev/video71
+crw-rw----+ 1 root video  81, 74 Jun 26  2025 /dev/video72
+crw-rw----+ 1 root video  81,  8 Jun 26  2025 /dev/video8
+crw-rw----+ 1 root video  81,  9 Jun 26  2025 /dev/video9
+
+/dev/dri:
+total 0
+drwxr-xr-x   3 root root        140 Jun 26  2025 .
+drwxr-xr-x  16 root root       5780 Jun 26  2025 ..
+drwxr-xr-x   2 root root        120 Jun 26  2025 by-path
+crw-rw----+  1 root video  226,   0 Jun 26  2025 card0
+crw-rw----+  1 root video  226,   1 Jun 26  2025 card1
+crw-rw----+  1 root render 226, 128 Jun 26  2025 renderD128
+crw-rw----+  1 root render 226, 129 Jun 26  2025 renderD129
+
+/dev/snd:
+total 0
+drwxr-xr-x   3 root root      260 Jun 26  2025 .
+drwxr-xr-x  16 root root     5780 Jun 26  2025 ..
+drwxr-xr-x   2 root root      100 Jun 26  2025 by-path
+crw-rw----+  1 root audio 116,  4 Jun 26  2025 controlC0
+crw-rw----+  1 root audio 116,  7 Jun 26  2025 controlC1
+crw-rw----+  1 root audio 116,  9 Jun 26  2025 controlC2
+crw-rw----+  1 root audio 116,  3 Jun 26  2025 pcmC0D0c
+crw-rw----+  1 root audio 116,  2 Jun 26  2025 pcmC0D0p
+crw-rw----+  1 root audio 116,  6 Jun 26  2025 pcmC1D0c
+crw-rw----+  1 root audio 116,  5 Jun 26  2025 pcmC1D0p
+crw-rw----+  1 root audio 116,  8 Jun 26  2025 pcmC2D0p
+crw-rw----+  1 root audio 116,  1 Jun 26  2025 seq
+crw-rw----+  1 root audio 116, 33 Jun 26  2025 timer
+
+===== ACCELERATOR_DEVICES =====
+$ sh -c ls -la /dev/rknn* /dev/dma_heap* /dev/mali* /dev/galcore* /dev/npu* /dev/vpu* /dev/hevc* /dev/rga* /dev/ion* /dev/ump* 2>/dev/null || true
+crw-rw---- 1 root video 10, 122 Jun 26  2025 /dev/mali0
+crw-rw---- 1 root video 10, 123 Jun 26  2025 /dev/rga
+
+/dev/dma_heap:
+total 0
+drwxr-xr-x  2 root root     100 Jan  1  1970 .
+drwxr-xr-x 16 root root    5780 Jun 26  2025 ..
+crw-------  1 root root  251, 2 Jun 26  2025 reserved
+crw-rw----  1 root video 251, 0 Jun 26  2025 system
+crw-rw----  1 root video 251, 1 Jun 26  2025 system-uncached
+
+===== RK_SYSFS =====
+$ sh -c find /sys -maxdepth 4 \( -iname "*npu*" -o -iname "*rknpu*" -o -iname "*mali*" -o -iname "*rga*" -o -iname "*vpu*" -o -iname "*hevc*" \) 2>/dev/null | head -200
+/sys/kernel/slab/va-region-slab-mali0
+/sys/class/devlink/platform:27930f00.iommu--platform:27930000.rga
+/sys/class/devlink/i2c:1-0023--platform:27700000.npu
+/sys/class/devlink/platform:27380000.power-management:power-controller--platform:27700000.npu
+/sys/class/devlink/platform:27380000.power-management:power-controller--platform:27930000.rga
+/sys/class/devlink/platform:27702000.iommu--platform:27700000.npu
+/sys/class/devlink/regulator:regulator.22--platform:27700000.npu
+/sys/class/devlink/platform:27380000.power-management:power-controller--platform:27920000.rga
+/sys/class/devlink/platform:firmware:scmi--platform:27700000.npu
+/sys/class/devlink/platform:27920f00.iommu--platform:27920000.rga
+/sys/class/misc/mali0
+/sys/class/misc/uinput
+/sys/class/misc/rga
+/sys/class/devfreq/27700000.npu
+/sys/class/input
+/sys/class/input/input5
+/sys/class/input/input3
+/sys/class/input/input1
+/sys/class/input/input4
+/sys/class/input/input2
+/sys/class/input/input0
+/sys/devices/platform/wireless-bluetooth/input
+/sys/devices/platform/27700000.npu
+/sys/devices/platform/27930000.rga
+/sys/devices/platform/27702000.iommu/consumer:platform:27700000.npu
+/sys/devices/platform/27920f00.iommu/consumer:platform:27920000.rga
+/sys/devices/platform/27920000.rga
+/sys/devices/platform/rknpu_dev.10.auto
+/sys/devices/platform/firmware:scmi/consumer:platform:27700000.npu
+/sys/devices/platform/es8388-sound/input
+/sys/devices/platform/27930f00.iommu/consumer:platform:27930000.rga
+/sys/devices/virtual/devlink/platform:27930f00.iommu--platform:27930000.rga
+/sys/devices/virtual/devlink/i2c:1-0023--platform:27700000.npu
+/sys/devices/virtual/devlink/platform:27380000.power-management:power-controller--platform:27700000.npu
+/sys/devices/virtual/devlink/platform:27380000.power-management:power-controller--platform:27930000.rga
+/sys/devices/virtual/devlink/platform:27702000.iommu--platform:27700000.npu
+/sys/devices/virtual/devlink/regulator:regulator.22--platform:27700000.npu
+/sys/devices/virtual/devlink/platform:27380000.power-management:power-controller--platform:27920000.rga
+/sys/devices/virtual/devlink/platform:firmware:scmi--platform:27700000.npu
+/sys/devices/virtual/devlink/platform:27920f00.iommu--platform:27920000.rga
+/sys/devices/virtual/misc/uinput
+/sys/devices/virtual/misc/rga
+/sys/devices/genpd:0:27700000.npu
+/sys/devices/genpd:1:27700000.npu
+/sys/fs/cgroup/system.slice/input-event-daemon.service
+/sys/bus/platform/devices/27700000.npu
+/sys/bus/platform/devices/27930000.rga
+/sys/bus/platform/devices/27920000.rga
+/sys/bus/platform/devices/rknpu_dev.10.auto
+/sys/bus/platform/drivers/rga3
+/sys/bus/platform/drivers/mali-utgard
+/sys/bus/platform/drivers/mali
+/sys/bus/platform/drivers/rockchip-rga
+/sys/bus/platform/drivers/rga2
+/sys/bus/platform/drivers/RKNPU
+/sys/bus/genpd/devices/genpd:0:27700000.npu
+/sys/bus/genpd/devices/genpd:1:27700000.npu
+/sys/firmware/devicetree/base/rga@27920000
+/sys/firmware/devicetree/base/rga@27930000
+/sys/firmware/devicetree/base/npu@27700000
+/sys/firmware/devicetree/base/npu-opp-table
+/sys/module/snd_seq_midi/parameters/input_buffer_size
+/sys/module/mali
+/sys/module/mali/parameters/mali_dedicated_mem_size
+/sys/module/mali/parameters/mali_max_job_runtime
+/sys/module/mali/parameters/mali_max_pp_cores_group_1
+/sys/module/mali/parameters/mali_mem_swap_out_threshold_value
+/sys/module/mali/parameters/mali_debug_level
+/sys/module/mali/parameters/mali_l2_max_reads
+/sys/module/mali/parameters/mali_dedicated_mem_start
+/sys/module/mali/parameters/mali_shared_mem_size
+/sys/module/mali/parameters/mali_max_pp_cores_group_2
+/sys/module/rockchip_rga
+/sys/module/rknpu
+
+===== DEVICE_TREE_MODEL =====
+$ sh -c tr "\0" "\n" </proc/device-tree/model 2>/dev/null; printf "\ncompatible:\n"; tr "\0" "\n" </proc/device-tree/compatible 2>/dev/null
+LCKFB TaishanPi 3M RK3576 Board
+
+compatible:
+lckfb,tspi-3m-rk3576
+rockchip,rk3576
+
+===== THERMAL =====
+$ sh -c for z in /sys/class/thermal/thermal_zone*; do [ -d "$z" ] || continue; printf "%s " "$z"; [ -r "$z/type" ] && printf "type=%s " "$(cat "$z/type")"; [ -r "$z/temp" ] && awk "{printf \"temp_c=%.1f\", \$1/1000}" "$z/temp"; printf "\n"; done
+/sys/class/thermal/thermal_zone0 type=soc-thermal temp_c=34.2
+/sys/class/thermal/thermal_zone1 type=bigcore-thermal temp_c=35.2
+/sys/class/thermal/thermal_zone2 type=little-core-thermal temp_c=35.2
+/sys/class/thermal/thermal_zone3 type=ddr-thermal temp_c=34.2
+/sys/class/thermal/thermal_zone4 type=npu-thermal temp_c=34.2
+/sys/class/thermal/thermal_zone5 type=gpu-thermal temp_c=34.2
+
+===== POWER_SUPPLY =====
+$ sh -c for d in /sys/class/power_supply/*; do [ -d "$d" ] || continue; echo "--- $d"; for f in "$d"/*; do [ -f "$f" ] && [ -r "$f" ] && printf "%s=%s\n" "$(basename "$f")" "$(cat "$f" 2>/dev/null)"; done; done
+--- /sys/class/power_supply/tcpm-source-psy-2-0022
+current_max=0
+current_now=0
+online=0
+type=USB
+uevent=POWER_SUPPLY_NAME=tcpm-source-psy-2-0022
+POWER_SUPPLY_TYPE=USB
+POWER_SUPPLY_USB_TYPE=[C] PD PD_PPS
+POWER_SUPPLY_ONLINE=0
+POWER_SUPPLY_VOLTAGE_MIN=0
+POWER_SUPPLY_VOLTAGE_MAX=0
+POWER_SUPPLY_VOLTAGE_NOW=0
+POWER_SUPPLY_CURRENT_MAX=0
+POWER_SUPPLY_CURRENT_NOW=0
+usb_type=[C] PD PD_PPS
+voltage_max=0
+voltage_min=0
+voltage_now=0
+
+===== NETWORK_INTERFACES =====
+$ ip -details address
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00 promiscuity 0  allmulti 0 minmtu 0 maxmtu 0 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 524280 tso_max_segs 65535 gro_max_size 65536 
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+2: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN group default qlen 1000
+    link/ether fa:a4:f6:c7:f8:1c brd ff:ff:ff:ff:ff:ff promiscuity 0  allmulti 0 minmtu 0 maxmtu 0 
+    dummy numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 
+3: end0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc mq state DOWN group default qlen 1000
+    link/ether 2e:22:47:a2:47:d1 brd ff:ff:ff:ff:ff:ff promiscuity 0  allmulti 0 minmtu 46 maxmtu 9000 numtxqueues 8 numrxqueues 8 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 parentbus platform parentdev 2a220000.ethernet 
+4: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 40:d9:5a:f8:e6:5e brd ff:ff:ff:ff:ff:ff promiscuity 0  allmulti 0 minmtu 68 maxmtu 1500 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 parentbus sdio parentdev mmc2:0001:2 
+    inet 192.168.1.53/24 brd 192.168.1.255 scope global dynamic noprefixroute wlan0
+       valid_lft 44888sec preferred_lft 44888sec
+    inet6 2408:820c:8faf:b670:9d2c:8c7c:d046:c881/64 scope global dynamic noprefixroute 
+       valid_lft 259006sec preferred_lft 172606sec
+    inet6 fe80::5a66:dadb:7fc3:e426/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+5: wlan1: <NO-CARRIER,BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DORMANT group default qlen 1000
+    link/ether 42:d9:5a:f8:e6:5e brd ff:ff:ff:ff:ff:ff promiscuity 0  allmulti 0 minmtu 68 maxmtu 1500 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 parentbus sdio parentdev mmc2:0001:2 
+
+===== NETWORK_ROUTES =====
+$ ip route
+default via 192.168.1.1 dev wlan0 proto dhcp src 192.168.1.53 metric 600 
+192.168.1.0/24 dev wlan0 proto kernel scope link src 192.168.1.53 metric 600 
+
+===== NETWORK_LINKS =====
+$ sh -c for i in /sys/class/net/*; do [ -d "$i" ] || continue; n=$(basename "$i"); printf "%s: " "$n"; [ -r "$i/operstate" ] && printf "state=%s " "$(cat "$i/operstate")"; [ -r "$i/speed" ] && printf "speed=%sMbps " "$(cat "$i/speed" 2>/dev/null)"; [ -r "$i/duplex" ] && printf "duplex=%s " "$(cat "$i/duplex" 2>/dev/null)"; [ -r "$i/address" ] && printf "mac=%s" "$(cat "$i/address")"; printf "\n"; done
+dummy0: state=down speed=Mbps duplex= mac=fa:a4:f6:c7:f8:1c
+end0: state=down speed=-1Mbps duplex=unknown mac=2e:22:47:a2:47:d1
+lo: state=unknown speed=Mbps duplex= mac=00:00:00:00:00:00
+wlan0: state=up speed=Mbps duplex= mac=40:d9:5a:f8:e6:5e
+wlan1: state=dormant speed=Mbps duplex= mac=42:d9:5a:f8:e6:5e
+
+===== LISTENING_PORTS =====
+$ sh -c ss -tulpn 2>/dev/null || netstat -tulpn 2>/dev/null || true
+Netid State  Recv-Q Send-Q                             Local Address:Port Peer Address:PortProcess
+udp   UNCONN 0      0                                        0.0.0.0:1701      0.0.0.0:*          
+udp   UNCONN 0      0                                   192.168.1.53:123       0.0.0.0:*          
+udp   UNCONN 0      0                                      127.0.0.1:123       0.0.0.0:*          
+udp   UNCONN 0      0                                        0.0.0.0:123       0.0.0.0:*          
+udp   UNCONN 0      0                                        0.0.0.0:4500      0.0.0.0:*          
+udp   UNCONN 0      0                                        0.0.0.0:500       0.0.0.0:*          
+udp   UNCONN 0      0      [2408:820c:8faf:b670:9d2c:8c7c:d046:c881]:123             *:*          
+udp   UNCONN 0      0                    [fe80::5a66:dadb:7fc3:e426]:123             *:*          
+udp   UNCONN 0      0                                          [::1]:123             *:*          
+udp   UNCONN 0      0                                              *:123             *:*          
+udp   UNCONN 0      0                                              *:4500            *:*          
+udp   UNCONN 0      0                                              *:500             *:*          
+udp   UNCONN 0      0                    [fe80::5a66:dadb:7fc3:e426]:546             *:*          
+tcp   LISTEN 0      0                                      127.0.0.1:4894      0.0.0.0:*          
+tcp   LISTEN 0      0                                        0.0.0.0:22        0.0.0.0:*          
+tcp   LISTEN 0      0                                              *:22              *:*          
+tcp   LISTEN 0      0                                              *:5555            *:*          
+
+===== SYSTEMD =====
+$ sh -c systemctl --version 2>/dev/null; printf "\nfailed units:\n"; systemctl --failed --no-pager 2>/dev/null; printf "\nrunning services sample:\n"; systemctl list-units --type=service --state=running --no-pager 2>/dev/null | head -120
+systemd 252 (252.39-1~deb12u1)
++PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified
+
+failed units:
+  UNIT LOAD ACTIVE SUB DESCRIPTION
+0 loaded units listed.
+
+running services sample:
+  UNIT                         LOAD   ACTIVE SUB     DESCRIPTION
+  acpid.service                loaded active running ACPI event daemon
+  bluetooth.service            loaded active running Bluetooth service
+  dbus.service                 loaded active running D-Bus System Message Bus
+  frpc.service                 loaded active running FRP Client Service
+  getty@tty1.service           loaded active running Getty on tty1
+  input-event-daemon.service   loaded active running Input Event Daemon
+  irqbalance.service           loaded active running irqbalance daemon
+  lightdm.service              loaded active running Light Display Manager
+  NetworkManager.service       loaded active running Network Manager
+  ntpsec.service               loaded active running Network Time Service
+  polkit.service               loaded active running Authorization Manager
+  rkaiq_3A.service             loaded active running Enable Rockchip camera engine rkaiq
+  rsyslog.service              loaded active running System Logging Service
+  serial-getty@ttyFIQ0.service loaded active running Serial Getty on ttyFIQ0
+  ssh.service                  loaded active running OpenBSD Secure Shell server
+  strongswan-starter.service   loaded active running strongSwan IPsec IKEv1/IKEv2 daemon using ipsec.conf
+  systemd-hostnamed.service    loaded active running Hostname Service
+  systemd-journald.service     loaded active running Journal Service
+  systemd-logind.service       loaded active running User Login Management
+  systemd-udevd.service        loaded active running Rule-based Manager for Device Events and Files
+  udisks2.service              loaded active running Disk Manager
+  upower.service               loaded active running Daemon for power management
+  user@1000.service            loaded active running User Manager for UID 1000
+  wpa_supplicant.service       loaded active running WPA supplicant
+  xl2tpd.service               loaded active running LSB: layer 2 tunelling protocol daemon
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+25 loaded units listed.
+
+===== PROCESSES_TOP =====
+$ sh -c ps aux --sort=-%mem | head -30; printf "\nCPU sorted:\n"; ps aux --sort=-%cpu | head -30
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root        2261  0.0  3.8 636668 153000 tty7    Ssl+ Jun23   1:08 /usr/lib/xorg/Xorg :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+lckfb       2458  0.0  2.7 1724592 109388 ?      Sl   Jun23   0:18 xfwm4
+lckfb       2361  0.0  2.2 527272 90628 ?        Ssl  Jun23   0:02 xfce4-session
+lckfb       2638  0.0  1.7 515292 68540 ?        Sl   Jun23   0:03 /usr/bin/python3 /usr/bin/blueman-applet
+lckfb       2624  0.0  1.6 615068 67688 ?        Sl   Jun23   0:08 xfdesktop
+lckfb       2609  0.0  1.4 530452 57412 ?        Sl   Jun23   0:27 xfce4-panel
+lckfb       2635  0.0  1.3 569204 52532 ?        Sl   Jun23   1:04 nm-applet
+lckfb       2762  0.1  1.2 346364 51016 ?        Sl   Jun23   3:42 /usr/bin/python3 /usr/bin/blueman-tray
+lckfb       2688  0.2  1.1 479752 47860 ?        Sl   Jun23   7:59 /usr/lib/aarch64-linux-gnu/xfce4/panel/wrapper-2.0 /usr/lib/aarch64-linux-gnu/xfce4/panel/plugins/libpulseaudio-plugin.so 8 20971533 pulseaudio PulseAudio Plugin Adjust the audio volume of the PulseAudio sound system
+lckfb       2684  0.0  1.1 621784 45316 ?        Sl   Jun23   0:06 /usr/lib/aarch64-linux-gnu/xfce4/panel/wrapper-2.0 /usr/lib/aarch64-linux-gnu/xfce4/panel/plugins/libsystray.so 6 20971532 systray Status Tray Plugin Provides status notifier items (application indicators) and legacy systray items
+root         351  0.0  1.1 253292 44196 ?        Sl   Jun23   0:22 /usr/bin/rkaiq_3A_server
+lckfb       2749  0.0  1.0 405516 42180 ?        Sl   Jun23   0:01 /usr/lib/aarch64-linux-gnu/xfce4/panel/wrapper-2.0 /usr/lib/aarch64-linux-gnu/xfce4/panel/plugins/libactions.so 14 20971534 actions Action Buttons Log out, lock or other system actions
+lckfb       2579  0.0  0.9 291984 38852 ?        Sl   Jun23   0:01 xfsettingsd
+lckfb       2614  0.0  0.9 404220 37508 ?        Sl   Jun23   0:00 Thunar --daemon
+lckfb       2640  0.0  0.9 328468 36868 ?        Sl   Jun23   0:00 light-locker
+lckfb       2634  0.0  0.8 252548 32996 ?        Sl   Jun23   0:01 xfce4-power-manager
+lckfb       2636  0.0  0.7 251100 30712 ?        Sl   Jun23   0:00 /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
+lckfb       2637  0.0  0.6 637420 27044 ?        SNl  Jun23   0:09 /usr/libexec/tracker-miner-fs-3
+root         337  0.0  0.5  67316 22296 ?        Ss   Jun23   0:15 /lib/systemd/systemd-journald
+root        1398  0.0  0.5 266000 20212 ?        Ssl  Jun23   2:49 /usr/sbin/NetworkManager --no-daemon
+ntpsec      2599  0.0  0.4  84360 18252 ?        SLs  Jun23   0:29 /usr/sbin/ntpd -p /run/ntpd.pid -c /etc/ntpsec/ntp.conf -g -N -u ntpsec:ntpsec
+root        2627  0.0  0.4 1242040 17744 ?       Ssl  Jun23   2:32 /usr/local/bin/frpc -c /opt/frp/frpc.toml
+lckfb       2358  0.0  0.4 263696 16340 ?        Ssl  Jun23   0:01 /usr/bin/wireplumber
+root           1  0.0  0.2 168904 11796 ?        Ss   Jun23   0:09 /sbin/init #-05/14/2026
+root        1313  0.0  0.2 391844 11604 ?        Ssl  Jun23   0:00 /usr/libexec/udisks2/udisksd
+root        1400  0.0  0.2  17236 11056 ?        Ss   Jun23   0:34 /sbin/wpa_supplicant -u -s -O DIR=/run/wpa_supplicant GROUP=netdev
+lckfb       2356  0.0  0.2  48740 10952 ?        Ssl  Jun23   0:00 /usr/bin/pipewire
+lckfb       2643  0.0  0.2 356508 10824 ?        Sl   Jun23   0:00 /usr/libexec/gvfs-udisks2-volume-monitor
+lckfb       2337  0.0  0.2  19584 10320 ?        Ss   Jun23   0:00 /lib/systemd/systemd --user
+
+CPU sorted:
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+lckfb      20463  400  0.1  14780  4272 ?        R    01:01   0:00 ps aux --sort=-%cpu
+root       20429 10.7  0.2  19280  9484 ?        Ss   01:01   0:00 sshd: root [priv]
+sshd       20439  8.0  0.1  16472  7060 ?        S    01:01   0:00 sshd: root [net]
+root       20255  7.6  0.1  16708  3996 ?        Ss   01:01   0:00 /lib/systemd/systemd-hostnamed
+root       20181  6.3  0.2  19280 10008 ?        Ss   01:01   0:00 sshd: lckfb [priv]
+lckfb      20244  4.4  0.1  19540  6544 ?        S    01:01   0:00 sshd: lckfb@notty
+lckfb      20246  1.0  0.0   2320   816 ?        Ss   01:01   0:00 sh -s
+lckfb       2688  0.2  1.1 479752 47860 ?        Sl   Jun23   7:59 /usr/lib/aarch64-linux-gnu/xfce4/panel/wrapper-2.0 /usr/lib/aarch64-linux-gnu/xfce4/panel/plugins/libpulseaudio-plugin.so 8 20971533 pulseaudio PulseAudio Plugin Adjust the audio volume of the PulseAudio sound system
+lckfb       2762  0.1  1.2 346364 51016 ?        Sl   Jun23   3:42 /usr/bin/python3 /usr/bin/blueman-tray
+root        1931  0.1  0.0      0     0 ?        S    Jun23   3:03 [dhd_dpc]
+root        1398  0.0  0.5 266000 20212 ?        Ssl  Jun23   2:49 /usr/sbin/NetworkManager --no-daemon
+lckfb       2413  0.0  0.0   8712  2972 ?        Ss   Jun23   2:32 /usr/bin/dbus-daemon --syslog --fork --print-pid 5 --print-address 7 --session
+root        2627  0.0  0.4 1242040 17744 ?       Ssl  Jun23   2:32 /usr/local/bin/frpc -c /opt/frp/frpc.toml
+root       20025  0.0  0.0      0     0 ?        I    00:46   0:00 [kworker/7:0-events]
+root        2261  0.0  3.8 636668 153000 tty7    Ssl+ Jun23   1:08 /usr/lib/xorg/Xorg :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+root        1288  0.0  0.0  10880  1184 ?        Ssl  Jun23   1:07 /usr/sbin/irqbalance --foreground --policyscript=/etc/irqbalance.d
+lckfb       2635  0.0  1.3 569204 52532 ?        Sl   Jun23   1:04 nm-applet
+root       20064  0.0  0.0      0     0 ?        I    00:50   0:00 [kworker/2:1-events]
+root       19538  0.0  0.0      0     0 ?        I    Jun24   0:01 [kworker/1:2-events]
+message+    1274  0.0  0.1   9352  4740 ?        Ss   Jun23   0:48 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+root       19909  0.0  0.0      0     0 ?        I    00:31   0:00 [kworker/0:2-events]
+root        1930  0.0  0.0      0     0 ?        S    Jun23   0:40 [dhd_watchdog_thread]
+root       20016  0.0  0.0      0     0 ?        I    00:45   0:00 [kworker/u16:0-events_power_efficient]
+root          14  0.0  0.0      0     0 ?        I    Jun23   0:35 [rcu_sched]
+root        1400  0.0  0.2  17236 11056 ?        Ss   Jun23   0:34 /sbin/wpa_supplicant -u -s -O DIR=/run/wpa_supplicant GROUP=netdev
+root       19673  0.0  0.0      0     0 ?        I    00:05   0:00 [kworker/u16:4-events_freezable_power_]
+root       19770  0.0  0.0      0     0 ?        I    00:16   0:00 [kworker/u16:1-events_power_efficient]
+lckfb      20164  0.0  0.1 236872  5832 ?        Sl   00:59   0:00 /usr/lib/aarch64-linux-gnu/xfce4/xfconf/xfconfd
+root       16218  0.0  0.0      0     0 ?        I    Jun24   0:06 [kworker/6:2-events]
+
+===== DMESG_ERRORS =====
+$ sh -c dmesg -T 2>/dev/null | egrep -i "error|fail|warn|npu|rknn|mali|rga|vpu|thermal|thrott|oom" | tail -200 || true
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_scale_ch2: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_tools_id0: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif_scale_ch3: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] stream_cif_mipi_id1: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_tools_id1: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif_scale_ch3: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_scale_ch0: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] stream_cif_mipi_id1: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_scale_ch1: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] stream_cif_mipi_id3: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_scale_ch2: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_tools_id2: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_tools_id0: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] stream_cif_mipi_id2: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] stream_cif_mipi_id0: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_scale_ch3: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_tools_id1: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_scale_ch1: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] rkcif_scale_ch2: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:40 2026] stream_cif_mipi_id0: update sensor info failed -19
+[Tue Jun 23 01:29:40 2026] [BT_RFKILL]: rfkill_rk_set_power: set bt wake_host input!
+[Tue Jun 23 01:29:42 2026] [dhd] CFG80211-ERROR) wl_is_fils_supported : FILS NOT supported, err -22
+[Tue Jun 23 01:29:42 2026] [dhd] CFG80211-ERROR) wl_is_fils_supported : FILS NOT supported, err -19
+[Tue Jun 23 01:29:42 2026] bcmsdh_sdmmc: probe of mmc2:0001:3 failed with error -110
+[Tue Jun 23 01:29:43 2026] [dhd] dhd_legacy_preinit_ioctls: Failed to get preserve log # !
+[Tue Jun 23 01:29:43 2026] [dhd] CFG80211-ERROR) init_roam_cache : roamscan_mode iovar failed. -23
+[Tue Jun 23 01:29:43 2026] [dhd] CFG80211-ERROR) wl_cfg80211_up : Failed to enable RCC.
+[Tue Jun 23 01:29:43 2026] [dhd] CFG80211-ERROR) wl_cfg80211_deinit_p2p_discovery : Disabling P2P Discovery Interface 
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_disable_discovery :  do nothing, not initialized
+[Tue Jun 23 01:29:43 2026] [dhd] CFG80211-ERROR) wl_cfg80211_flush_pmksa : Not supporting Flushing pmklist on virtual interfaces than primary interface, primary_dev wlan0 dev wlan1
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_set_discovery : p2p_disc 1 error -16
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_init_discovery : set discover error
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_enable_discovery :  init discovery error -16
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_disable_discovery :  do nothing, not initialized
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_start_p2p_device : P2P enable discovery failed, ret=-16
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_disable_discovery :  do nothing, not initialized
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_del_p2p_disc_if : P2P interface unregistered
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_set_discovery : p2p_disc 1 error -16
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_init_discovery : set discover error
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_enable_discovery :  init discovery error -16
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_disable_discovery :  do nothing, not initialized
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_start_p2p_device : P2P enable discovery failed, ret=-16
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_disable_discovery :  do nothing, not initialized
+[Tue Jun 23 01:29:43 2026] [dhd] CFGP2P-ERROR) wl_cfgp2p_del_p2p_disc_if : P2P interface unregistered
+[Tue Jun 23 01:29:43 2026] [BT_RFKILL]: rfkill_rk_set_power: set bt wake_host input!
+[Tue Jun 23 01:29:44 2026] dw-apb-uart 2ad90000.serial: failed to request DMA, use interrupt mode
+[Tue Jun 23 01:29:45 2026] mali 27800000.gpu: Clearing BASE_MEM_UNCACHED_GPU flag to avoid MMA violation
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id0: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id1: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_tools_id2: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id2: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id3: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch0: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch1: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch2: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch3: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_tools_id0: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_tools_id1: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id0: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id1: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id2: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id3: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch0: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch1: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch2: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch3: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_tools_id0: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_tools_id1: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_tools_id2: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id0: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id1: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id2: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] stream_cif_mipi_id3: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch0: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch1: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch2: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_scale_ch3: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_tools_id0: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_tools_id1: update sensor info failed -19
+[Tue Jun 23 01:29:48 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:29:48 2026] rkcif_tools_id2: update sensor info failed -19
+[Tue Jun 23 01:29:50 2026] [dhd] CFG80211-ERROR) wl_mkeep_alive_update : wl_mkeep_alive_update: Get mkeep_alive failed (error=-2)
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id0: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id1: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_tools_id2: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id2: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id3: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch0: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch1: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch2: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch3: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_tools_id0: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_tools_id1: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id0: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id1: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id2: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id3: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch0: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch1: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch2: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch3: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_tools_id0: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_tools_id1: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds1: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_tools_id2: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id0: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id1: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id2: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] stream_cif_mipi_id3: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch0: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch1: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch2: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[3] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_scale_ch3: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[0] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_tools_id0: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[1] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_tools_id1: update sensor info failed -19
+[Tue Jun 23 01:30:09 2026] rkcif-mipi-lvds3: rkcif_update_sensor_info: stream[2] get remote terminal sensor failed!
+[Tue Jun 23 01:30:09 2026] rkcif_tools_id2: update sensor info failed -19
+
+===== PACKAGE_MANAGERS =====
+$ sh -c command -v apt && apt --version; command -v dpkg && dpkg --print-architecture; command -v rpm && rpm --version; command -v pacman && pacman --version; true
+/usr/bin/apt
+apt 2.6.1 (arm64)
+/usr/bin/dpkg
+arm64
+
+===== APT_SOURCES =====
+$ sh -c find /etc/apt -maxdepth 3 -type f \( -name "*.list" -o -name "*.sources" \) -print -exec sed -n "1,160p" {} \; 2>/dev/null
+/etc/apt/sources.list
+deb http://deb.debian.org/debian bookworm main contrib
+deb-src http://deb.debian.org/debian bookworm main contrib
+deb http://deb.debian.org/debian-security bookworm-security main contrib
+deb-src http://deb.debian.org/debian-security bookworm-security main contrib
+deb http://deb.debian.org/debian bookworm-updates main contrib
+deb-src http://deb.debian.org/debian bookworm-updates main contrib
+
+===== INSTALLED_PACKAGES_DPKG =====
+$ sh -c dpkg-query -W -f="${binary:Package}\t${Version}\t${Architecture}\n" 2>/dev/null | sort | head -1000 || true
+sh: 1: Bad substitution
+
+===== COMPILERS_AND_BUILD =====
+$ sh -c for c in gcc g++ clang clang++ cmake make ninja meson pkg-config git curl wget unzip tar; do if command -v "$c" >/dev/null 2>&1; then printf "\n## %s\n" "$c"; "$c" --version 2>&1 | head -5; fi; done
+
+## gcc
+gcc (Debian 12.2.0-14+deb12u1) 12.2.0
+Copyright (C) 2022 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+## g++
+g++ (Debian 12.2.0-14+deb12u1) 12.2.0
+Copyright (C) 2022 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+## cmake
+cmake version 3.25.1
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+
+## make
+GNU Make 4.3
+Built for aarch64-unknown-linux-gnu
+Copyright (C) 1988-2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+
+## pkg-config
+1.8.1
+
+## git
+git version 2.39.5
+
+## curl
+curl 7.88.1 (aarch64-unknown-linux-gnu) libcurl/7.88.1 OpenSSL/3.0.19 zlib/1.2.13 brotli/1.0.9 zstd/1.5.4 libidn2/2.3.3 libpsl/0.21.2 (+libidn2/2.3.3) libssh2/1.10.0 nghttp2/1.52.0 librtmp/2.3 OpenLDAP/2.5.13
+Release-Date: 2023-02-20, security patched: 7.88.1-10+deb12u14
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp
+Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM NTLM_WB PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
+
+## wget
+GNU Wget 1.21.3 built on linux-gnu.
+
+-cares +digest -gpgme +https +ipv6 +iri +large-file -metalink +nls 
++ntlm +opie +psl +ssl/gnutls 
+
+
+## unzip
+caution:  both -n and -o specified; ignoring -o
+UnZip 6.00 of 20 April 2009, by Debian. Original by Info-ZIP.
+
+Usage: unzip [-Z] [-opts[modifiers]] file[.zip] [list] [-x xlist] [-d exdir]
+  Default action is to extract files in list, except those in xlist, to exdir;
+
+## tar
+tar (GNU tar) 1.34
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+===== PYTHON =====
+$ sh -c for p in python3 python; do if command -v "$p" >/dev/null 2>&1; then printf "\n## %s\n" "$p"; "$p" --version 2>&1; "$p" - <<'PY' 2>/dev/null
+import sys, platform, site
+print("executable=", sys.executable)
+print("platform=", platform.platform())
+print("paths=", sys.path[:8])
+try:
+    print("sitepackages=", site.getsitepackages())
+except Exception as e:
+    print("sitepackages_error=", e)
+PY
+fi; done; for p in pip3 pip; do if command -v "$p" >/dev/null 2>&1; then printf "\n## %s\n" "$p"; "$p" --version; "$p" list 2>/dev/null | head -300; fi; done
+
+## python3
+Python 3.11.2
+executable= /usr/bin/python3
+platform= Linux-6.1.99-aarch64-with-glibc2.36
+paths= ['', '/usr/lib/python311.zip', '/usr/lib/python3.11', '/usr/lib/python3.11/lib-dynload', '/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages']
+sitepackages= ['/usr/local/lib/python3.11/dist-packages', '/usr/lib/python3/dist-packages', '/usr/lib/python3.11/dist-packages']
+
+===== ML_RUNTIMES =====
+$ sh -c for c in rknn-toolkit-lite2 rknn_server rknn_transfer_proxy npu-smi clinfo vulkaninfo glxinfo ffmpeg gst-inspect-1.0 onnxruntime_test benchmark_model; do if command -v "$c" >/dev/null 2>&1; then printf "\n## %s\n" "$c"; "$c" --version 2>&1 | head -80; fi; done; python3 - <<'PY' 2>/dev/null
+mods=["rknnlite","rknn","onnxruntime","torch","tensorflow","tflite_runtime","numpy","cv2","PIL"]
+for m in mods:
+    try:
+        mod=__import__(m)
+        print(m, getattr(mod, "__version__", "import_ok"))
+    except Exception as e:
+        print(m, "missing_or_error:", e)
+PY
+
+## rknn_server
+Connection to 150.158.146.192 closed by remote host.

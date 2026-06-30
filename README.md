@@ -1,0 +1,113 @@
+# Edge Model Lab
+
+Edge Model Lab is the control project for validating and deploying edge-side model workloads on three Rockchip devices.
+
+The Mac at `/Users/wq` is the control machine. The boards are deployment targets:
+
+- `orange-rk3588`: Orange Pi RK3588 / 16G+256G, primary deployment target, Docker-first.
+- `linaro-rk3576`: RK3576 / 8G+64G, main RK3576 compatibility target, systemd + Python venv first.
+- `lckfb-rk3576`: RK3576 / 4G+64G, low-memory validation target.
+
+## Current Phase
+
+Phase 1 foundation is in place, and Phase 2 runtime baselines are underway:
+
+- Preserve device audit reports and raw logs.
+- Maintain a machine-readable device inventory.
+- Build a local `edgectl` command for listing and health-checking devices.
+- Register local vendor RKNN/RKLLM/ONNX assets without committing large model blobs.
+- Run minimum RKNN Lite smoke tests on target boards.
+- Deploy the RK3576 YOLOv5 vendor demo as a systemd one-shot smoke unit.
+- Deploy a RK3576 Python RKNN HTTP service for long-running inference validation.
+- Keep passwords and secrets out of the project.
+
+## Layout
+
+```text
+inventory/reports/   Human-readable device reports.
+inventory/raw-logs/  Raw audit command output.
+docs/                Project design, milestones, experiment notes.
+docs/guides/         Clean operating manuals and beginner handoff docs.
+scripts/             Local control scripts.
+deploy/              Future systemd and Docker Compose deployment files.
+models/              Model metadata and conversion notes, not large model blobs.
+benchmarks/          Benchmark plans and results.
+```
+
+## Start Here
+
+For a clean handoff, read these in order:
+
+1. [Project Summary, 2026-06-30](docs/guides/project-summary-2026-06-30.md)
+2. [Project Handoff](docs/guides/project-handoff.md)
+3. [Beginner Deployment Guide](docs/guides/beginner-deployment-guide.md)
+4. [RK3588 Qwen3-VL-4B Runbook](docs/guides/rk3588-qwen3-vl-4b-runbook.md)
+5. [Device and Model Matrix](docs/guides/device-model-matrix.md)
+6. [Command Reference](docs/guides/command-reference.md)
+7. [Troubleshooting](docs/guides/troubleshooting.md)
+
+Current main milestone: `orange-rk3588` can run `Qwen/Qwen3.5-4B` multimodal inference through RKLLM `1.3.0` on RKNPU `v0.9.8`.
+
+## First Commands
+
+Planned phase 1 interface:
+
+```bash
+./scripts/edgectl list
+./scripts/edgectl health all
+./scripts/edgectl health orange-rk3588
+./scripts/edgectl models --platform rk3588
+./scripts/edgectl rknn-bootstrap linaro-rk3576
+./scripts/edgectl rknn-smoke orange-rk3588 rk3588_mobilenet_v2_lite2
+./scripts/edgectl yolo-smoke linaro-rk3576
+./scripts/edgectl yolo-deploy linaro-rk3576
+./scripts/edgectl rknn-service-deploy linaro-rk3576
+./scripts/edgectl rknn-service-bench linaro-rk3576 --count 20
+./scripts/edgectl service-status linaro-rk3576 edge-rknn-python.service
+./scripts/edgectl logs linaro-rk3576 edge-rknn-python.service --lines 80
+./scripts/edgectl llm-deploy lckfb-rk3576
+./scripts/edgectl llm-deploy linaro-rk3576
+./scripts/edgectl llm-deploy orange-rk3588
+./scripts/edgectl rk3588-qwen3-vl-smoke orange-rk3588
+./scripts/edgectl rkllm-download-qwen3-vl-source --chunk-mb 32 --workers 4
+./scripts/edgectl rkllm-conversion-check
+./scripts/edgectl rkllm-prepare-conversion /path/to/large-linux-disk/rkllm-qwen3-vl
+```
+
+`models/assets.yaml` stores metadata and local source paths for vendor assets. Large `.rknn`, `.rkllm`, `.onnx`, and `.pt` files stay in the original data directories.
+
+`llm-deploy` is a dedicated RKLLM smoke path. It does not participate in `deploy all`.
+
+- `lckfb-rk3576` and `linaro-rk3576`: TaishanPi RK3576 Qwen3-VL-2B-Instruct vendor demo.
+- `orange-rk3588`: Orange Pi RK3588 RKLLM text demo with `Qwen1_5.rkllm`.
+
+`rk3588-qwen3-vl-smoke` verifies the already deployed RK3588 `Qwen3-VL-4B-Instruct` multimodal bundle on the Orange Pi. It checks RKNPU `0.9.8`, CMA, the vision RKNN encoder, and the full RKLLM multimodal demo without re-uploading model files.
+
+The implementation uses conservative chunked uploads, remote size checks, and same-size skip checks for large `.rkllm` / `.rknn` artifacts because direct `scp`/`sftp` transfers to `lckfb-rk3576` were truncating multi-hundred-megabyte files. Re-running a deploy resumes from validated chunks when possible and skips already assembled files with the expected size.
+
+`rkllm-download-qwen3-vl-source` downloads `Qwen/Qwen3-VL-4B-Instruct` from Hugging Face into the default ZSPACE path:
+
+```text
+/Users/wq/Documents/ZSPACE/sata11-15850752485/edge-model-sources/huggingface/Qwen/Qwen3-VL-4B-Instruct
+```
+
+Large Hugging Face weight shards are downloaded as fixed-size range chunks and assembled locally, so failed network requests only retry the failed chunk.
+
+## Security
+
+`devices.yaml` intentionally does not store passwords. Use SSH keys, environment variables, or an ignored local credential file for access.
+
+## Local Credential Setup
+
+Preferred setup is SSH key auth to each board.
+
+For temporary password auth:
+
+```bash
+cp devices.local.example.yaml devices.local.yaml
+export EDGE_ORANGE_RK3588_PASSWORD='...'
+export EDGE_LINARO_RK3576_PASSWORD='...'
+export EDGE_LCKFB_RK3576_PASSWORD='...'
+```
+
+`devices.local.yaml` is ignored by git.

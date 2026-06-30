@@ -1,0 +1,17 @@
+[Unit]
+Description=Edge RKNN YOLOv5 smoke run
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/edge/apps/rknn_yolov5_demo
+Environment=LD_LIBRARY_PATH=/opt/edge/apps/rknn_yolov5_demo/lib
+ExecStart=/opt/edge/apps/rknn_yolov5_demo/rknn_yolov5_demo model/RK3576/yolov5s-640-640.rknn model/bus.jpg
+User=edge
+Group=edge
+SupplementaryGroups=video render
+
+[Install]
+WantedBy=multi-user.target

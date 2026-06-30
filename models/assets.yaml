@@ -1,0 +1,152 @@
+assets:
+  rk3588_mobilenet_v2_lite2:
+    kind: rknn
+    platform: rk3588
+    workload: image-classification
+    source: vendor-rknn-toolkit2-lite2-example
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/RKNPU/rknn-toolkit2.zip
+    archive_member: rknn-toolkit2/rknn-toolkit-lite2/examples/dynamic_shape/mobilenet_v2_for_rk3588.rknn
+    size_bytes: 5719052
+    smoke_input: synthetic
+    notes:
+      - Good first RK3588 RKNN Lite runtime smoke model.
+
+  rk3576_mobilenet_v2_lite2:
+    kind: rknn
+    platform: rk3576
+    workload: image-classification
+    source: vendor-rknn-toolkit2-lite2-example
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/RKNPU/rknn-toolkit2.zip
+    archive_member: rknn-toolkit2/rknn-toolkit-lite2/examples/dynamic_shape/mobilenet_v2_for_rk3576.rknn
+    size_bytes: 5827212
+    smoke_input: synthetic
+    notes:
+      - Good first RK3576 RKNN Lite runtime smoke model.
+
+  rk3588_resnet18_lite2:
+    kind: rknn
+    platform: rk3588
+    workload: image-classification
+    source: vendor-rknn-toolkit2-lite2-example
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/RKNPU/rknn-toolkit2.zip
+    archive_member: rknn-toolkit2/rknn-toolkit-lite2/examples/resnet18/resnet18_for_rk3588.rknn
+    size_bytes: 11990743
+    smoke_input: synthetic
+    notes:
+      - Secondary RK3588 classification smoke model.
+
+  rk3576_resnet18_lite2:
+    kind: rknn
+    platform: rk3576
+    workload: image-classification
+    source: vendor-rknn-toolkit2-lite2-example
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/RKNPU/rknn-toolkit2.zip
+    archive_member: rknn-toolkit2/rknn-toolkit-lite2/examples/resnet18/resnet18_for_rk3576.rknn
+    size_bytes: 11948375
+    smoke_input: synthetic
+    notes:
+      - Secondary RK3576 classification smoke model.
+
+  k7_rk3576_yolov5s_demo:
+    kind: rknn
+    platform: rk3576
+    workload: object-detection
+    source: kickpi-k7-yolov5-linux-demo
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/K7 rk3576/3-SoftwareData/Linux_rknn_yolov5/rknn_yolov5_demo_Linux_rk3576.zip
+    archive_member: rknn_yolov5_demo_Linux_rk3576/model/RK3576/yolov5s-640-640.rknn
+    size_bytes: 8197828
+    smoke_input: vendor-bus-jpg
+    notes:
+      - Demo archive also includes executable binaries, librknnrt, librga, MPP, labels, and bus.jpg.
+
+  taishan_rk3576_qwen3_vl_2b_vision:
+    kind: rknn
+    platform: rk3576
+    workload: vision-language-encoder
+    source: lckfb-taishanpi-ai-app
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/Qwen3-VL-2B-Instruct/2025-12-31/qwen3-vl_vision_rk3576.rknn
+    size_bytes: 873568285
+    smoke_input: vendor-app
+    notes:
+      - Pairs with qwen3-vl-2b-instruct_w8a8_rk3576.rkllm in the same directory.
+
+  taishan_rk3576_qwen3_vl_2b_llm:
+    kind: rkllm
+    platform: rk3576
+    workload: vision-language-llm
+    source: lckfb-taishanpi-ai-app
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/Qwen3-VL-2B-Instruct/2025-12-31/qwen3-vl-2b-instruct_w8a8_rk3576.rkllm
+    size_bytes: 2385677036
+    smoke_input: vendor-app
+    notes:
+      - Used by edgectl llm-deploy on lckfb-rk3576 and linaro-rk3576.
+
+  orangepi_rk3588_qwen1_5_rkllm:
+    kind: rkllm
+    platform: rk3588
+    workload: text-generation-llm
+    source: orangepi-rkllm-toolkit
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/香橙派RK3588S/官方工具/RKLLM工具包/转换后的模型/Qwen1_5.rkllm
+    size_bytes: 795100644
+    smoke_input: interactive-text
+    notes:
+      - Smallest provided RK3588 RKLLM text model; used by edgectl llm-deploy on orange-rk3588.
+
+  orangepi_rk3588_deepseek_r1_distill_qwen_1_5b_rkllm:
+    kind: rkllm
+    platform: rk3588
+    workload: text-generation-llm
+    source: orangepi-rkllm-toolkit
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/香橙派RK3588S/官方工具/RKLLM工具包/转换后的模型/DeepSeek-R1-Distill-Qwen-1.5B.rkllm
+    size_bytes: 2035400060
+    smoke_input: interactive-text
+    notes:
+      - Candidate follow-up model after the Qwen1_5 RKLLM smoke path is stable.
+
+  orangepi_rk3588_qwen3_5_4b_vision:
+    kind: rknn
+    platform: rk3588
+    workload: vision-language-encoder
+    source: Qwen/Qwen3.5-4B
+    path: /home/orangepi/edge-model-lab/qwen35-4b-rk3588/models/qwen3.5_vision_rk3588.rknn
+    size_bytes: 704579761
+    smoke_input: demo-and-user-image
+    notes:
+      - Converted with Rockchip rknn-llm release-v1.3.0 multimodal demo flow.
+      - Server source artifact at /home/wq/edge-workspaces/rkllm-qwen35-4b-rk3588-v130/rknn/qwen3.5_vision_rk3588.rknn.
+      - RKNN export log reported REGTASK warnings, but Orange Pi RK3588S board-side loading and inference passed.
+
+  orangepi_rk3588_qwen3_5_4b_llm:
+    kind: rkllm
+    platform: rk3588
+    workload: vision-language-llm
+    source: Qwen/Qwen3.5-4B
+    path: /home/orangepi/edge-model-lab/qwen35-4b-rk3588/models/qwen3.5-4b_w8a8_rk3588.rkllm
+    size_bytes: 5540941884
+    smoke_input: demo-and-user-image
+    notes:
+      - Converted with rkllm-toolkit 1.3.0, W8A8, target rk3588, 3 NPU cores, max context 4096.
+      - Server source artifact at /home/wq/edge-workspaces/rkllm-qwen35-4b-rk3588-v130/rkllm/qwen3.5-4b_w8a8_rk3588.rkllm.
+      - Deployed with RKLLM runtime 1.3.0 demo under /home/orangepi/edge-model-lab/qwen35-4b-rk3588.
+
+  taishan_yolo11n_onnx:
+    kind: onnx
+    platform: portable
+    workload: object-detection
+    source: lckfb-taishanpi-ai-app
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/YOLO11/yolo11n.onnx
+    size_bytes: null
+    smoke_input: conversion-source
+    notes:
+      - Candidate source for later RK3588/RK3576 conversion pipeline.
+
+  taishan_yolov8n_onnx:
+    kind: onnx
+    platform: portable
+    workload: object-detection
+    source: lckfb-taishanpi-ai-app
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/YOLOv8/yolov8n.onnx
+    size_bytes: null
+    smoke_input: conversion-source
+    notes:
+      - Candidate source for later RK3588/RK3576 conversion pipeline.
