@@ -131,6 +131,44 @@ EDGE_LINARO_RK3576_PASSWORD='...' ./scripts/edgectl llm-deploy linaro-rk3576
 EDGE_LCKFB_RK3576_PASSWORD='...' ./scripts/edgectl llm-deploy lckfb-rk3576
 ```
 
+## Home Server Training
+
+The home server is part of the project, not an external manual step.
+
+Use it for:
+
+- LoRA/QLoRA fine-tuning
+- dataset formatting and cleaning
+- small evaluation runs
+- Hugging Face model downloads
+- RKLLM/RKNN conversion
+- deploy bundle packaging
+
+Do not treat it as a from-scratch large-model training cluster. It has an RTX 4060 Ti with 8GB VRAM, which is practical for adapter fine-tuning but not for full-parameter training of 4B+ models.
+
+Standard server paths:
+
+```text
+/home/wq/edge-model-sources/     downloaded base models
+/home/wq/edge-datasets/          training and evaluation datasets
+/home/wq/edge-training-runs/     LoRA/QLoRA outputs and logs
+/home/wq/edge-workspaces/        conversion workspaces
+/home/wq/edge-tools/             toolchains and Python environments
+/home/wq/edge-logs/              long-running job logs
+```
+
+Training-to-deployment path:
+
+```text
+dataset -> LoRA/QLoRA adapter -> merged Hugging Face model -> RKLLM/RKNN conversion -> board smoke test
+```
+
+Full guide:
+
+```text
+docs/guides/home-server-training.md
+```
+
 ## Lessons Learned
 
 Rockchip model deployment is a system problem, not only a model conversion problem. The model artifact, runtime library, board kernel, RKNPU driver, CMA memory reservation, and NPU target platform all have to match.

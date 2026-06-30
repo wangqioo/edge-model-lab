@@ -143,6 +143,55 @@ Download Hugging Face source model:
 ./scripts/edgectl rkllm-download-qwen3-vl-source --chunk-mb 32 --workers 4
 ```
 
+## Home Server Training
+
+Connect to the home server:
+
+```bash
+ssh wq@192.168.1.39
+```
+
+Create standard project directories:
+
+```bash
+mkdir -p \
+  /home/wq/edge-model-sources \
+  /home/wq/edge-datasets \
+  /home/wq/edge-training-runs \
+  /home/wq/edge-workspaces \
+  /home/wq/edge-tools \
+  /home/wq/edge-logs
+```
+
+Create a training environment:
+
+```bash
+python3 -m venv /home/wq/edge-tools/train-qwen-lora-py312
+source /home/wq/edge-tools/train-qwen-lora-py312/bin/activate
+python -m pip install --upgrade pip
+```
+
+Monitor GPU and memory:
+
+```bash
+nvidia-smi
+free -h
+df -h /
+```
+
+Run a long training job with logs:
+
+```bash
+nohup bash train.sh > /home/wq/edge-logs/<run-name>.log 2>&1 &
+tail -f /home/wq/edge-logs/<run-name>.log
+```
+
+See:
+
+```text
+docs/guides/home-server-training.md
+```
+
 ## Local Verification
 
 Run project tests:
