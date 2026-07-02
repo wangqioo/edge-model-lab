@@ -38,6 +38,51 @@ Detailed record:
 docs/experiments/2026-06-30-rk3588-qwen35-4b-conversion.md
 ```
 
+## RK1828 Safety Rules
+
+These rules are mandatory for RK1828 work. The RK3588 host has been wedged by
+unsafe concurrent access to the RK1828 PCIe/RKEP path.
+
+Power sequence:
+
+```text
+RK3588 off
+RK1828 12V on
+wait until RK1828 has fully started and LED/fan state is stable
+RK3588 on
+```
+
+Runtime access rules:
+
+- Do not hot-plug the RK1828 M.2 card.
+- Do not run `rknn3_transfer_proxy`, `pcie_upgrade_tool`, `rknn3_model_test`,
+  `rknn3_vlm_demo`, `rknn3_llm_demo`, or `rkllm3-server` concurrently.
+- Do not run `pcie_upgrade_tool ... uf` while `rknn3_transfer_proxy` is running.
+- Do not use `systemctl start rknn3` or `/bin/rknn3_startup start` for bring-up.
+- After any RK3588 recovery, the first command must be a read-only status check.
+
+Use the guarded wrapper for RK1828 runtime operations:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
+```
+
+`status` does not call `rknn3_transfer_proxy`; it is safe as the first check
+after the board comes back. `devices`, `firmware`, `start-proxy`, and
+`vision-smoke` touch the RK1828 runtime path and must remain serialized through
+the wrapper.
+
+Detailed records:
+
+- [RK1828 Qwen3-VL-4B Runbook](docs/guides/rk1828-qwen3-vl-4b-runbook.md)
+- [2026-07-03 RK1828 power and runtime experiment](docs/experiments/2026-07-03-rk1828-12v-power-detection.md)
+
 ## Repository Layout
 
 ```text
