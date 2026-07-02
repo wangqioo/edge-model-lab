@@ -69,6 +69,7 @@ Use the guarded wrapper for RK1828 runtime operations:
 
 ```bash
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py preflight
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
@@ -76,10 +77,10 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-prox
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
 ```
 
-`status` does not call `rknn3_transfer_proxy`; it is safe as the first check
-after the board comes back. `devices`, `firmware`, `start-proxy`, and
-`vision-smoke` touch the RK1828 runtime path and must remain serialized through
-the wrapper.
+`status` and `preflight` do not call `rknn3_transfer_proxy`; they are safe as
+the first checks after the board comes back. `devices`, `firmware`,
+`start-proxy`, and `vision-smoke` touch the RK1828 runtime path and must remain
+serialized through the wrapper.
 
 The wrapper intentionally refuses `firmware` by default. Only use this when
 physical recovery is available:

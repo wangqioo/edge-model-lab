@@ -292,6 +292,7 @@ bring-up:
 
 ```bash
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py preflight
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
@@ -306,8 +307,10 @@ The wrapper takes a remote lock and refuses unsafe combinations:
 - model tests refuse to run while upgrade/model/server processes are present.
 - `status` does not invoke `rknn3_transfer_proxy`; use it first after a board
   recovery to check host state without touching the RK1828 runtime path.
-- `devices` is the first transfer-layer query and should only be used after
-  `status` shows no conflicting runtime processes.
+- `preflight` also avoids transfer-layer calls; use it after `status` to collect
+  PCIe, module, firmware, runtime binary, service, and smoke-file evidence.
+- `devices` is the first transfer-layer query and should only be used after both
+  `status` and `preflight` show no conflicting runtime processes.
 
 The wrapper refuses firmware download by default because it can hang the host.
 Only use it with physical access to power-cycle the boards:
@@ -321,22 +324,17 @@ strictly read-only.
 
 ## First Checks After 12V Power
 
-Run these on the RK3588 host before trying model inference:
+Run these from the Mac control machine before trying model inference:
 
 ```bash
-lspci -nn
-dmesg | tail -n 200
-lsmod | grep -i rkn
-ls /dev | grep -Ei 'rkn|npu|rk182'
-/usr/local/bin/rknn3_transfer_proxy devices
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py preflight
 ```
 
-Useful PCIe checks:
+Only if both read-only checks look clean, use the first transfer-layer query:
 
 ```bash
-dmesg | grep -Ei 'pcie|pci|rk182|rknpu|npu'
-lspci -tv
-lspci -vv
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
 ```
 
 Record the output in a new experiment note under `docs/experiments/`.

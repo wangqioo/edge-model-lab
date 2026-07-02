@@ -111,6 +111,60 @@ devices() {
   run_timeout 10 /bin/rknn3_transfer_proxy devices
 }
 
+preflight() {
+  echo "=== preflight: runtime tools ==="
+  for path in \
+    /bin/rknn3_transfer_proxy \
+    /bin/pcie_upgrade_tool \
+    /bin/rknn3_model_test \
+    /lib/librknn3_api.so \
+    "$firmware_path" \
+    "$module_path"; do
+    if [ -e "$path" ]; then
+      ls -l "$path"
+    else
+      echo "missing: $path"
+    fi
+  done
+
+  echo "=== preflight: pci endpoint ==="
+  lspci -nn | grep -Ei '182a|1828|processing' || true
+  if [ -e "/sys/bus/pci/devices/$device_id" ]; then
+    echo "$device_id present under /sys/bus/pci/devices"
+    for attr in vendor device class revision current_link_speed current_link_width; do
+      if [ -r "/sys/bus/pci/devices/$device_id/$attr" ]; then
+        printf "%s=" "$attr"
+        cat "/sys/bus/pci/devices/$device_id/$attr"
+      fi
+    done
+  else
+    echo "$device_id missing under /sys/bus/pci/devices"
+  fi
+
+  echo "=== preflight: kernel config ==="
+  if [ -r "/boot/config-$(uname -r)" ]; then
+    grep -E 'CONFIG_PCIE_FUNC_RKEP|CONFIG_PCI|CONFIG_NTB|CONFIG_UIO|CONFIG_VFIO' "/boot/config-$(uname -r)" || true
+  else
+    echo "missing /boot/config-$(uname -r)"
+  fi
+
+  echo "=== preflight: driver/device nodes ==="
+  lsmod | grep -E '^pcie_rkep|rkep' || true
+  ls -l /dev/pcie-rkep-* 2>&1 || true
+  modinfo "$module_path" 2>/dev/null | sed -n '1,80p' || true
+
+  echo "=== preflight: services and processes ==="
+  systemctl is-active rknn3.service rknn-mdns.service 2>&1 || true
+  systemctl is-enabled rknn3.service rknn-mdns.service 2>&1 || true
+  print_processes
+
+  echo "=== preflight: smoke files ==="
+  ls -lh "$vision_dir/$vision_model" "$vision_dir/$vision_weight" 2>&1 || true
+
+  echo "=== preflight: recent pci/rkep/rknn logs ==="
+  dmesg -T | grep -Ei 'fe150000|182a|rkep|rknn|pcie' | tail -120 || true
+}
+
 stop_runtime() {
   echo "=== stopping runtime processes ==="
   pkill -TERM -f 'rknn3_transfer_proxy|pcie_upgrade_tool|rknn3_model_test|rknn3_vlm_demo|rknn3_llm_demo|rkllm3-server' 2>/dev/null || true
@@ -228,6 +282,7 @@ vision_smoke() {
 
 case "$action" in
   status) status ;;
+  preflight) preflight ;;
   devices) devices ;;
   stop-runtime) stop_runtime ;;
   load-driver) load_driver ;;
@@ -252,6 +307,7 @@ def build_parser() -> argparse.ArgumentParser:
         "action",
         choices=(
             "status",
+            "preflight",
             "devices",
             "stop-runtime",
             "load-driver",
