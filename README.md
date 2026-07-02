@@ -58,6 +58,10 @@ Runtime access rules:
 - Do not run `rknn3_transfer_proxy`, `pcie_upgrade_tool`, `rknn3_model_test`,
   `rknn3_vlm_demo`, `rknn3_llm_demo`, or `rkllm3-server` concurrently.
 - Do not run `pcie_upgrade_tool ... uf` while `rknn3_transfer_proxy` is running.
+- Do not run firmware download unless someone is physically present to power
+  recover the RK3588/RK1828 stack. On 2026-07-03, `pcie_upgrade_tool ... uf`
+  made the RK3588 host unreachable even after proxy/model processes were
+  stopped.
 - Do not use `systemctl start rknn3` or `/bin/rknn3_startup start` for bring-up.
 - After any RK3588 recovery, the first command must be a read-only status check.
 
@@ -68,7 +72,6 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
-EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
 ```
@@ -77,6 +80,13 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smo
 after the board comes back. `devices`, `firmware`, `start-proxy`, and
 `vision-smoke` touch the RK1828 runtime path and must remain serialized through
 the wrapper.
+
+The wrapper intentionally refuses `firmware` by default. Only use this when
+physical recovery is available:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware --allow-firmware-risk
+```
 
 Detailed records:
 

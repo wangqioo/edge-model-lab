@@ -31,20 +31,46 @@ Converted artifacts are already on the home server:
 Runtime validation has moved past the initial RK3588 host-kernel transfer
 blocker. With the correct power sequence, the RK1828 is visible in PCIe as
 `0000:01:00.0`. A rebuilt Orange Pi `6.1.43-rockchip-rk3588` RKEP module can
-load and create `/dev/pcie-rkep-0000:01:00.0`. RKNN3 startup is still not
-validated: after installing the RK1828 M.2 runtime and restarting
-`rknn3.service`, the RK3588 host stopped responding on LAN.
+load and create `/dev/pcie-rkep-0000:01:00.0`.
 
-The RKNN3 M.2 runtime and custom RKEP module are currently isolated out of the
-live RK3588 system paths:
+On 2026-07-03, a second RKEP compatibility issue was found and patched locally:
+RKNN3 `1.0.4` user space requires RKEP function-driver version `0x30300` via
+`_IOR('P', 0, int)` and mmap resources for BAR1/BAR5 at indexes 7 and 8. The
+original Orange Pi 6.1.43 driver returned version `0x0` and rejected mmap index
+7/8. After patching and rebuilding the module, `rknn3_transfer_proxy` opened the
+device and logged:
+
+```text
+rk pcie tiny version: 30300
+bar0 size=0x400000
+bar1 size=0x100000
+bar2 size=0x4000000
+bar4 size=0x100000
+bar5 size=0x100000
+rc_cc_version=30300
+gen2x1
+```
+
+This is not yet full model success. A minimal RKNN3 smoke reached
+`find_devices ret=0 n_devices=1`, then hung inside `rknn3_init`. A
+`pcie_upgrade_tool ... uf /lib/firmware/rknn3_rk1820.img` attempt after stopping
+proxy/model processes made the RK3588 host unreachable on LAN. Do not repeat
+firmware download unless physical power recovery is available.
+
+Earlier in the bring-up, the RKNN3 M.2 runtime and custom RKEP module were
+isolated out of the live RK3588 system paths for recovery:
 
 ```text
 /home/orangepi/rk1828-rknn3-runtime-disabled-20260703-034331
 ```
 
 After this isolation rollback, the RK3588 host rebooted normally without RK1828
-power. Do not reinstall or re-enable the runtime service until the RK1828-first
-power test has been repeated on the rolled-back system.
+power. The later 2026-07-03 RK1828-first boot test restored the RKNN3 user-space
+runtime and installed the patched RKEP module manually, without enabling
+`rknn3.service`. The last confirmed reachable runtime state had the patched
+`/usr/lib/modules/pcie-rkep.ko` installed and `rknn3_transfer_proxy` able to open
+the RK1828 PCIe device. The host then became unreachable during a manual
+firmware download attempt.
 
 ## What Is Ready
 
@@ -220,7 +246,7 @@ Backup directory:
 /home/orangepi/rk1828-rknn3-runtime-disabled-20260703-034331
 ```
 
-Current known-good RK3588-only state:
+Known-good RK3588-only rollback state from earlier recovery:
 
 ```text
 rknn3.service: no unit file, inactive
@@ -269,7 +295,6 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
-EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
 ```
@@ -283,6 +308,13 @@ The wrapper takes a remote lock and refuses unsafe combinations:
   recovery to check host state without touching the RK1828 runtime path.
 - `devices` is the first transfer-layer query and should only be used after
   `status` shows no conflicting runtime processes.
+
+The wrapper refuses firmware download by default because it can hang the host.
+Only use it with physical access to power-cycle the boards:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware --allow-firmware-risk
+```
 
 Do not bypass this wrapper with hand-written SSH one-liners unless the command is
 strictly read-only.

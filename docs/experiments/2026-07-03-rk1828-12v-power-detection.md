@@ -359,6 +359,135 @@ and the RK1828 PCI device ID was added:
 { PCI_VDEVICE(ROCKCHIP, 0x182a), 1,  },
 ```
 
+## RKNN3 1.0.4 RKEP ABI Patch
+
+After the initial module loaded, `rknn3_transfer_proxy` still failed during
+device open:
+
+```text
+pcie_rkep drv version 0x0 is not compatible, at least 0x30300
+mmap index 7 is out of number
+mmap index 8 is out of number
+```
+
+Binary inspection of `rknn3_transfer_proxy` showed the driver version is read
+with:
+
+```text
+ioctl(fd, 0x80045000, &version)  # _IOR('P', 0, int)
+```
+
+The EVB10 `6.1.162` module strings showed BAR1/BAR5 mmap support, while the
+Orange Pi 6.1.43 source only exposed BAR0/BAR2/BAR4 and resource indexes 0..6.
+
+The local Orange Pi 6.1.43 source was patched to add:
+
+```text
+#define RKEP_FUNC_DRV_VERSION 0x30300
+#define PCIE_EP_GET_FUNC_DRV_VERSION _IOR(PCIE_BASE, 0, int)
+PCIE_EP_MMAP_RESOURCE_BAR1  # index 7
+PCIE_EP_MMAP_RESOURCE_BAR5  # index 8
+```
+
+and `pcie-rkep.c` was patched to return `0x30300` for the version ioctl and mmap
+BAR1/BAR5.
+
+Rebuilt module metadata:
+
+```text
+name:     pcie_rkep
+alias:    pci:v00001D87d0000182Asv*sd*bc*sc*i*
+vermagic: 6.1.43-rockchip-rk3588 SMP mod_unload aarch64
+```
+
+After installing this module on RK3588:
+
+```text
+/usr/lib/modules/pcie-rkep.ko size: 209432
+/dev/pcie-rkep-0000:01:00.0 present
+```
+
+`rknn3_transfer_proxy devices` returned:
+
+```text
+List of ntb devices attached
+0000:01:00.0        b98e6c51    PCIE
+```
+
+`rknn3_transfer_proxy` then opened the device successfully:
+
+```text
+rk pcie tiny version: 30300
+bar0 size=0x400000
+bar1 size=0x100000
+bar2 size=0x4000000
+bar4 size=0x100000
+bar5 size=0x100000
+rc_cc_version=30300
+gen2x1
+```
+
+This proves the host-driver ABI blocker was removed.
+
+## Current Runtime Blocker
+
+The converted vision smoke bundle is staged at:
+
+```text
+/home/orangepi/edge-model-lab/rk1828-vision-smoke
+Qwen3-VL-4B-vision-rk1828-prune.rknn
+Qwen3-VL-4B-vision-rk1828-prune.weight
+```
+
+The official test command:
+
+```bash
+/bin/rknn3_model_test Qwen3-VL-4B-vision-rk1828-prune.rknn \
+  Qwen3-VL-4B-vision-rk1828-prune.weight none none 0x3 1
+```
+
+timed out after 180 seconds without model output.
+
+A minimal line-buffered smoke program narrowed the hang:
+
+```text
+find_devices ret=0 n_devices=1
+device[0] id=0000:01:00.0 type=PCIE
+```
+
+It then hung inside `rknn3_init` and timed out after 60 seconds. Therefore the
+current blocker is RKNN3 device/server initialization, not PCIe enumeration, not
+RKEP device open, and not model file loading.
+
+## Firmware Download Risk
+
+After stopping proxy/model processes, the guarded wrapper attempted:
+
+```bash
+/bin/pcie_upgrade_tool -s 0000:01:00.0 uf /lib/firmware/rknn3_rk1820.img
+```
+
+The command produced no progress output, did not return within the expected
+window, and the RK3588 LAN SSH endpoint became unreachable:
+
+```text
+ssh: connect to host 192.168.1.52 port 22: Host is down
+ssh: connect to host 192.168.1.52 port 22: Operation timed out
+```
+
+Do not run firmware download again unless physical recovery is available. The
+safe wrapper now refuses `firmware` by default and requires:
+
+```bash
+./scripts/rk1828_safe_runtime.py firmware --allow-firmware-risk
+```
+
+After the board is physically recovered, the first command must be:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
+```
+
 The rebuilt module reports:
 
 ```text
@@ -575,11 +704,12 @@ Use this Bus-Id for RKLLM3/RKNN3 runtime commands:
 0000:01:00.0
 ```
 
-Do not mark full model runtime as validated yet. The hardware is detected, and
-the proxy can list the PCIe endpoint, but RKNN3 runtime startup is not validated.
-The installer-provided service previously made the RK3588 host unreachable after
-manual restart, and the runtime stack is currently isolated in the rollback
-backup directory.
+Do not mark full model runtime as validated yet. The hardware is detected, the
+patched RKEP driver lets `rknn3_transfer_proxy` open the PCIe endpoint, and the
+minimal smoke reaches `find_devices ret=0 n_devices=1`. The current unvalidated
+step is `rknn3_init`, which hangs before model loading. See the "RKNN3 1.0.4
+RKEP ABI Patch", "Current Runtime Blocker", and "Firmware Download Risk"
+sections above for the latest state.
 
 ## Unsafe Runtime Attempt
 

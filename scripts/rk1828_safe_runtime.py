@@ -15,11 +15,13 @@ DEFAULT_HOST = "192.168.1.52"
 DEFAULT_USER = "orangepi"
 DEFAULT_PASSWORD_ENV = "EDGE_ORANGE_RK3588_PASSWORD"
 DEFAULT_MODULE = "/usr/lib/modules/pcie-rkep.ko"
+DEFAULT_SOURCE_MODULE = ""
 DEFAULT_DEVICE_ID = "0000:01:00.0"
 DEFAULT_FIRMWARE = "/lib/firmware/rknn3_rk1820.img"
 DEFAULT_VISION_DIR = "/home/orangepi/edge-model-lab/rk1828-vision-smoke"
 DEFAULT_VISION_MODEL = "Qwen3-VL-4B-vision-rk1828-prune.rknn"
 DEFAULT_VISION_WEIGHT = "Qwen3-VL-4B-vision-rk1828-prune.weight"
+FIRMWARE_RISK_TOKEN = "ALLOW_RK1828_FIRMWARE_RISK"
 
 
 REMOTE_SCRIPT = r"""#!/usr/bin/env bash
@@ -32,6 +34,8 @@ firmware_path="${4:-/lib/firmware/rknn3_rk1820.img}"
 vision_dir="${5:-/home/orangepi/edge-model-lab/rk1828-vision-smoke}"
 vision_model="${6:-Qwen3-VL-4B-vision-rk1828-prune.rknn}"
 vision_weight="${7:-Qwen3-VL-4B-vision-rk1828-prune.weight}"
+source_module="${8:-}"
+firmware_risk_token="${9:-}"
 
 lock_file=/tmp/rk1828-runtime.lock
 exec 9>"$lock_file"
@@ -131,9 +135,49 @@ load_driver() {
   ls -l /dev/pcie-rkep-* 2>&1 || true
 }
 
+unload_driver() {
+  refuse_if_upgrade_or_model_running
+  refuse_if_proxy_running
+  echo "=== unloading driver ==="
+  if lsmod | grep -q '^pcie_rkep'; then
+    rmmod pcie_rkep
+  else
+    echo "pcie_rkep is not loaded"
+  fi
+  lsmod | grep -E '^pcie_rkep|rkep' || true
+  ls -l /dev/pcie-rkep-* 2>&1 || true
+}
+
+install_module() {
+  refuse_if_upgrade_or_model_running
+  refuse_if_proxy_running
+  if [ -z "$source_module" ]; then
+    echo "missing --source-module for install-module" >&2
+    exit 89
+  fi
+  if [ ! -f "$source_module" ]; then
+    echo "missing source module: $source_module" >&2
+    exit 90
+  fi
+  echo "=== installing module ==="
+  if lsmod | grep -q '^pcie_rkep'; then
+    rmmod pcie_rkep
+  fi
+  if [ -f "$module_path" ]; then
+    cp -a "$module_path" "${module_path}.bak-$(date +%Y%m%d%H%M%S)"
+  fi
+  install -m 0644 "$source_module" "$module_path"
+  modinfo "$module_path" | sed -n '1,40p'
+}
+
 firmware() {
   refuse_if_proxy_running
   refuse_if_upgrade_or_model_running
+  if [ "$firmware_risk_token" != "ALLOW_RK1828_FIRMWARE_RISK" ]; then
+    echo "refusing: firmware download has repeatedly made the RK3588 host unreachable" >&2
+    echo "only run it with --allow-firmware-risk when physical power recovery is available" >&2
+    exit 91
+  fi
   echo "=== firmware download ==="
   if [ ! -f "$firmware_path" ]; then
     echo "missing firmware: $firmware_path" >&2
@@ -187,6 +231,8 @@ case "$action" in
   devices) devices ;;
   stop-runtime) stop_runtime ;;
   load-driver) load_driver ;;
+  unload-driver) unload_driver ;;
+  install-module) install_module ;;
   firmware) firmware ;;
   start-proxy) start_proxy ;;
   vision-smoke) vision_smoke ;;
@@ -209,6 +255,8 @@ def build_parser() -> argparse.ArgumentParser:
             "devices",
             "stop-runtime",
             "load-driver",
+            "unload-driver",
+            "install-module",
             "firmware",
             "start-proxy",
             "vision-smoke",
@@ -220,10 +268,19 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--password-env", default=DEFAULT_PASSWORD_ENV)
     parser.add_argument("--device-id", default=DEFAULT_DEVICE_ID)
     parser.add_argument("--module-path", default=DEFAULT_MODULE)
+    parser.add_argument("--source-module", default=DEFAULT_SOURCE_MODULE)
     parser.add_argument("--firmware-path", default=DEFAULT_FIRMWARE)
     parser.add_argument("--vision-dir", default=DEFAULT_VISION_DIR)
     parser.add_argument("--vision-model", default=DEFAULT_VISION_MODEL)
     parser.add_argument("--vision-weight", default=DEFAULT_VISION_WEIGHT)
+    parser.add_argument(
+        "--allow-firmware-risk",
+        action="store_true",
+        help=(
+            "Allow the firmware action. This can make the RK3588 host "
+            "unreachable and should only be used with physical recovery access."
+        ),
+    )
     return parser
 
 
@@ -244,6 +301,8 @@ def run_remote(args: argparse.Namespace) -> int:
         args.vision_dir,
         args.vision_model,
         args.vision_weight,
+        args.source_module,
+        FIRMWARE_RISK_TOKEN if args.allow_firmware_risk else "",
     ]
     remote_cmd = textwrap.dedent(
         f"""
