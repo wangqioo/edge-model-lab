@@ -745,10 +745,40 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
-EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
 ```
+
+Firmware download is intentionally not part of the normal sequence. It requires
+physical recovery access and an explicit risk flag:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware --allow-firmware-risk
+```
+
+## 2026-07-03 05:21 Reachability Check
+
+After the user reported that the RK3588 had been powered on again, only
+read-only network checks were run. No RK1828 runtime, firmware, proxy, model, or
+driver command was executed.
+
+Observed state:
+
+```text
+ssh 192.168.1.52:22: Operation timed out / No route to host
+Mac ARP for 192.168.1.52: incomplete
+home server ip neigh for 192.168.1.52: FAILED
+home server ping 192.168.1.52: 100% packet loss
+150.158.146.192:6280: TCP open, but SSH closes during login
+LAN nmap: 192.168.1.52 not present
+SSH hosts discovered: 192.168.1.9, .26, .39, .42, .50, .53
+orangepi/orangepi login on the discovered non-.39 SSH hosts: permission denied
+```
+
+Conclusion: at that time, the RK3588 host had not returned as a reachable LAN
+host and had not obviously taken a different DHCP address. Continue to treat the
+board as not remotely recoverable until `status` can connect and print host
+state.
 
 ## Next Checks
 
