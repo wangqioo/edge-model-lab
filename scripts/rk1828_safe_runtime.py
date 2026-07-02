@@ -154,7 +154,7 @@ start_proxy() {
   else
     rm -f /tmp/rknn3-transfer-proxy.log
     RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini \
-      nohup /bin/rknn3_transfer_proxy >/tmp/rknn3-transfer-proxy.log 2>&1 &
+      nohup /bin/rknn3_transfer_proxy >/tmp/rknn3-transfer-proxy.log 2>&1 9>&- &
     sleep 3
   fi
   print_processes
