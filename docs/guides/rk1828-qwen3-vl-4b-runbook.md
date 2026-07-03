@@ -51,11 +51,22 @@ rc_cc_version=30300
 gen2x1
 ```
 
-This is not yet full model success. A minimal RKNN3 smoke reached
-`find_devices ret=0 n_devices=1`, then hung inside `rknn3_init`. A
-`pcie_upgrade_tool ... uf /lib/firmware/rknn3_rk1820.img` attempt after stopping
-proxy/model processes made the RK3588 host unreachable on LAN. Do not repeat
-firmware download unless physical power recovery is available.
+This is not yet full model success. `rknn3_transfer_proxy devices` and
+`pcie_upgrade_tool ld` can list the RK1828 endpoint, but a guarded
+`rknn3_model_test` run timed out after 180 seconds. The proxy log shows the
+client does reach the PCIe/RKEP path, but the endpoint object state is wrong:
+BAR0 `obj_info` reports `magic=18` instead of the RKNN3/RKEP object magic
+`0x524B4550`, and the proxy logs suspicious endpoint/DMA values such as
+`ep_cc_version=7bedd9db`, `bar1_phy_addr=0x0`, `bar2_phy_addr=0x0`, and
+`bar5_phy_addr=0x0`.
+
+The current working blocker is therefore the RK3588 host RKEP driver ABI or
+RK1828 endpoint boot state, not model conversion and not a missing environment
+variable alone. Binary inspection of the vendor EVB10 `pcie-rkep.ko` shows
+extra support strings and symbols absent from the current Orange Pi source
+module, including `update magic=%x, ver=%x`, `dma_alloc_attrs`,
+`dma_mmap_attrs`, and DMA mask setup. Do not repeat firmware download unless
+physical power recovery is available.
 
 Earlier in the bring-up, the RKNN3 M.2 runtime and custom RKEP module were
 isolated out of the live RK3588 system paths for recovery:
@@ -69,8 +80,8 @@ power. The later 2026-07-03 RK1828-first boot test restored the RKNN3 user-space
 runtime and installed the patched RKEP module manually, without enabling
 `rknn3.service`. The last confirmed reachable runtime state had the patched
 `/usr/lib/modules/pcie-rkep.ko` installed and `rknn3_transfer_proxy` able to open
-the RK1828 PCIe device. The host then became unreachable during a manual
-firmware download attempt.
+the RK1828 PCIe device. Later guarded tests kept the host reachable and cleaned
+all proxy/model processes after timeout.
 
 ## What Is Ready
 
@@ -528,8 +539,28 @@ pcie-rkep 0000:01:00.0: did=182a
 ```
 
 The RK1828 M.2 runtime installer has been installed on the RK3588 host, but
-`rknn3.service` startup caused the host to stop responding. On the next boot,
-disable or inspect `rknn3.service` before starting it again.
+`rknn3.service` must stay disabled during bring-up. Use the guarded wrapper
+instead of service startup so RKEP, proxy, firmware, and model operations remain
+serialized and can be cleaned up after each test.
+
+Current driver gap:
+
+```text
+Orange Pi patched module:
+  version ioctl 0x30300 works
+  BAR1/BAR5 mmap indexes 7/8 work
+  BAR0 obj_info still reads magic=18
+
+Vendor EVB10 module strings:
+  update magic=%x, ver=%x
+  dma_alloc_attrs
+  dma_mmap_attrs
+  dma_set_mask / dma_set_coherent_mask
+```
+
+The next safe engineering task is to close this RKEP ABI gap or obtain the
+matching Rockchip RK3588 host package. Do not use model success as the next
+test until `pcie-state` and proxy logs show sane RKNN3/RKEP object state.
 
 Public RK182x bring-up notes support the same diagnosis:
 
@@ -543,8 +574,8 @@ Public RK182x bring-up notes support the same diagnosis:
 
 Use public notes only as diagnosis references. Do not directly boot a kernel
 built for another vendor board on the Orange Pi. The safe path is either a
-Rockchip/FAE RK3588 host package for RK1828, or an Orange Pi kernel rebuild with
-the required Rockchip RKEP support and a rollback plan.
+Rockchip/FAE RK3588 host package for RK1828, or an Orange Pi kernel/module
+rebuild with the required Rockchip RKEP ABI and a rollback plan.
 
 ## Conversion Record
 

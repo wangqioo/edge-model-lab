@@ -879,29 +879,79 @@ ran under the guarded wrapper and timed out after 180 seconds with no model
 output. The RK3588 host remained reachable afterward, and `stop-runtime` cleaned
 the proxy processes.
 
+## 2026-07-03 11:33 Guarded Vision Smoke Retest
+
+The wrapper was updated to force `/lib` first in `LD_LIBRARY_PATH` for
+`rknn3_model_test` and to export `RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini`.
+This did not change the failure mode. `vision-smoke` printed only:
+
+```text
+=== vision model smoke ===
+```
+
+and timed out after 180 seconds with exit code 124. `stop-runtime` then cleaned
+the proxy/model path, and a later `status` confirmed the RK3588 host was still
+reachable with no RKNN3 runtime processes.
+
+The proxy log proves the client reached the RK1828 PCIe/RKEP path before
+stalling:
+
+```text
+rk pcie tiny version: 30300
+open rkep: /dev/pcie-rkep-0000:01:00.0 Success.
+bar0 size=0x400000
+bar1 size=0x100000
+bar2 size=0x4000000
+bar4 size=0x100000
+bar5 size=0x100000
+magic=18, ver=49d76a3c
+rc_cc_version=30300
+ep_cc_version=7bedd9db
+bar1_phy_addr=0x0
+bar2_phy_addr=0x0
+bar5_phy_addr=0x0
+```
+
+`magic=18` is not the RKNN3/RKEP object magic `0x524B4550`, so the failure is
+now below model loading and below user-space library selection. It is in the
+RK3588 RKEP driver ABI or RK1828 endpoint boot/object state.
+
+Binary inspection of the vendor EVB10 `pcie-rkep.ko` found newer support that is
+not present in the current Orange Pi source module:
+
+```text
+update magic=%x, ver=%x
+dma_alloc_attrs
+dma_mmap_attrs
+dma_set_mask
+dma_set_coherent_mask
+```
+
 Current working hypothesis: PCIe enumeration, the patched RKEP function driver,
 the device node, `rknn3_transfer_proxy devices`, and `pcie_upgrade_tool ld` are
-now working. The remaining blocker is the RK1828 endpoint firmware/device state:
-RKNN3 device management cannot initialize, and model initialization waits until
-timeout. Do not retry model tests until the firmware/boot state is understood.
-Do not run firmware download except with physical recovery available and the
-explicit `--allow-firmware-risk` flag.
+now working. The remaining blocker is the RKNN3/RK1828 RKEP ABI gap or endpoint
+boot state. Do not retry model tests until `pcie-state` and proxy logs show a
+sane BAR0 `obj_info` magic. Do not run firmware download except with physical
+recovery available and the explicit `--allow-firmware-risk` flag.
 
 ## Next Checks
 
 1. Keep the known-good power sequence: RK1828 12V first, then boot or reboot the
    RK3588 host.
-2. Install or boot a RK3588 host kernel/runtime package that provides
-   `CONFIG_PCIE_FUNC_RKEP=y` or an equivalent Rockchip RKEP module.
+2. Fix the Orange Pi `pcie-rkep.ko` compatibility gap against the newer
+   RKNN3/RK1828 RKEP ABI, or obtain a Rockchip/FAE RK3588 host package whose
+   RKEP module exposes the same behavior as the EVB10 `6.1.162` module.
 3. Re-run:
 
 ```text
 lspci -nn | grep -Ei '182a|1828|processing'
 grep CONFIG_PCIE_FUNC_RKEP /boot/config-$(uname -r)
+./scripts/rk1828_safe_runtime.py pcie-state
 rknn3_transfer_proxy devices
 ```
 
-4. Retry the vision smoke program against Bus-Id `0000:01:00.0`.
+4. Retry `vision-smoke` only after the driver/proxy log shows a sane RKNN3/RKEP
+   object state, especially BAR0 `obj_info` magic `0x524B4550`.
 5. After C API init succeeds, copy the full
    `/home/wq/edge-model-lab/models/artifacts/rk1828/qwen3-vl-4b` bundle from the
    home server to the RK3588 host.

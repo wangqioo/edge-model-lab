@@ -132,6 +132,56 @@ smi() {
   RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini run_timeout 20 /bin/rknn-smi info -t board -d 0 2>&1 || true
 }
 
+pcie_state() {
+  refuse_if_upgrade_or_model_running
+  echo "=== pci resource table ==="
+  cat "/sys/bus/pci/devices/$device_id/resource" 2>&1 || true
+
+  echo "=== pci resource files ==="
+  ls -l "/sys/bus/pci/devices/$device_id"/resource* 2>&1 || true
+
+  echo "=== pci config head ==="
+  hexdump -C -n 256 "/sys/bus/pci/devices/$device_id/config" 2>&1 || true
+
+  echo "=== rkep sysfs control ==="
+  ls -l "/sys/bus/pci/devices/$device_id/rkep" 2>&1 || true
+
+  echo "=== driver binding ==="
+  readlink -f "/sys/bus/pci/devices/$device_id/driver" 2>&1 || true
+  modinfo "$module_path" 2>/dev/null | sed -n '1,80p' || true
+
+  echo "=== current RKEP object state from dmesg ==="
+  dmesg -T | grep -Ei 'obj_info|rkep|did=182a|vid=1d87' | tail -100 || true
+}
+
+runtime_libs() {
+  echo "=== dynamic linker config ==="
+  ls -l /etc/ld.so.conf.d/rknn3.conf /etc/profile.d/rknn3-env.sh 2>&1 || true
+  sed -n '1,120p' /etc/ld.so.conf.d/rknn3.conf 2>/dev/null || true
+  sed -n '1,120p' /etc/profile.d/rknn3-env.sh 2>/dev/null || true
+
+  echo "=== rknn3_model_test default libraries ==="
+  ldd /bin/rknn3_model_test | grep -E 'rknn3|rkllm|not found' || true
+
+  echo "=== rknn3_model_test with /lib first ==="
+  LD_LIBRARY_PATH="/lib:${LD_LIBRARY_PATH:-}" \
+    ldd /bin/rknn3_model_test | grep -E 'rknn3|rkllm|not found' || true
+
+  echo "=== RKNN3 library versions ==="
+  for path in \
+    /lib/librknn3_api.so \
+    /lib/librknn3_api_rkcp.so \
+    /opt/edge/rknn3-runtime-1.0.4/rknn3-runtime/rknn3-api/Linux/aarch64/librknn3_api.so; do
+    echo "--- $path"
+    if [ -e "$path" ]; then
+      sha256sum "$path"
+      strings "$path" | grep -E 'librknn3_api version|Transfer version' | head -5 || true
+    else
+      echo "missing"
+    fi
+  done
+}
+
 preflight() {
   echo "=== preflight: runtime tools ==="
   for path in \
@@ -179,8 +229,12 @@ preflight() {
   systemctl is-enabled rknn3.service rknn-mdns.service 2>&1 || true
   print_processes
 
+  pcie_state
+
   echo "=== preflight: smoke files ==="
   ls -lh "$vision_dir/$vision_model" "$vision_dir/$vision_weight" 2>&1 || true
+
+  runtime_libs
 
   echo "=== preflight: recent pci/rkep/rknn logs ==="
   dmesg -T | grep -Ei 'fe150000|182a|rkep|rknn|pcie' | tail -120 || true
@@ -298,13 +352,16 @@ vision_smoke() {
   fi
   echo "=== vision model smoke ==="
   cd "$vision_dir"
-  RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini \
+  LD_LIBRARY_PATH="/lib:${LD_LIBRARY_PATH:-}" \
+    RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini \
     run_timeout 180 /bin/rknn3_model_test "$vision_model" "$vision_weight" none none 0x3 1
 }
 
 case "$action" in
   status) status ;;
   preflight) preflight ;;
+  pcie-state) pcie_state ;;
+  runtime-libs) runtime_libs ;;
   devices) devices ;;
   pcie-list) pcie_list ;;
   smi) smi ;;
@@ -332,6 +389,8 @@ def build_parser() -> argparse.ArgumentParser:
         choices=(
             "status",
             "preflight",
+            "pcie-state",
+            "runtime-libs",
             "devices",
             "pcie-list",
             "smi",
