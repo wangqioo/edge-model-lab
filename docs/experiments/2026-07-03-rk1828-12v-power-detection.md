@@ -845,6 +845,29 @@ rknn-smi info -l: Failed to initialize rknnsmi
 rknn-smi info -t board -d 0: Failed to initialize rknnsmi
 ```
 
+The original installer also deploys `rknn-mdns` and sets
+`RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini`. The current recovered RK3588
+runtime did not have `rknn-mdns.service` or `/etc/profile.d/rknn3-env.sh`
+installed. Manually starting `rknn-mdns` created the ini file but discovered no
+devices:
+
+```text
+rknn-mdns -t /tmp/rk-mdns.ini -s 2
+/tmp/rk-mdns.ini:
+NETWORK_SOCKET_DEVICES=
+
+/tmp/mdns_discovery.log:
+no devices found
+```
+
+Running `rknn-smi` as root with `RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini`
+still returned `Failed to initialize rknnsmi`. Setting
+`NETWORK_SOCKET_DEVICES` manually to `127.0.0.1:18821`, `127.0.0.1:18898`,
+and `tcp://127.0.0.1:...` variants also returned rc 255. This makes the missing
+profile variable insufficient as a sole explanation, although the wrapper now
+exports `RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini` for client-side smoke
+commands to match the vendor startup environment.
+
 The vision smoke command:
 
 ```text

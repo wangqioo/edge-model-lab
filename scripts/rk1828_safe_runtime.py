@@ -125,11 +125,11 @@ pcie_list() {
 smi() {
   refuse_if_upgrade_or_model_running
   echo "=== rknn-smi version ==="
-  run_timeout 20 /bin/rknn-smi -v 2>&1 || true
+  RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini run_timeout 20 /bin/rknn-smi -v 2>&1 || true
   echo "=== rknn-smi device list ==="
-  run_timeout 20 /bin/rknn-smi info -l 2>&1 || true
+  RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini run_timeout 20 /bin/rknn-smi info -l 2>&1 || true
   echo "=== rknn-smi board ==="
-  run_timeout 20 /bin/rknn-smi info -t board -d 0 2>&1 || true
+  RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini run_timeout 20 /bin/rknn-smi info -t board -d 0 2>&1 || true
 }
 
 preflight() {
@@ -298,7 +298,8 @@ vision_smoke() {
   fi
   echo "=== vision model smoke ==="
   cd "$vision_dir"
-  run_timeout 180 /bin/rknn3_model_test "$vision_model" "$vision_weight" none none 0x3 1
+  RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini \
+    run_timeout 180 /bin/rknn3_model_test "$vision_model" "$vision_weight" none none 0x3 1
 }
 
 case "$action" in
