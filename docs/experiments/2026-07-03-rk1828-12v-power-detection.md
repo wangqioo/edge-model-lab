@@ -744,6 +744,8 @@ Future runtime operations should use the guarded wrapper:
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py preflight
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py pcie-list
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py smi
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
@@ -780,6 +782,87 @@ Conclusion: at that time, the RK3588 host had not returned as a reachable LAN
 host and had not obviously taken a different DHCP address. Continue to treat the
 board as not remotely recoverable until `status` can connect and print host
 state.
+
+## 2026-07-03 11:06 Recovery Test
+
+The RK3588 host later returned on the LAN:
+
+```text
+orangepi5plus
+wlP2p33s0 UP 192.168.1.52/24
+system boot 2026-07-03 10:17
+```
+
+The first safe checks were run through `scripts/rk1828_safe_runtime.py`.
+
+Observed good state:
+
+```text
+lspci: 0000:01:00.0 Processing accelerators [1200]: Rockchip Device [1d87:182a]
+PCIe link: 5.0 GT/s x1
+runtime files present: rknn3_transfer_proxy, pcie_upgrade_tool, rknn3_model_test
+firmware present: /lib/firmware/rknn3_rk1820.img
+patched module present: /usr/lib/modules/pcie-rkep.ko
+smoke files present:
+  Qwen3-VL-4B-vision-rk1828-prune.rknn
+  Qwen3-VL-4B-vision-rk1828-prune.weight
+rknn3.service: not installed/inactive
+```
+
+The patched RKEP driver loaded and created the device node:
+
+```text
+pcie_rkep 36864 0
+crw------- 1 root root 10, 120 /dev/pcie-rkep-0000:01:00.0
+```
+
+The transfer-layer checks succeeded:
+
+```text
+rknn3_transfer_proxy devices:
+List of ntb devices attached
+0000:01:00.0        b98e6c51    PCIE
+
+pcie_upgrade_tool ld:
+Program directory: /usr/bin/
+List of connected rkep devices
+Addr=0000:01:00.0 [1d87:182a]
+```
+
+Starting `rknn3_transfer_proxy` succeeded and launched a per-device proxy:
+
+```text
+DeviceManager: started proxy pid=... for device=0000:01:00.0
+rknn3_transfer_proxy_b98e6c51 -s 0000:01:00.0
+ctrl: listening on 127.0.0.1:18821
+```
+
+However, RKNN3 device management still failed:
+
+```text
+rknn-smi -v: Failed to initialize rknnsmi
+rknn-smi info -l: Failed to initialize rknnsmi
+rknn-smi info -t board -d 0: Failed to initialize rknnsmi
+```
+
+The vision smoke command:
+
+```text
+/bin/rknn3_model_test Qwen3-VL-4B-vision-rk1828-prune.rknn \
+  Qwen3-VL-4B-vision-rk1828-prune.weight none none 0x3 1
+```
+
+ran under the guarded wrapper and timed out after 180 seconds with no model
+output. The RK3588 host remained reachable afterward, and `stop-runtime` cleaned
+the proxy processes.
+
+Current working hypothesis: PCIe enumeration, the patched RKEP function driver,
+the device node, `rknn3_transfer_proxy devices`, and `pcie_upgrade_tool ld` are
+now working. The remaining blocker is the RK1828 endpoint firmware/device state:
+RKNN3 device management cannot initialize, and model initialization waits until
+timeout. Do not retry model tests until the firmware/boot state is understood.
+Do not run firmware download except with physical recovery available and the
+explicit `--allow-firmware-risk` flag.
 
 ## Next Checks
 

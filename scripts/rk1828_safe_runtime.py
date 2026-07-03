@@ -111,6 +111,27 @@ devices() {
   run_timeout 10 /bin/rknn3_transfer_proxy devices
 }
 
+pcie_list() {
+  refuse_if_upgrade_or_model_running
+  refuse_if_proxy_running
+  echo "=== pcie upgrade tool list ==="
+  if ! command -v /bin/pcie_upgrade_tool >/dev/null 2>&1; then
+    echo "missing /bin/pcie_upgrade_tool" >&2
+    exit 92
+  fi
+  run_timeout 15 /bin/pcie_upgrade_tool ld
+}
+
+smi() {
+  refuse_if_upgrade_or_model_running
+  echo "=== rknn-smi version ==="
+  run_timeout 20 /bin/rknn-smi -v 2>&1 || true
+  echo "=== rknn-smi device list ==="
+  run_timeout 20 /bin/rknn-smi info -l 2>&1 || true
+  echo "=== rknn-smi board ==="
+  run_timeout 20 /bin/rknn-smi info -t board -d 0 2>&1 || true
+}
+
 preflight() {
   echo "=== preflight: runtime tools ==="
   for path in \
@@ -284,6 +305,8 @@ case "$action" in
   status) status ;;
   preflight) preflight ;;
   devices) devices ;;
+  pcie-list) pcie_list ;;
+  smi) smi ;;
   stop-runtime) stop_runtime ;;
   load-driver) load_driver ;;
   unload-driver) unload_driver ;;
@@ -309,6 +332,8 @@ def build_parser() -> argparse.ArgumentParser:
             "status",
             "preflight",
             "devices",
+            "pcie-list",
+            "smi",
             "stop-runtime",
             "load-driver",
             "unload-driver",

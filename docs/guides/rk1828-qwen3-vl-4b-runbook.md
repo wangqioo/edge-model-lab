@@ -294,6 +294,8 @@ bring-up:
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py preflight
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py pcie-list
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py smi
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
@@ -311,6 +313,10 @@ The wrapper takes a remote lock and refuses unsafe combinations:
   PCIe, module, firmware, runtime binary, service, and smoke-file evidence.
 - `devices` is the first transfer-layer query and should only be used after both
   `status` and `preflight` show no conflicting runtime processes.
+- `pcie-list` runs `pcie_upgrade_tool ld` only. It does not download firmware.
+- `smi` runs read-only `rknn-smi` queries with timeouts. If this fails while
+  `devices` succeeds, the PCIe/RKEP path is open but RKNN3 device management is
+  not initialized.
 
 The wrapper refuses firmware download by default because it can hang the host.
 Only use it with physical access to power-cycle the boards:

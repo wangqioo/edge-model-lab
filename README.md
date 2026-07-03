@@ -71,6 +71,8 @@ Use the guarded wrapper for RK1828 runtime operations:
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py preflight
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py pcie-list
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py smi
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
@@ -78,7 +80,8 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smo
 ```
 
 `status` and `preflight` do not call `rknn3_transfer_proxy`; they are safe as
-the first checks after the board comes back. `devices`, `firmware`,
+the first checks after the board comes back. `pcie-list` checks
+`pcie_upgrade_tool ld` without firmware download. `devices`, `smi`, `firmware`,
 `start-proxy`, and `vision-smoke` touch the RK1828 runtime path and must remain
 serialized through the wrapper.
 
