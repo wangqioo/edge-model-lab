@@ -59,7 +59,10 @@ download or SMI/proxy interaction.
 
 ## Known Good Manual Bring-Up
 
-Keep `rknn3.service` disabled until reboot behavior is validated:
+This is now a recovery path, not the normal day-to-day path. The normal path is
+the auto-start service in the next section.
+
+Keep the vendor services disabled:
 
 ```bash
 systemctl disable rknn3.service rknn-mdns.service
@@ -104,6 +107,88 @@ rknn-smi:
 
 proxy:
   0000:01:00.0 b98e6c51 PCIE
+```
+
+## Automatic Bring-Up
+
+The working boot path is controlled by these files:
+
+```text
+repo source:
+  deploy/systemd/rk1828/rk1828-runtime-start
+  deploy/systemd/rk1828/rk1828-runtime.service
+
+installed on RK3588 host:
+  /usr/local/sbin/rk1828-runtime-start
+  /etc/systemd/system/rk1828-runtime.service
+```
+
+Enabled services:
+
+```bash
+systemctl enable rk1828-rkep-load.service rk1828-runtime.service
+systemctl disable rknn3.service rknn-mdns.service
+```
+
+Boot order:
+
+```text
+rk1828-rkep-load.service
+-> load adapted /usr/lib/modules/pcie-rkep.ko
+-> create /dev/pcie-rkep-0000:01:00.0
+-> rk1828-runtime.service
+-> verify adapted driver sha256
+-> download /lib/firmware/rknn3_rk1820.img with pcie_upgrade_tool
+-> exec /bin/rknn3_transfer_proxy in the systemd cgroup
+```
+
+The runtime script deliberately checks the adapted driver hash before touching
+the RK1828K:
+
+```text
+58b4cd6664953d560aa8fc72b6295caec2634793ba17246f32e66108fcb913b2
+```
+
+This prevents a vendor reinstall from silently replacing the working driver
+with an incompatible one.
+
+Reboot verification on 2026-07-08:
+
+```text
+system boot: 2026-07-08 21:38 CST
+rk1828-runtime.service: active (running), enabled
+rknn3.service: disabled, inactive
+rknn-mdns.service: disabled, inactive
+rknn-smi: Device 0 Online, Health OK, Chip RK1828, Bus-Id 0000:01:00.0
+memory: 32 / 5120 MB
+proxy: 0000:01:00.0 b98e6c51 PCIE
+```
+
+Normal status checks:
+
+```bash
+systemctl status rk1828-runtime.service --no-pager -l
+journalctl -u rk1828-runtime.service -n 120 --no-pager
+rknn-smi info
+rknn3_transfer_proxy devices
+```
+
+The existing guarded wrapper still works with the service running:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py smi
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
+```
+
+`vision-smoke` is expected to end at `Failed to open input numpy file: none`;
+the important proof is before that:
+
+```text
+rknn3_init success
+rknn3_load_model_from_data success
+Core number: 8
+rknn3_model_init success
 ```
 
 ## What Was Noise
@@ -222,4 +307,3 @@ Keep the full chronology for audit only:
 docs/experiments/2026-07-03-rk1828-12v-power-detection.md
 docs/experiments/2026-07-08-rk1828k-vendor-escalation.md
 ```
-

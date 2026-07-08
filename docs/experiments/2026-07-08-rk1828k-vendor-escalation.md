@@ -9,6 +9,12 @@ RKEP driver plus RKNN3 SMI userspace can open the PCIe device. The unresolved
 failure is the RK1828K endpoint becoming not alive / the RK3588 host becoming
 unreachable when the official RKNN3 startup path downloads firmware.
 
+Update after adapting the vendor driver: the RK1828K is now usable through a
+controlled boot service. `rk1828-runtime.service` loads the verified adapted
+driver path, downloads firmware, and keeps `rknn3_transfer_proxy` running after
+reboot. On 2026-07-08 21:38 CST, reboot verification showed
+`rknn-smi info -> Online / OK / RK1828 / 0000:01:00.0`.
+
 Vendor-recommended startup delays were applied to both `/bin/rknn3_startup` and
 `/usr/bin/rknn3_startup`:
 

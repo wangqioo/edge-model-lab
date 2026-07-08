@@ -1,0 +1,21 @@
+[Unit]
+Description=Bring up RK1828 RKNN3 runtime
+After=rk1828-rkep-load.service network-online.target
+Requires=rk1828-rkep-load.service
+Wants=network-online.target
+Conflicts=rknn3.service
+ConditionPathExists=/usr/lib/modules/pcie-rkep.ko
+ConditionPathExists=/lib/firmware/rknn3_rk1820.img
+
+[Service]
+Type=simple
+Environment=RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini
+ExecStart=/usr/local/sbin/rk1828-runtime-start
+ExecStop=-/usr/bin/killall rknn3_transfer_proxy
+ExecStopPost=-/usr/bin/killall rknn3_transfer_proxy_b98e6c51
+KillMode=control-group
+TimeoutStartSec=180
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

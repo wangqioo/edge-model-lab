@@ -81,6 +81,17 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-prox
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
 ```
 
+The RK1828K boot path is now automated by
+`deploy/systemd/rk1828/rk1828-runtime.service`, installed on the RK3588 host as
+`/etc/systemd/system/rk1828-runtime.service`. After a reboot, the quick checks
+are:
+
+```bash
+systemctl status rk1828-runtime.service --no-pager -l
+rknn-smi info
+rknn3_transfer_proxy devices
+```
+
 `status`, `preflight`, `pcie-state`, and `runtime-libs` do not call
 `rknn3_transfer_proxy`; they are safe as the first checks after the board comes
 back. `pcie-list` checks `pcie_upgrade_tool ld` without firmware download.

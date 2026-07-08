@@ -59,7 +59,20 @@ print_processes() {
 }
 
 has_process() {
-  pgrep -f "$1" >/dev/null 2>&1
+  local pattern="$1"
+  ps -eo comm=,args= |
+    awk -v pattern="$pattern" '
+      {
+        executable = $2
+        sub(".*/", "", executable)
+      }
+      executable ~ pattern || ($1 ~ /^timeout/ && $0 ~ pattern) {
+        found = 1
+      }
+      END {
+        exit found ? 0 : 1
+      }
+    '
 }
 
 refuse_if_upgrade_or_model_running() {
