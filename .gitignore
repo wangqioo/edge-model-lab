@@ -3,4 +3,5 @@ devices.local.yaml
 *.pyc
 __pycache__/
 .venv/
-
+.cache/
+tmp/
