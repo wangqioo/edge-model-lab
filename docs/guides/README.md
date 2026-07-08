@@ -9,8 +9,9 @@ Start here:
 3. [Project Handoff](project-handoff.md)
 4. [Beginner Deployment Guide](beginner-deployment-guide.md)
 5. [RK3588 Qwen3-VL-4B Runbook](rk3588-qwen3-vl-4b-runbook.md)
-6. [Device and Model Matrix](device-model-matrix.md)
-7. [Command Reference](command-reference.md)
-8. [Troubleshooting](troubleshooting.md)
+6. [RK1828K Bring-Up Lessons](rk1828k-bringup-lessons.md)
+7. [Device and Model Matrix](device-model-matrix.md)
+8. [Command Reference](command-reference.md)
+9. [Troubleshooting](troubleshooting.md)
 
 The experiment logs in `docs/experiments/` keep the chronological record. These guides are the cleaned-up operating manual.
