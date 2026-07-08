@@ -338,6 +338,93 @@ input parser problem, not a hardware bring-up failure:
 Invalid numpy dtype f2
 ```
 
+## Gemma4 E4B VLM Notes
+
+Gemma4 E4B with image recognition is deployed as a side-by-side test path, not
+as a replacement for the current Qwen3-VL chat service.
+
+Current preserved service path:
+
+```text
+150.158.146.192:6288 -> rkclaw-web.service:8888 -> rkllm3-server.service:8899
+```
+
+Gemma4 files are separate:
+
+```text
+model dir: /home/orangepi/lincaigui/gemma4-e4b
+demo dir:  /home/orangepi/rknn3-model-zoo/install/rk3588_linux_aarch64/rknn_gemma4_demo
+script:    /home/orangepi/lincaigui/run-gemma4-e4b-vlm.sh
+```
+
+Official RKNN3 `v1.0.4` preconverted `gemma4-e4b` file sizes:
+
+```text
+gemma4-e4b_per_layer_inputs.embed.bin 5637144576
+gemma4-e4b.embed.bin                  1342177280
+gemma4-e4b.tokenizer.gguf             15780102
+llm_gemma4-e4b.rknn                   28253368
+llm_gemma4-e4b.safetensors            50332472
+llm_gemma4-e4b.weight                 3000512512
+vision_gemma4-e4b.rknn                4014528
+vision_gemma4-e4b.weight              92916736
+```
+
+The official Gemma4 C++ demo builds Audio, Vision, and LLM together. For a
+Vision+LLM-only smoke test on this RK3588 host, the audio path caused a link
+failure through `audioutils -> libfftw3f.a`:
+
+```text
+relocation R_AARCH64_ADR_PREL_PG_HI21 against symbol `stdout@@GLIBC_2.17'
+can not be used when making a shared object; recompile with -fPIC
+```
+
+Since the image-recognition path passes empty audio model and audio input
+arguments, the useful fix is to patch the demo into a VLM-only build:
+
+```bash
+cd /home/orangepi/rknn3-model-zoo
+patch -p1 < /path/to/edge-model-lab/patches/rknn3/gemma4-vlm-only-no-fftw.patch
+./build-linux.sh -t rk3588 -a aarch64 -d gemma4
+```
+
+The resulting binary should not link FFTW:
+
+```bash
+ldd install/rk3588_linux_aarch64/rknn_gemma4_demo/rknn_gemma4_demo | grep -i fftw
+```
+
+Expected result: no output.
+
+Gemma4 and Qwen3-VL both need the RK1828 accelerator. Do not enable Gemma4 as a
+boot service until resource sharing and recovery behavior are validated. For a
+manual Gemma4 smoke, stop the Qwen model server only for the duration of the
+test, then start it again.
+
+Manual smoke command:
+
+```bash
+sudo systemctl stop rkllm3-server.service
+/home/orangepi/lincaigui/run-gemma4-e4b-vlm.sh \
+  /home/orangepi/rknn3-model-zoo/datasets/COCO/subset/000000419312.jpg \
+  "<image>请用中文简短描述这张图片。"
+sudo systemctl start rkllm3-server.service
+```
+
+Validated on 2026-07-09 with Qwen temporarily stopped:
+
+```text
+Gemma4 return code: 0
+Image output: 这张图片展示了一张摆满了各种食物的餐桌...
+Prefill: 84 tokens, 204.73 ms, 410.30 tokens/s
+Generate: 51 tokens, 1072.55 ms, 47.55 tokens/s
+Vision latency: 83.07 ms, 12.04 FPS
+```
+
+The first failed Gemma4 attempt returned `rknn3_model_init` `ACK_FAIL` because
+`rkllm3-server.service` was still active and holding the RK1828. Treat that as a
+resource-conflict failure, not a Gemma4 model failure.
+
 ## Do Not Repeat
 
 Avoid these patterns:

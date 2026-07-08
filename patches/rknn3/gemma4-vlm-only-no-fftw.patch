@@ -1,0 +1,77 @@
+diff --git a/examples/gemma4/cpp/CMakeLists.txt b/examples/gemma4/cpp/CMakeLists.txt
+index 15cb73d..d1df595 100644
+--- a/examples/gemma4/cpp/CMakeLists.txt
++++ b/examples/gemma4/cpp/CMakeLists.txt
+@@ -37,14 +37,13 @@ add_executable(${PROJECT_NAME}
+     rknn_gemma4.cc
+     llm/rknn_gemma4_llm.cc
+     vision/rknn_gemma4_vision.cc
+-    audio/rknn_gemma4_audio.cc
++    audio/rknn_gemma4_audio_stub.cc
+ )
+ 
+ target_link_libraries(${PROJECT_NAME}
+     cnpy
+     timeutils
+     imageutils
+-    audioutils
+     fileutils
+     ${LIBRKNNAPI}
+     ${LIBTOKENIZER}
+diff --git a/examples/gemma4/cpp/audio/rknn_gemma4_audio_stub.cc b/examples/gemma4/cpp/audio/rknn_gemma4_audio_stub.cc
+new file mode 100644
+index 0000000..450ced1
+--- /dev/null
++++ b/examples/gemma4/cpp/audio/rknn_gemma4_audio_stub.cc
+@@ -0,0 +1,48 @@
++// Vision+LLM-only build stub.
++// The RK1828K Gemma4 image-recognition path does not load the audio model.
++
++#include "rknn_gemma4_audio.h"
++
++#include <stdio.h>
++
++int read_audio(const char* path, audio_buffer_t* audio)
++{
++    (void)path;
++    (void)audio;
++    printf("Gemma4 audio file loading is disabled in this Vision+LLM build.\n");
++    return -1;
++}
++
++int init_gemma4_audio(rknn_gemma4_audio_context* audio_ctx, const char* model_path, const char* weight_path,
++                      uint32_t core_mask)
++{
++    (void)audio_ctx;
++    (void)model_path;
++    (void)weight_path;
++    (void)core_mask;
++    printf("Gemma4 audio is disabled in this Vision+LLM build.\n");
++    return -1;
++}
++
++int release_gemma4_audio(rknn_gemma4_audio_context* audio_ctx)
++{
++    (void)audio_ctx;
++    return 0;
++}
++
++int get_n_audio(rknn_gemma4_audio_context* audio_ctx, int audio_len)
++{
++    (void)audio_ctx;
++    (void)audio_len;
++    return 0;
++}
++
++int inference_gemma4_audio(rknn_gemma4_audio_context* audio_ctx, audio_buffer_t* audio, float16* audio_embeds,
++                           int* n_valid_audio)
++{
++    (void)audio_ctx;
++    (void)audio;
++    (void)audio_embeds;
++    if (n_valid_audio) {
++        *n_valid_audio = 0;
++    }
++    printf("Gemma4 audio inference is disabled in this Vision+LLM build.\n");
++    return -1;
++}
