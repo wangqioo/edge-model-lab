@@ -191,6 +191,81 @@ Core number: 8
 rknn3_model_init success
 ```
 
+## Local Chat Service
+
+The user-facing local AI chat stack has two more services on the RK3588 host:
+
+```text
+rkllm3-server.service
+-> serves Qwen3-VL on http://127.0.0.1:8899/v1
+
+rkclaw-web.service
+-> serves RKClaw Chat on http://0.0.0.0:8888
+-> calls RKCLAW_BASE_URL=http://127.0.0.1:8899/v1
+```
+
+FRP maps the public TCP port to the RKClaw web service:
+
+```text
+150.158.146.192:6288 -> orangepi5plus 127.0.0.1:8888
+```
+
+On 2026-07-08 after a reboot, FRP was active and the public port accepted TCP,
+but `127.0.0.1:8888` and `127.0.0.1:8899` were not listening. That produced an
+HTTP "empty reply from server" on `http://150.158.146.192:6288/`. The root
+cause was that the RK1828 runtime service was enabled, but the model server and
+RKClaw web UI were only manual `nohup` scripts and had no boot-time unit.
+
+The fixed services are tracked in:
+
+```text
+deploy/systemd/rk1828/rkllm3-server.service
+deploy/systemd/rk1828/rkclaw-web.service
+```
+
+Installed paths on the RK3588 host:
+
+```text
+/etc/systemd/system/rkllm3-server.service
+/etc/systemd/system/rkclaw-web.service
+```
+
+Normal status checks:
+
+```bash
+systemctl status rk1828-runtime.service rkllm3-server.service rkclaw-web.service frpc.service --no-pager -l
+ss -lntp | grep -E ':8888|:8899'
+curl -sS http://127.0.0.1:8888/api/health
+curl -sS http://127.0.0.1:8899/v1/models
+curl -sS http://150.158.146.192:6288/api/health
+```
+
+Expected health result:
+
+```json
+{"ok":true,"model_base":"http://127.0.0.1:8899/v1"}
+```
+
+Minimal model smoke:
+
+```bash
+curl -sS --max-time 60 http://127.0.0.1:8899/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"qwen3-vl","messages":[{"role":"user","content":"你好，用一句话回答。"}],"max_tokens":16}'
+```
+
+Minimal RKClaw web API smoke:
+
+```bash
+curl -sS --max-time 90 http://127.0.0.1:8888/api/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"用一句话说你已经启动。"}'
+```
+
+The RKClaw `/api/chat` endpoint expects a `message` string. Sending OpenAI-style
+`messages` directly to this endpoint returns `empty message`; send OpenAI-style
+payloads to `8899/v1/chat/completions` instead.
+
 ## What Was Noise
 
 These were useful to check once, but they were not the final cause:

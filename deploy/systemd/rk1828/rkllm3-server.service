@@ -1,0 +1,39 @@
+[Unit]
+Description=RKLLM3 Qwen3-VL server on RK1828
+After=rk1828-runtime.service network-online.target
+Requires=rk1828-runtime.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=orangepi
+Group=orangepi
+WorkingDirectory=/home/orangepi/lincaigui
+ExecStart=/usr/local/bin/rkllm3-server \
+  --model ./Qwen3-VL-4B-RK1828/Qwen3-VL-4B-llm.rknn \
+  --model2 ./Qwen3-VL-4B-RK1828/Qwen3-VL-4B-vision.rknn \
+  --vocab ./Qwen3-VL-4B-RK1828/Qwen3-VL-4B.tokenizer.gguf \
+  --embed ./Qwen3-VL-4B-RK1828/Qwen3-VL-4B.embed.bin \
+  --host 0.0.0.0 \
+  --port 8899 \
+  -c 1024 \
+  --repeat-penalty 1.1 \
+  --presence-penalty 1.0 \
+  --frequency-penalty 1.0 \
+  --top-k 1 \
+  --top-p 0.8 \
+  --temp 0.8 \
+  --img-width 384 \
+  --img-height 384 \
+  --qwenvl \
+  -a qwen3-vl \
+  --device-id 0000:01:00.0 \
+  --img-start <vision_start> \
+  --img-end <vision_end> \
+  --img-content <image_pad>
+Restart=on-failure
+RestartSec=8
+TimeoutStartSec=240
+
+[Install]
+WantedBy=multi-user.target

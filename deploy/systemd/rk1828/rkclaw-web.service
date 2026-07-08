@@ -1,0 +1,18 @@
+[Unit]
+Description=RKClaw local AI chat web UI
+After=rkllm3-server.service frpc.service network-online.target
+Wants=rkllm3-server.service frpc.service network-online.target
+
+[Service]
+Type=simple
+User=orangepi
+Group=orangepi
+WorkingDirectory=/home/orangepi/lincaigui/rkclaw
+Environment=RKCLAW_BASE_URL=http://127.0.0.1:8899/v1
+ExecStart=/home/orangepi/lincaigui/rkclaw/.venv/bin/python -m uvicorn rkclaw.server:app --host 0.0.0.0 --port 8888
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=60
+
+[Install]
+WantedBy=multi-user.target
