@@ -1,0 +1,326 @@
+diff --git examples/Qwen2_5_Omni/cpp/CMakeLists.txt examples/Qwen2_5_Omni/cpp/CMakeLists.txt
+index 1cb5afa..3b80fac 100644
+--- examples/Qwen2_5_Omni/cpp/CMakeLists.txt
++++ examples/Qwen2_5_Omni/cpp/CMakeLists.txt
+@@ -26,7 +26,7 @@ include_directories(${CMAKE_SOURCE_DIR}/audio/)
+ 
+ set(llm_file llm/rknn_qwen2_5_omni_llm.cc)
+ set(vision_file vision/rknn_qwen2_5_omni_vision.cc)
+-set(audio_file audio/rknn_qwen2_5_omni_audio.cc)
++set(audio_file audio/rknn_qwen2_5_omni_audio_stub.cc)
+ 
+ message(STATUS "LIBRKNNAPI = ${LIBRKNNAPI}")
+ message(STATUS "LIBRKNNAPI_INCLUDES = ${LIBRKNNAPI_INCLUDES}")
+@@ -42,7 +42,6 @@ add_executable(${PROJECT_NAME}
+ 
+ target_link_libraries(${PROJECT_NAME}
+ 	imageutils
+-    audioutils
+     fileutils
+     timeutils
+     ${LIBRKNNAPI}
+@@ -85,4 +84,4 @@ file(GLOB EMBED_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../model/llm/*.embed.bin")
+ install(FILES ${RKNN_FILES} DESTINATION ./model)
+ install(FILES ${WEIGHT_FILES} DESTINATION ./model)
+ install(FILES ${TOKENIZER_FILES} DESTINATION ./model)
+-install(FILES ${EMBED_FILES} DESTINATION ./model)
+\ No newline at end of file
++install(FILES ${EMBED_FILES} DESTINATION ./model)
+diff --git examples/Qwen2_5_Omni/cpp/audio/rknn_qwen2_5_omni_audio_stub.cc examples/Qwen2_5_Omni/cpp/audio/rknn_qwen2_5_omni_audio_stub.cc
+new file mode 100644
+index 0000000..2349863
+--- /dev/null
++++ examples/Qwen2_5_Omni/cpp/audio/rknn_qwen2_5_omni_audio_stub.cc
+@@ -0,0 +1,49 @@
++// Vision+LLM-only build stub.
++// The official RKNN3 v1.0.4 Qwen2.5-Omni-3B preconverted bundle includes
++// vision and LLM files only, not the audio RKNN/weight pair.
++
++#include "rknn_qwen2_5_omni_audio.h"
++
++#include <stdio.h>
++
++int read_audio(const char* path, audio_buffer_t* audio)
++{
++    (void)path;
++    (void)audio;
++    printf("Qwen2.5-Omni audio file loading is disabled in this Vision+LLM build.\n");
++    return -1;
++}
++
++int init_qwen2_5_omni_audio(rknn_qwen2_5_omni_audio_context* audio_ctx, const char* model_path,
++                            const char* weight_path, uint32_t core_mask)
++{
++    (void)audio_ctx;
++    (void)model_path;
++    (void)weight_path;
++    (void)core_mask;
++    printf("Qwen2.5-Omni audio is disabled in this Vision+LLM build.\n");
++    return -1;
++}
++
++int release_qwen2_5_omni_audio(rknn_qwen2_5_omni_audio_context* audio_ctx)
++{
++    (void)audio_ctx;
++    return 0;
++}
++
++int get_n_audio(rknn_qwen2_5_omni_audio_context* audio_ctx, int audio_len)
++{
++    (void)audio_ctx;
++    (void)audio_len;
++    return 0;
++}
++
++int inference_qwen2_5_omni_audio(rknn_qwen2_5_omni_audio_context* audio_ctx, audio_buffer_t* audio,
++                                 float16* audio_embeds)
++{
++    (void)audio_ctx;
++    (void)audio;
++    (void)audio_embeds;
++    printf("Qwen2.5-Omni audio inference is disabled in this Vision+LLM build.\n");
++    return -1;
++}
+diff --git examples/Qwen2_5_Omni/cpp/main.cc examples/Qwen2_5_Omni/cpp/main.cc
+index 616e53f..22f1446 100644
+--- examples/Qwen2_5_Omni/cpp/main.cc
++++ examples/Qwen2_5_Omni/cpp/main.cc
+@@ -202,6 +202,8 @@ int main(int argc, char **argv)
+     const char *img_path           = argv[12];
+     const char *audio_path         = argv[13];
+     const char *prompt             = argv[14];
++    bool        enable_audio       = audio_model_path != NULL && audio_weight_path != NULL &&
++                                     audio_model_path[0] != '\0' && audio_weight_path[0] != '\0';
+ 
+     int ret;
+     rknn_perf_metrics_t perf;
+@@ -307,7 +309,7 @@ int main(int argc, char **argv)
+     callback.embed_userdata     = &embedding_info;
+ 
+     ret = init_qwen2_5_omni_model(&rknn_app_ctx, llm_model_path, llm_weight_path, vision_model_path, vision_weight_path, audio_model_path, audio_weight_path,
+-                                &params, n_params, callback, vision_core_mask, audio_core_mask, llm_core_mask);
++                                &params, n_params, callback, llm_core_mask, vision_core_mask, audio_core_mask);
+     if (ret != 0) {
+         printf("init_qwen2_5_omni_model fail! ret=%d llm_model_path=%s vision_model_path=%s\n", ret, llm_model_path, vision_model_path);
+         goto out;
+@@ -321,10 +323,12 @@ int main(int argc, char **argv)
+     }
+ 
+     // Read Audio
+-    ret = read_audio(audio_path, &src_audio);
+-    if (ret != 0) {
+-        printf("read audio fail! ret=%d audio_path=%s\n", ret, audio_path);
+-        goto out;
++    if (enable_audio) {
++        ret = read_audio(audio_path, &src_audio);
++        if (ret != 0) {
++            printf("read audio fail! ret=%d audio_path=%s\n", ret, audio_path);
++            goto out;
++        }
+     }
+ 
+     // Image Embed
+@@ -334,14 +338,19 @@ int main(int argc, char **argv)
+     img_embeds = (float16*)malloc((n_embed_img) * sizeof(float16));
+ 
+     // Audio Embed
+-    n_audio_tokens = get_n_audio(&(rknn_app_ctx.audio), src_audio.num_frames);
+-    n_embed_audio = n_audio_tokens * rknn_app_ctx.audio.embeds_dim1;
+-    audio_embeds = (float16*)malloc((n_embed_audio) * sizeof(float16));
++    if (enable_audio) {
++        n_audio_tokens = get_n_audio(&(rknn_app_ctx.audio), src_audio.num_frames);
++        n_embed_audio = n_audio_tokens * rknn_app_ctx.audio.embeds_dim1;
++        audio_embeds = (float16*)malloc((n_embed_audio) * sizeof(float16));
++    } else {
++        n_audio_tokens = 0;
++        n_embed_audio = 0;
++    }
+ 
+     if (strstr(prompt, "<image>")) {
+         n_image = 1;
+     }
+-    if (strstr(prompt, "<audio>")) {
++    if (enable_audio && strstr(prompt, "<audio>")) {
+         n_audio = 1;
+     }
+ 
+@@ -413,4 +422,4 @@ out:
+     }
+ 
+     return ret;
+-}
+\ No newline at end of file
++}
+diff --git examples/Qwen2_5_Omni/cpp/qwen2_5_omni.cc examples/Qwen2_5_Omni/cpp/qwen2_5_omni.cc
+index a1702c2..dcecec5 100644
+--- examples/Qwen2_5_Omni/cpp/qwen2_5_omni.cc
++++ examples/Qwen2_5_Omni/cpp/qwen2_5_omni.cc
+@@ -25,6 +25,7 @@
+ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision, uint32_t core_mask_audio, uint32_t core_mask_llm)
+ {
+     int ret = -1;
++    bool enable_audio = app_ctx->audio.rknn_ctx != 0;
+ 
+     uint32_t core_num_vision = 0;
+     uint32_t core_num_audio = 0;
+@@ -34,10 +35,12 @@ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision,
+         printf("rknn3_query failed! ret=%d\n", ret);
+         return ret;
+     }
+-    ret = rknn3_query(app_ctx->audio.rknn_ctx, RKNN3_QUERY_CORE_NUMBER, &core_num_audio, sizeof(core_num_audio));
+-    if (ret < 0) {
+-        printf("rknn3_query failed! ret=%d\n", ret);
+-        return ret;
++    if (enable_audio) {
++        ret = rknn3_query(app_ctx->audio.rknn_ctx, RKNN3_QUERY_CORE_NUMBER, &core_num_audio, sizeof(core_num_audio));
++        if (ret < 0) {
++            printf("rknn3_query failed! ret=%d\n", ret);
++            return ret;
++        }
+     }
+     ret = rknn3_query(app_ctx->llm.rknn_ctx, RKNN3_QUERY_CORE_NUMBER, &core_num_llm, sizeof(core_num_llm));
+     if (ret < 0) {
+@@ -51,8 +54,10 @@ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision,
+     for (int i = 0; i < 32; i++) {
+         if (core_mask_vision & (1 << i))    core_num_vision_++;
+     }
+-    for (int i = 0; i < 32; i++) {
+-        if (core_mask_audio & (1 << i))    core_num_audio_++;
++    if (enable_audio) {
++        for (int i = 0; i < 32; i++) {
++            if (core_mask_audio & (1 << i))    core_num_audio_++;
++        }
+     }
+     for (int i = 0; i < 32; i++) {
+         if (core_mask_llm & (1 << i))    core_num_llm_++;
+@@ -61,7 +66,7 @@ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision,
+         printf("the core_mask_vision = %x is not match the core_num_vision = %d!\n", core_mask_vision, core_num_vision);
+         return -1;
+     }
+-    if (core_num_audio_ != core_num_audio) {
++    if (enable_audio && core_num_audio_ != core_num_audio) {
+         printf("the core_mask_audio = %x is not match the core_num_audio = %d!\n", core_mask_audio, core_num_audio);
+         return -1;
+     }
+@@ -75,10 +80,13 @@ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision,
+         printf("Failed to allocate memory for core_mem_sizes_vision\n");
+         return ret;
+     }
+-    rknn3_core_mem_size* core_mem_sizes_audio = (rknn3_core_mem_size*)malloc(sizeof(rknn3_core_mem_size) * core_num_audio);
+-    if (!core_mem_sizes_audio) {
+-        printf("Failed to allocate memory for core_mem_sizes_audio\n");
+-        return ret;
++    rknn3_core_mem_size* core_mem_sizes_audio = NULL;
++    if (enable_audio) {
++        core_mem_sizes_audio = (rknn3_core_mem_size*)malloc(sizeof(rknn3_core_mem_size) * core_num_audio);
++        if (!core_mem_sizes_audio) {
++            printf("Failed to allocate memory for core_mem_sizes_audio\n");
++            return ret;
++        }
+     }
+     rknn3_core_mem_size* core_mem_sizes_llm = (rknn3_core_mem_size*)malloc(sizeof(rknn3_core_mem_size) * core_num_llm);
+     if (!core_mem_sizes_llm) {
+@@ -90,10 +98,12 @@ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision,
+         printf("rknn3_query core memory size failed! ret=%d\n", ret);
+         return ret;
+     }
+-    ret = rknn3_query(app_ctx->audio.rknn_ctx, RKNN3_QUERY_CORE_MEM_SIZE, core_mem_sizes_audio, sizeof(rknn3_core_mem_size) * core_num_audio);
+-    if (ret < 0) {
+-        printf("rknn3_query core memory size failed! ret=%d\n", ret);
+-        return ret;
++    if (enable_audio) {
++        ret = rknn3_query(app_ctx->audio.rknn_ctx, RKNN3_QUERY_CORE_MEM_SIZE, core_mem_sizes_audio, sizeof(rknn3_core_mem_size) * core_num_audio);
++        if (ret < 0) {
++            printf("rknn3_query core memory size failed! ret=%d\n", ret);
++            return ret;
++        }
+     }
+     ret = rknn3_query(app_ctx->llm.rknn_ctx, RKNN3_QUERY_CORE_MEM_SIZE, core_mem_sizes_llm, sizeof(rknn3_core_mem_size) * core_num_llm);
+     if (ret < 0) {
+@@ -102,7 +112,9 @@ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision,
+     }
+ 
+     rknn3_core_mem_size* core_mem_sizes_max = NULL;
+-    if (core_num_vision >= core_num_audio) {
++    if (!enable_audio) {
++        core_mem_sizes_max = core_mem_sizes_vision;
++    } else if (core_num_vision >= core_num_audio) {
+         for (int i = 0; i < core_num_audio; i++) {
+             core_mem_sizes_vision[i].internal_size = std::max(core_mem_sizes_vision[i].internal_size, core_mem_sizes_audio[i].internal_size);
+         }
+@@ -113,7 +125,7 @@ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision,
+         }
+         core_mem_sizes_max = core_mem_sizes_audio;
+     }
+-    uint32_t core_num_max = std::max(core_num_vision, core_num_audio);
++    uint32_t core_num_max = enable_audio ? std::max(core_num_vision, core_num_audio) : core_num_vision;
+ 
+     if (core_num_max >= core_num_llm) {
+         for (int i = 0; i < core_num_llm; i++) {
+@@ -144,7 +156,9 @@ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision,
+     }
+ 
+     free(core_mem_sizes_vision);
+-    free(core_mem_sizes_audio);
++    if (core_mem_sizes_audio) {
++        free(core_mem_sizes_audio);
++    }
+     free(core_mem_sizes_llm);
+ 
+     ret = rknn3_set_internal_mem(app_ctx->vision.rknn_ctx, app_ctx->internal_mems, core_num_vision);
+@@ -152,10 +166,12 @@ int init_internal_share(rknn_app_context_t* app_ctx, uint32_t core_mask_vision,
+         printf("rknn3_set_internal_mem failed! ret=%d\n", ret);
+         return ret;
+     }
+-    ret = rknn3_set_internal_mem(app_ctx->audio.rknn_ctx, app_ctx->internal_mems, core_num_audio);
+-    if (ret < 0) {
+-        printf("rknn3_set_internal_mem failed! ret=%d\n", ret);
+-        return ret;
++    if (enable_audio) {
++        ret = rknn3_set_internal_mem(app_ctx->audio.rknn_ctx, app_ctx->internal_mems, core_num_audio);
++        if (ret < 0) {
++            printf("rknn3_set_internal_mem failed! ret=%d\n", ret);
++            return ret;
++        }
+     }
+     ret = rknn3_set_internal_mem(app_ctx->llm.rknn_ctx, app_ctx->internal_mems, core_num_llm);
+     if (ret < 0) {
+@@ -187,6 +203,8 @@ int init_qwen2_5_omni_model(rknn_app_context_t* app_ctx, const char* llm_model_p
+                     rknn3_llm_param* params, int n_params, RKLLMCallback callback, uint32_t llm_core_mask, uint32_t vision_core_mask, uint32_t audio_core_mask)
+ {
+     int ret = 0;
++    bool enable_audio = audio_model_path != NULL && audio_weight_path != NULL &&
++                        audio_model_path[0] != '\0' && audio_weight_path[0] != '\0';
+ 
+     printf("--> init qwen2_5_omni vision model\n");
+     ret = init_qwen2_5_omni_vision(&(app_ctx->vision), vision_model_path, vision_weight_path, vision_core_mask);
+@@ -196,12 +214,16 @@ int init_qwen2_5_omni_model(rknn_app_context_t* app_ctx, const char* llm_model_p
+         return ret;
+     }
+ 
+-    printf("--> init qwen2_5_omni audio model\n");
+-    ret = init_qwen2_5_omni_audio(&(app_ctx->audio), audio_model_path, audio_weight_path, audio_core_mask);
+-    if (ret < 0)
+-    {
+-        printf("rknn_init qwen2_5_omni audio model fail! ret=%d\n", ret);
+-        return ret;
++    if (enable_audio) {
++        printf("--> init qwen2_5_omni audio model\n");
++        ret = init_qwen2_5_omni_audio(&(app_ctx->audio), audio_model_path, audio_weight_path, audio_core_mask);
++        if (ret < 0)
++        {
++            printf("rknn_init qwen2_5_omni audio model fail! ret=%d\n", ret);
++            return ret;
++        }
++    } else {
++        printf("--> skip qwen2_5_omni audio model\n");
+     }
+ 
+     printf("--> init qwen2_5_omni llm model\n");
+@@ -275,4 +297,4 @@ int inference_qwen2_5_omni_model(rknn_app_context_t* app_ctx, image_buffer_t* im
+     }
+ 
+     return ret;
+-}
+\ No newline at end of file
++}

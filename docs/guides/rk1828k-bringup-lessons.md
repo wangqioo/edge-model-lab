@@ -425,6 +425,86 @@ The first failed Gemma4 attempt returned `rknn3_model_init` `ACK_FAIL` because
 `rkllm3-server.service` was still active and holding the RK1828. Treat that as a
 resource-conflict failure, not a Gemma4 model failure.
 
+## Qwen2.5-Omni-3B VLM Notes
+
+Official RKNN3 `v1.0.4` has a `Qwen2_5_Omni` demo, but the preconverted
+`Qwen2.5-Omni-3B` download bundle contains only Vision+LLM files. It does not
+include the `Qwen2.5-Omni-3B-audio.rknn` and `.weight` files shown in the demo
+README.
+
+Current validated scope:
+
+```text
+works: Vision + LLM image understanding
+not yet validated: Audio + LLM or Vision + Audio + LLM
+reason: official preconverted bundle lacks audio RKNN/weight files
+```
+
+Qwen2.5-Omni-3B files are separate from the current Qwen3-VL service:
+
+```text
+model dir: /home/orangepi/lincaigui/Qwen2.5-Omni-3B
+demo dir:  /home/orangepi/rknn3-model-zoo/install/rk3588_linux_aarch64/rknn_Qwen2_5_Omni_demo
+script:    /home/orangepi/lincaigui/run-qwen25-omni-3b-vlm.sh
+```
+
+Official preconverted file sizes:
+
+```text
+Qwen2.5-Omni-3B.embed.bin        622329856
+Qwen2.5-Omni-3B.tokenizer.gguf   5930151
+llm_Qwen2.5-Omni-3B.rknn         28195776
+llm_Qwen2.5-Omni-3B.weight       1936839168
+vision_Qwen2.5-Omni-3B.rknn      6694208
+vision_Qwen2.5-Omni-3B.weight    411765248
+```
+
+The stock demo failed to link on the RK3588 host for the same FFTW reason as
+Gemma4:
+
+```text
+libfftw3f.a(assert.o): relocation R_AARCH64_ADR_PREL_PG_HI21 against symbol `stdout@@GLIBC_2.17'
+```
+
+The working patch is:
+
+```bash
+cd /home/orangepi/rknn3-model-zoo
+patch -p0 < /path/to/edge-model-lab/patches/rknn3/qwen25-omni-3b-vlm-only-no-fftw.patch
+./build-linux.sh -t rk3588 -a aarch64 -d Qwen2_5_Omni
+```
+
+The patch also fixes a demo argument bug: `main.cc` read masks as
+`vision_core_mask audio_core_mask llm_core_mask`, but called
+`init_qwen2_5_omni_model()` with the wrong order. The bad order passed `0` as
+the vision core mask in VLM-only mode and caused:
+
+```text
+core mask 0x00000000 is not contiguous
+rknn_model_init failed! ret=-2
+```
+
+Manual smoke command:
+
+```bash
+sudo systemctl stop rkllm3-server.service
+/home/orangepi/lincaigui/run-qwen25-omni-3b-vlm.sh
+sudo systemctl start rkllm3-server.service
+```
+
+Validated on 2026-07-09 with Qwen temporarily stopped:
+
+```text
+Qwen2.5-Omni-3B return code: 0
+Image output: 月球上，宇航员正在打开啤酒瓶。
+Prefill: 247 tokens, 315.24 ms, 783.53 tokens/s
+Generate: 12 tokens, 147.97 ms, 81.10 tokens/s
+Vision latency: 240.90 ms, 4.15 FPS
+```
+
+Do not describe this as full audio-capable Omni deployment until the missing
+audio RKNN/weight pair is converted or supplied by the vendor.
+
 ## Do Not Repeat
 
 Avoid these patterns:
