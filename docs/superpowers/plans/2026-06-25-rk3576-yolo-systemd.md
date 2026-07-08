@@ -72,7 +72,7 @@ Add a service unit that runs `/opt/edge/apps/rknn_yolov5_demo/rknn_yolov5_demo` 
 Run:
 
 ```bash
-EDGE_LINARO_RK3576_PASSWORD='linaro' ./scripts/edgectl yolo-smoke linaro-rk3576
+EDGE_LINARO_RK3576_PASSWORD='...' ./scripts/edgectl yolo-smoke linaro-rk3576
 ```
 
 Expected: vendor demo exits 0 or prints an actionable missing dependency/runtime error that is recorded.
@@ -82,7 +82,7 @@ Expected: vendor demo exits 0 or prints an actionable missing dependency/runtime
 Run:
 
 ```bash
-EDGE_LCKFB_RK3576_PASSWORD='lckfb' ./scripts/edgectl yolo-smoke lckfb-rk3576
+EDGE_LCKFB_RK3576_PASSWORD='...' ./scripts/edgectl yolo-smoke lckfb-rk3576
 ```
 
 Expected: same as linaro, but record memory/runtime differences.

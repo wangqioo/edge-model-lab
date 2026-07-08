@@ -620,24 +620,966 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-prox
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
 ```
 
-## Next Checks
+## Serialized Firmware Attempt
 
-1. Keep the known-good power sequence: RK1828 12V first, then boot or reboot the
-   RK3588 host.
-2. Install or boot a RK3588 host kernel/runtime package that provides
-   `CONFIG_PCIE_FUNC_RKEP=y` or an equivalent Rockchip RKEP module.
-3. Re-run:
+On 2026-07-03 evening, the guarded wrapper was used to repeat the bring-up
+sequence without concurrent RK1828 runtime operations.
+
+Successful checks before firmware download:
 
 ```text
-lspci -nn | grep -Ei '182a|1828|processing'
-grep CONFIG_PCIE_FUNC_RKEP /boot/config-$(uname -r)
-rknn3_transfer_proxy devices
+RK3588 SSH reachable at 192.168.1.52
+lspci: 0000:01:00.0 Processing accelerators [1200]: Rockchip [1d87:182a]
+/usr/lib/modules/pcie-rkep.ko present
+insmod pcie-rkep.ko succeeded
+/dev/pcie-rkep-0000:01:00.0 created
+rknn3.service inactive / no unit file
+rknn3_transfer_proxy devices:
+0000:01:00.0        b98e6c51    PCIE
 ```
 
-4. Retry the vision smoke program against Bus-Id `0000:01:00.0`.
-5. After C API init succeeds, copy the full
+The next step was run through the serialized wrapper:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware
+```
+
+`firmware` launched:
+
+```text
+/bin/pcie_upgrade_tool -s 0000:01:00.0 uf /lib/firmware/rknn3_rk1820.img
+```
+
+No `rknn3_transfer_proxy`, model test, VLM demo, LLM demo, or `rkllm3-server`
+process was running at the time. The firmware command produced no output, did
+not return through the wrapper timeout, and RK3588 became unreachable from the
+Mac:
+
+```text
+ping 192.168.1.52: 100% packet loss
+ssh 192.168.1.52: Operation timed out
+```
+
+This narrows the blocker: the host failure is not only caused by concurrent
+proxy/model access. The serialized firmware download path itself can wedge the
+RK3588 host with the current RK1828 runtime package, firmware, RKEP module, or
+power/runtime combination.
+
+## Recovery After Serialized Firmware Hang
+
+After physically recovering the hardware, the RK3588 host came back on LAN:
+
+```text
+ping 192.168.1.52: reachable
+ssh: reachable
+hostname: orangepi5plus
+system boot: 2026-07-03 18:17
+```
+
+The first post-recovery command was the read-only wrapper status check. It
+showed the desired safe baseline:
+
+```text
+lspci: 0000:01:00.0 Processing accelerators [1200]: Rockchip [1d87:182a]
+/usr/lib/modules/pcie-rkep.ko present
+/dev/pcie-rkep-* absent before driver load
+rknn3.service inactive / no unit file
+no RK1828 runtime processes
+```
+
+The staged driver and transfer-layer checks succeeded again:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
+```
+
+Result:
+
+```text
+pcie_rkep loaded
+/dev/pcie-rkep-0000:01:00.0 created
+rknn3_transfer_proxy devices:
+0000:01:00.0        b98e6c51    PCIE
+```
+
+This confirms the board can recover to the PCIe/RKEP/transfer-discovery layer
+after removing the bad runtime state. The remaining blocker is specifically at
+or before firmware download through `pcie_upgrade_tool ... uf`, not initial
+PCIe enumeration, RKEP module loading, or transfer device discovery.
+
+## 2026-07-07 rknn-smi Init Failure
+
+Observed symptom:
+
+```text
+root@orangepi5plus:~# rknn-smi info
+Failed to initialize rknnsmi
+```
+
+Initial read-only status showed:
+
+```text
+lspci: 0000:01:00.0 Processing accelerators [1200]: Rockchip [1d87:182a]
+/usr/lib/modules/pcie-rkep.ko: missing
+/dev/pcie-rkep-*: missing
+rknn3.service: active/enabled
+rknn3_transfer_proxy: running
+```
+
+The service log explained the first failure:
+
+```text
+rknn3_startup: warning: failed to get pcie-rkep.ko
+rknn3_startup: Failed to load driver or find device
+```
+
+The module had been left in backup/isolation locations:
+
+```text
+/usr/lib/modules/pcie-rkep.ko.bak-20260703045926
+/home/orangepi/rk1828-rknn3-runtime-disabled-20260703-034331/usr/lib/modules/pcie-rkep.ko
+```
+
+After restoring `/usr/lib/modules/pcie-rkep.ko` and running only the guarded
+driver step:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
+```
+
+the driver and device node came up:
+
+```text
+pcie_rkep              36864  0
+/dev/pcie-rkep-0000:01:00.0
+```
+
+The transfer layer also listed the RK1828:
+
+```text
+rknn3_transfer_proxy devices:
+0000:01:00.0        b98e6c51    PCIE
+```
+
+`rknn-smi info` still failed after that. Additional checks showed
+`pcie_upgrade_tool ld` can see the endpoint, while `/tmp/rk-mdns.ini` was absent
+or contained no socket devices:
+
+```text
+Addr=0000:01:00.0 [1d87:182a]
+NETWORK_SOCKET_DEVICES=
+Failed to initialize rknnsmi
+```
+
+The vendor suggested adding delays in `/bin/rknn3_startup`: `sleep 2` after
+driver load and `sleep 10` after firmware update. That patch was installed on
+the RK3588 host with backup:
+
+```text
+/bin/rknn3_startup.bak-20260707195117
+```
+
+The same delay windows were also added to `scripts/rk1828_safe_runtime.py` so
+future guarded runs do not depend on the board-local startup script.
+
+High-risk boundary: the patched `/bin/rknn3_startup start` was not executed in
+this session, because it proceeds into `pcie_upgrade_tool ... uf` firmware
+download. Earlier serialized firmware download attempts on this runtime stack
+made the RK3588 host unreachable. Retry that path only with local recovery or
+serial console available.
+
+## 2026-07-07 RKEP Driver Version Fix
+
+`rknn-smi` debug logging exposed the concrete reason initialization failed:
+
+```text
+pcie_rkep drv version 0x0 is not compatible, at least 0x30301
+rknnsmi init pcie failed, ret=-6
+```
+
+The installed `pcie-rkep.ko` could enumerate PCIe and create
+`/dev/pcie-rkep-0000:01:00.0`, but it did not return the function driver
+version expected by the RKNN3 `1.0.4` / `rknn-smi 1.3.0` user-space stack.
+
+The matching Orange Pi `6.1.43-rockchip-rk3588` kernel tree on the home server
+already had the RKEP version ioctl wired:
+
+```text
+/home/wq/edge-tools/orangepi-kernel/linux-orangepi-6.1.43-full
+include/uapi/linux/rk-pcie-ep.h: RKEP_FUNC_DRV_VERSION
+drivers/misc/rockchip/pcie-rkep.c: PCIE_EP_GET_FUNC_DRV_VERSION
+```
+
+`RKEP_FUNC_DRV_VERSION` was updated from `0x30300` to the user-space-required
+`0x30301`, then `pcie-rkep.ko` was rebuilt:
+
+```text
+sha256: 2343ebd6bf3826e3f1da747b3101826522ade509112725b26a4559f2dd9d16df
+vermagic: 6.1.43-rockchip-rk3588 SMP mod_unload aarch64
+alias: pci:v00001D87d0000182Asv*sd*bc*sc*i*
+```
+
+The new module was installed to:
+
+```text
+/usr/lib/modules/pcie-rkep.ko
+/lib/modules/pcie-rkep.ko
+```
+
+After unloading the old module and loading the rebuilt one, `rknn-smi` no longer
+failed during initialization:
+
+```text
+rknn-smi info -l
+  Device Count                  : 1
+    Device ID                   : 0
+    Communication mode          : PCIe
+    Chip Count                  : 0
+
+rknn-smi info
+| 0             Offline  | NA | NA | NA |
+```
+
+This is a real layer of progress: the host RKEP version handshake now passes,
+and RKNN3 user space can see the RK1828 as a PCIe SMI device. The device remains
+offline because the RK1828 firmware/application side is not alive yet.
+
+## 2026-07-07 Firmware Attempt After RKEP Version Fix
+
+After the RKEP version fix, the guarded sequence was retried:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware
+```
+
+`start-proxy` succeeded and listed:
+
+```text
+0000:01:00.0        b98e6c51    PCIE
+```
+
+`firmware` then entered:
+
+```text
+/bin/pcie_upgrade_tool -s 0000:01:00.0 uf /lib/firmware/rknn3_rk1820.img
+```
+
+The command did not return, and the RK3588 host stopped responding on LAN:
+
+```text
+ping 192.168.1.52: 100% packet loss
+ssh 192.168.1.52: no response
+```
+
+This confirms the remaining blocker is not the RKEP driver version check. It is
+at or below firmware download / RK1828 boot handoff. Do not retry firmware
+download remotely without local recovery or serial console. The next variable
+must be one of:
+
+- a vendor-confirmed RK1828 M.2 firmware/runtime package matching this board,
+- a stronger/measured 12V supply and thermal check,
+- serial console or local display observation during `pcie_upgrade_tool ... uf`,
+- a vendor-provided `pcie-rkep.ko`/firmware pair known to work together.
+
+## 2026-07-08 Recovery And Read-Only State
+
+After physical recovery, the RK3588 host came back on LAN:
+
+```text
+2026-07-08 00:44 CST
+ping 192.168.1.52: reachable
+hostname: orangepi5plus
+kernel: 6.1.43-rockchip-rk3588
+uptime: about 1 minute
+```
+
+The first command was the read-only report:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py post-recovery-report
+```
+
+It confirmed the safe baseline:
+
+```text
+lspci: 0000:01:00.0 Processing accelerators [1200]: Rockchip [1d87:182a]
+rknn3.service: inactive, disabled
+rknn-mdns.service: inactive, disabled
+no RK1828 runtime processes
+```
+
+However, the recovery had restored or left the old RKEP module in the live paths:
+
+```text
+d60794519a45e582d12e02ccfcd741acb374bcb82924678149c49fc1089ef656  /usr/lib/modules/pcie-rkep.ko
+d60794519a45e582d12e02ccfcd741acb374bcb82924678149c49fc1089ef656  /lib/modules/pcie-rkep.ko
+ls: cannot access '/dev/pcie-rkep-*': No such file or directory
+```
+
+The fixed module was copied back from the Mac and installed to both live paths:
+
+```text
+2343ebd6bf3826e3f1da747b3101826522ade509112725b26a4559f2dd9d16df  /usr/lib/modules/pcie-rkep.ko
+2343ebd6bf3826e3f1da747b3101826522ade509112725b26a4559f2dd9d16df  /lib/modules/pcie-rkep.ko
+```
+
+After `insmod`, the host driver and device node were healthy:
+
+```text
+pcie_rkep              36864  0
+crw------- 1 root root 10, 120 /dev/pcie-rkep-0000:01:00.0
+Kernel driver in use: pcie-rkep
+```
+
+Read-only SMI and transfer checks then reached the same layer as before:
+
+```text
+rknn-smi info -l:
+  Device Count                  : 1
+    Device ID                   : 0
+    Communication mode          : PCIe
+    Product Name                : NA
+    Serial Number               : NA
+    Chip Count                  : 0
+
+rknn-smi info:
+| 0             Offline  | NA | NA | NA |
+
+pcie_upgrade_tool ld:
+Addr=0000:01:00.0 [1d87:182a]
+
+rknn3_transfer_proxy devices:
+0000:01:00.0        b98e6c51    PCIE
+```
+
+Important debug lines from `/var/log/rknn-smi.log`:
+
+```text
+rk pcie tiny version: 30301
+open rkep: /dev/pcie-rkep-0000:01:00.0 Success.
+rc_cc_version=30301
+ep_cc_version=7bfdc9db
+hw_reset, 18, 13
+PCIe device 0 is not alive
+rknnsmi init success
+```
+
+`rknn-smi -v` still reports no live connect versions:
+
+```text
+rknn-smi version              : 1.3.0
+PCIe driver version           : NA
+RC chips connect version      : NA
+EP chips connect version      : NA
+rknn3 API version             : 1.0.4
+```
+
+This narrows the current boundary. The RK3588 host side is now correct through
+PCIe enumeration, RKEP module binding, RKEP version `0x30301`, and transfer
+device discovery. The failing layer is RK1828 endpoint liveness after boot or
+firmware handoff.
+
+The installed firmware image matches the cached RKNN3 SDK `1.0.4` M.2 installer:
+
+```text
+83807abd6e068e52fdd27436d9e06a9db9d9e69d285b1c1379fa16ab3fe1e884  /lib/firmware/rknn3_rk1820.img
+83807abd6e068e52fdd27436d9e06a9db9d9e69d285b1c1379fa16ab3fe1e884  .cache/rk1828-release-v1.0.4/installer/system_root/lib/firmware/rknn3_rk1820.img
+```
+
+The official RKNN3 Quick Start only documents checking RK1820/RK1828 connection
+with:
+
+```text
+./rknn3_transfer_proxy devices
+```
+
+and the expected PCIe device row. This board already passes that documented
+connection check. The remaining `Offline` state needs vendor guidance for
+firmware download / loader / endpoint liveness, not another model conversion or
+another `rknn3_transfer_proxy devices` check.
+
+## Local Reference Recheck
+
+After the 2026-07-08 recovery, the older RK182X `V1.0.0` documents, the
+RM182XMC0 hardware design guide, and the M.2-to-PCIe carrier guide were checked
+again because the RKNN3 `V1.0.4` Quick Start stops at
+`rknn3_transfer_proxy devices` for the connection check.
+
+Relevant local files:
+
+```text
+/Users/wq/Downloads/开发资料/05_RKNN3软件SDK_V1.0.0/01_ReleaseNote与QuickStart_V1.0.0/01_Rockchip_RK182X_Quick_Start_RKNN3_SDK_V1.0.0_CN.pdf
+/Users/wq/Downloads/开发资料/02_底板与参考设计/01_M2转PCIe扩展板/02_使用说明/RK1820_M2_TO_PCIE_Guide_V1.1_20260312_CN.pdf
+/Users/wq/Downloads/开发资料/01_硬件核心资料/02_硬件设计指南/Rockchip RM182XMC0 Hardware_Design_Guide_V1.1_CN_20260415.pdf
+```
+
+Findings:
+
+- The RKNN3 `V1.0.0` and `V1.0.4` Quick Starts both use
+  `rknn3_transfer_proxy devices` as the documented RK1820/RK1828 connection
+  check. This board passes that check.
+- The M.2-to-PCIe guide says the carrier needs independent 12V power and
+  recommends `12V/3A` or above.
+- The same M.2-to-PCIe guide lists the kit adapter as `12V/5A`.
+- The RM182XMC0 hardware design guide says the module needs additional
+  `12V/3A` power from the baseboard.
+- The hardware design guide documents `SARADC_IN0_BOOT` floating as default
+  `PCIe2.1 BOOT`, and pulled down with `0R` as optional `USB2.0 BOOT`.
+- The hardware design guide says `PIN50` is reset input, active low, controlled
+  by the host GPIO.
+
+This changes the priority of the next experiment. A `12V/1A` supply may be
+enough for LED/fan/PCIe enumeration, but it is below the documented current
+requirement and is not a valid basis for firmware download or endpoint liveness
+testing. Before another `pcie_upgrade_tool ... uf` attempt, use a measured
+`12V/3A+` supply, preferably the documented `12V/5A` class supply, and observe
+the board locally.
+
+The Mac-side wrapper was then tightened so this dangerous action cannot be
+rerun accidentally:
+
+```text
+scripts/rk1828_safe_runtime.py firmware
+```
+
+now exits locally before SSH unless the caller explicitly passes:
+
+```text
+--allow-firmware-hang
+```
+
+A new read-only action was added for the first check after physical recovery:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py post-recovery-report
+```
+
+That report collects PCIe state, module metadata, userspace and firmware hashes,
+service state, `rknn-smi info -l`, `rknn-smi info`, `/var/log/rknn-smi.log`, and
+recent kernel logs. It does not run `insmod` or `pcie_upgrade_tool ... uf`.
+
+## 2026-07-08 Orange Pi Host Adaptation Without Reflashing
+
+After the RK3588 host was physically rebooted, LAN access recovered:
+
+```text
+ping 192.168.1.52: 3/3 received
+```
+
+The first read-only recovery report showed a useful but incomplete state:
+
+```text
+lspci: 0000:01:00.0 Processing accelerators [1200]: Rockchip [1d87:182a]
+/usr/lib/modules/pcie-rkep.ko sha256:
+2343ebd6bf3826e3f1da747b3101826522ade509112725b26a4559f2dd9d16df
+/dev/pcie-rkep-*: absent
+rknn-smi: Failed to initialize rknnsmi
+```
+
+This confirmed that the fixed RKEP module survived the reboot, but it was not
+autoloaded. Manually running the guarded `load-driver` action restored the host
+PCIe/RKEP layer:
+
+```text
+pcie_rkep              36864  0
+crw------- 1 root root 10, 120 /dev/pcie-rkep-0000:01:00.0
+```
+
+The Orange Pi host was then adapted without reflashing by installing a dedicated
+oneshot service:
+
+```text
+/etc/systemd/system/rk1828-rkep-load.service
+/usr/local/sbin/rk1828-rkep-load
+```
+
+The service only runs PCI rescan, loads `/usr/lib/modules/pcie-rkep.ko`, waits
+for the device node, and exits. It does not start `rknn3_transfer_proxy`, does
+not start RKNN3 services, and does not run `pcie_upgrade_tool ... uf`.
+
+Verified service state:
+
+```text
+systemctl is-enabled rk1828-rkep-load.service: enabled
+systemctl is-active rk1828-rkep-load.service: active
+```
+
+After this adaptation, the host layer is repeatable:
+
+```text
+lspci: 0000:01:00.0 [1d87:182a]
+pcie_rkep loaded
+/dev/pcie-rkep-0000:01:00.0 exists
+rknn-smi info -l:
+  Device Count: 1
+  Communication mode: PCIe
+  Chip Count: 0
+rknn-smi info:
+  Device 0 Offline
+```
+
+The remaining failure is unchanged and now isolated below host enumeration,
+driver load, and SMI initialization:
+
+```text
+rk pcie tiny version: 30301
+rc_cc_version=30301
+ep_cc_version=7bedc9fb
+hw_reset, 18, 13
+PCIe device 0 is not alive
+```
+
+The EVB10 `boot.img` was inspected as a FIT image, and its embedded FDT was
+extracted from offset `0x800` with size `0x4a963`. Comparing the EVB10 FDT with
+the live Orange Pi DTB showed that `pcie@fe150000` has the same essential host
+controller shape: Gen3, four lanes, same ranges, same DBI/config addresses, and
+status `okay`. The `reset-gpios` and regulator phandles differ, but those are
+board-specific wiring details and cannot be copied directly from EVB10 to
+Orange Pi.
+
+Current conclusion: reflashing is not required to make the Orange Pi host reach
+a stable PCIe/RKEP/SMI discovery state. The unresolved blocker is RK1828
+endpoint liveness after reset or firmware handoff, not host-side module loading.
+Further work needs either serial/kernel logs during `pcie_upgrade_tool ... uf`,
+a vendor-confirmed RK1828 firmware/update image, or exact guidance for the
+meaning of `hw_reset, 18, 13`.
+
+## 2026-07-08 PCIe MaskROM And Direct Firmware Attempt
+
+Further probing found a more precise endpoint state. Running `pcie_upgrade_tool`
+as root with the non-writing test command succeeded:
+
+```text
+/bin/pcie_upgrade_tool -s 0000:01:00.0 td
+Testing device...
+Soc=rk1820 Addr=0000:01:00.0 Mode=MaskROM [1d87:182a]
+Testing device OK
+```
+
+This means the RK1828 endpoint is reachable over PCIe and is currently in
+MaskROM mode. The previous `Offline` result is therefore not a generic PCIe
+enumeration failure; the endpoint is waiting for a bootloader/firmware flow.
+
+The firmware image was inspected locally:
+
+```text
+sha256: 83807abd6e068e52fdd27436d9e06a9db9d9e69d285b1c1379fa16ab3fe1e884
+header: RKFW
+contains: LDR, RKNS, loader, parameter, rootfs, rk1820
+does not contain string: rk1828
+```
+
+The lack of an `rk1828` string is not proof that the image is wrong, because the
+package may use RK1820 naming for the RK182X family, but it is now an explicit
+vendor-confirmation item.
+
+A new guarded Mac-side action was added:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi \
+  ./scripts/rk1828_safe_runtime.py firmware-direct --allow-firmware-hang
+```
+
+It differs from the earlier firmware attempt in three ways:
+
+```text
+1. refuses to run if rknn3_transfer_proxy is active,
+2. runs `pcie_upgrade_tool ... td` first to confirm MaskROM reachability,
+3. passes an explicit temporary directory: `uf "$firmware_path" /tmp/rk1828-fw`.
+```
+
+The direct attempt reproduced the failure faster:
+
+```text
+=== direct firmware download without proxy ===
+Testing device...
+Soc=rk1820 Addr=0000:01:00.0 Mode=MaskROM [1d87:182a]
+Testing device OK
+```
+
+Immediately after `uf` started, the RK3588 host stopped responding to ping:
+
+```text
+ping 02:31:06 ok
+ping 02:31:07 ok
+ping 02:31:08 fail
+...
+```
+
+Local hanging SSH/wrapper processes were killed. The board again needs physical
+recovery.
+
+This rules out `rknn3_transfer_proxy` interference as the primary cause of the
+host drop. The failure is now isolated to the `pcie_upgrade_tool uf` transition
+from MaskROM to loader/firmware. The next useful variables are:
+
+```text
+1. a vendor-confirmed RK1828/RK182X firmware image or update.img,
+2. a vendor-confirmed sequence such as db bootloader -> uf firmware -> run,
+3. kernel/serial logs during the first seconds of `uf`,
+4. an official RK3588 EVB10 host run for A/B comparison.
+```
+
+### 2026-07-08 Post-Reboot Narrowing
+
+After physical reboot, the custom driver autoload service survived and did what
+it was meant to do:
+
+```text
+systemctl is-active rk1828-rkep-load.service -> active
+/dev/pcie-rkep-0000:01:00.0 exists
+pcie_upgrade_tool ld -> Addr=0000:01:00.0 [1d87:182a]
+```
+
+The read-only PCIe boot test also remained stable:
+
+```text
+pcie_upgrade_tool -s 0000:01:00.0 td
+Soc=rk1820 Addr=0000:01:00.0 Mode=MaskROM [1d87:182a]
+Testing device OK
+```
+
+The official SDK quick-start connectivity check now passes on this adapted
+Orange Pi host:
+
+```text
+rknn3_transfer_proxy devices
+List of ntb devices attached
+0000:01:00.0        b98e6c51    PCIE
+```
+
+That means the host can enumerate the PCIe endpoint and the RKNN3 transfer tool
+can see the coprocessor transport. The failure is not basic PCIe detection.
+
+Additional `pcie_upgrade_tool` subcommands narrow the state machine:
+
+```text
+rvd <id> -> Device is not in loader mode
+rd       -> Device is not in loader mode
+```
+
+Neither command dropped the RK3588 host. This suggests `rvd` and `rd` require
+the RK182X endpoint to have already moved from MaskROM into loader mode, and the
+host drop is specific to the `uf` loader/firmware download transition rather
+than every `pcie_upgrade_tool` operation.
+
+The RKNN3 firmware image was unpacked locally with `afptool-rs` to inspect its
+Rockchip RKFW/RKAF structure without touching the board:
+
+```text
+rknn3_rk1820.img
+  RKFW BOOT: 92551 bytes
+  embedded RKAF update: 3278852 bytes
+  manufacturer: RK1820
+  model: RK1820
+  partitions:
+    parameter.mem
+    subsoc_rtt.img
+    node2_rtt.img
+    node4_rtt.img
+    rk1820_ddr_v1.15.bin
+```
+
+String inspection of the runtime images also reports `RK1820` in
+`subsoc_rtt.img`, `node2_rtt.img`, and `node4_rtt.img`. This is not enough by
+itself to prove the package is wrong for RK1828K, because Rockchip may package
+RK182X firmware under RK1820 naming. It is, however, now a concrete
+vendor-confirmation item: this exact image must be confirmed as valid for
+RK1828K, or replaced with a dedicated RK1828/RK1828K image.
+
+USB fallback was checked from the RK3588 host. `lsusb` did not show the
+Rockchip USB update-mode ID used by the installer script:
+
+```text
+USB update ID expected by rknn_upgrade_tool: 2207:180b
+observed: no 2207:180b device
+```
+
+So the current wiring exposes RK1828K over PCIe only; the installer wrapper's
+USB `upgrade_tool ufx` path is not available unless the module's USB update
+interface is physically exposed.
+
+### 2026-07-08 Bootloader-Only Isolation
+
+The RKFW `BOOT` payload was extracted locally from `rknn3_rk1820.img`:
+
+```text
+tmp/rk1828-fw-unpack/rkfw/BOOT
+size: 92551 bytes
+sha256: 6dac3fec660fa5720c81a0850b793ca5be1e010e0574df3c428e8465268e4bea
+```
+
+It was copied to the RK3588 host as `/tmp/rk1828-fw/BOOT`, and a guarded
+bootloader-only action was used:
+
+```bash
+./scripts/rk1828_safe_runtime.py bootloader-direct \
+  --allow-bootloader-download \
+  --bootloader-path /tmp/rk1828-fw/BOOT
+```
+
+Result:
+
+```text
+Testing device...
+Soc=rk1820 Addr=0000:01:00.0 Mode=MaskROM [1d87:182a]
+Testing device OK
+Downloading bootloader...
+Downloading bootloader OK
+Testing device...
+Soc=rk1820 Addr=0000:01:00.0 Mode=Loader [1d87:182a]
+Testing device OK
+```
+
+The RK3588 host stayed pingable during this bootloader-only transition. This is
+the first confirmed path from MaskROM to Loader on the Orange Pi host.
+
+After that, the official `rknn3_transfer_proxy devices` still listed the PCIe
+device, and `pcie_upgrade_tool td` confirmed `Mode=Loader`. `rknn-smi info -l`
+still reported the PCIe device as not alive, which is expected if only loader is
+running and the full RKNN3 runtime firmware has not been downloaded.
+
+However, attempting Loader-state interaction with `rvd <id>` hung and the
+RK3588 host then became unreachable. This narrows the failure further:
+
+```text
+Safe:
+  MaskROM td
+  transfer_proxy devices
+  db extracted BOOT -> Loader
+
+Unsafe observed:
+  uf full firmware image
+  Loader-state rvd / SMI-style interaction after db
+```
+
+The remaining risky transition is therefore not bootloader download itself. It
+is the handoff after Loader starts: either full firmware/DDR/RTT download, the
+Loader command protocol, or PCIe DMA/message setup once the Loader is active.
+
+After the next physical reboot, the host returned to the clean baseline again:
+
+```text
+rk1828-rkep-load.service: active
+/dev/pcie-rkep-0000:01:00.0 exists
+pcie_upgrade_tool ld -> Addr=0000:01:00.0 [1d87:182a]
+pcie_upgrade_tool td -> Mode=MaskROM
+rknn3_transfer_proxy devices -> 0000:01:00.0 b98e6c51 PCIE
+```
+
+No `pcie_upgrade_tool`, `rknn-smi`, or RKNN3 runtime processes were left
+running. `/sys/fs/pstore` was empty after recovery, and the previous boot's
+journal did not include a panic/oops trace around the host drop. The failure
+therefore did not leave a captured Linux panic record; it behaves more like a
+hard PCIe/kernel hang or board-level reset/power event.
+
+Because Loader-state `rvd` was shown to be unsafe on this host, the local
+wrapper now refuses `read-vendor` unless `--allow-loader-interaction` is passed
+explicitly.
+
+### 2026-07-08 Vendor Delay Retest
+
+The seller suggested adding delays to `rknn3_startup`. The RK3588 host already
+had those changes in both `/bin/rknn3_startup` and `/usr/bin/rknn3_startup`:
+
+```sh
+# wait after driver load
+sleep 2
+
+# wait after firmware update
+sleep 10
+```
+
+Before the retest, the safe baseline was:
+
+```text
+lspci -> 0000:01:00.0 [1d87:182a]
+/dev/pcie-rkep-0000:01:00.0 exists
+pcie_upgrade_tool td -> Soc=rk1820 Addr=0000:01:00.0 Mode=MaskROM [1d87:182a], Testing device OK
+rknn3_transfer_proxy devices -> 0000:01:00.0 b98e6c51 PCIE
+rknn-smi info -> Device Count 1, PCIe, Offline, Chip Count 0
+```
+
+`rknn-smi` debug output now proves that SMI can open the RKEP device, but the
+endpoint application is not alive:
+
+```text
+open rkep: /dev/pcie-rkep-0000:01:00.0 Success.
+id=182a1d87
+magic=18, ver=49f76a3c
+ep_cc_version=5bedd9db
+gen2x1
+hw_reset, 18, 17
+PCIe device 0 is not alive
+Total EP device num: 1
+rknnsmi init success
+```
+
+Then the delayed startup script was run manually:
+
+```bash
+/bin/rknn3_startup stop
+/bin/rknn3_startup start
+```
+
+It still made the RK3588 host unreachable:
+
+```text
+start:open rknn3_transfer_proxy
+find device 0000:01:00.0
+Timeout, server 192.168.1.52 not responding.
+SSH_STARTUP_COMMAND_FAILED=255
+```
+
+Immediate ping and SSH checks failed:
+
+```text
+6 packets transmitted, 0 packets received, 100.0% packet loss
+ssh: connect to host 192.168.1.52 port 22: Host is down
+```
+
+The local log is:
+
+```text
+tmp/rk1828-vendor-startup-20260708-093211.log
+```
+
+This proves the seller's delay-only workaround is insufficient on this hardware
+and runtime stack. The failure still occurs during or immediately after the
+startup script launches firmware download for `0000:01:00.0`.
+
+A standalone escalation report for the seller was written to:
+
+```text
+docs/experiments/2026-07-08-rk1828k-vendor-escalation.md
+```
+
+### 2026-07-08 Loader To Firmware Retest
+
+After another reboot, `/tmp/rk1828-fw/BOOT` was gone because it lived under
+`/tmp`, so the extracted BOOT payload was copied to the RK3588 host again:
+
+```text
+sha256(/tmp/rk1828-fw/BOOT)=6dac3fec660fa5720c81a0850b793ca5be1e010e0574df3c428e8465268e4bea
+```
+
+Bootloader download was repeatable and did not drop the host:
+
+```text
+pcie_upgrade_tool -s 0000:01:00.0 td
+Soc=rk1820 Addr=0000:01:00.0 Mode=MaskROM [1d87:182a]
+Testing device OK
+
+pcie_upgrade_tool -s 0000:01:00.0 db /tmp/rk1828-fw/BOOT
+Downloading bootloader OK
+
+pcie_upgrade_tool -s 0000:01:00.0 td
+Soc=rk1820 Addr=0000:01:00.0 Mode=Loader [1d87:182a]
+Testing device OK
+```
+
+Then `rd` from Loader mode returned success, but the device remained in Loader:
+
+```text
+pcie_upgrade_tool -s 0000:01:00.0 rd
+Device reset OK
+
+pcie_upgrade_tool -s 0000:01:00.0 td
+Soc=rk1820 Addr=0000:01:00.0 Mode=Loader [1d87:182a]
+Testing device OK
+```
+
+Finally, full firmware download was attempted from the confirmed Loader state,
+without `rknn3_transfer_proxy`, and with an explicit tmp directory:
+
+```bash
+pcie_upgrade_tool -s 0000:01:00.0 uf /lib/firmware/rknn3_rk1820.img /tmp/rk1828-fw
+```
+
+It still made the RK3588 host unreachable:
+
+```text
+Timeout, server 192.168.1.52 not responding.
+UF_SSH_FAILED=255
+
+8 packets transmitted, 0 packets received, 100.0% packet loss
+ssh: connect to host 192.168.1.52 port 22: Operation timed out
+```
+
+The local log is:
+
+```text
+tmp/rk1828-loader-uf-direct-20260708-094412.log
+```
+
+This removes the simple explanation that the official startup script fails only
+because it skipped an explicit bootloader step. The explicit `db BOOT` step is
+safe and reaches Loader; `uf rknn3_rk1820.img` still fails from Loader. The
+remaining suspect area is the full firmware image contents, the DDR/RTT handoff,
+or RK1828K-specific PCIe/Loader protocol compatibility.
+
+## Next Checks
+
+1. Keep `rk1828-rkep-load.service` enabled so rebooted hosts automatically
+   expose `/dev/pcie-rkep-0000:01:00.0`.
+2. Do not retry `pcie_upgrade_tool ... uf` on this exact runtime stack without a
+   new variable to test, such as a vendor-confirmed RK3588 host runtime package,
+   a different RK1828 firmware image, a measured stronger 12V supply, or direct
+   local serial/console observation.
+3. After each recovery or reboot, first run the read-only report:
+
+```bash
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py post-recovery-report
+```
+
+4. Then re-run only read-only and driver checks:
+
+```text
+./scripts/rk1828_safe_runtime.py test-device
+./scripts/rk1828_safe_runtime.py devices
+lspci -nn | grep -Ei '182a|1828|processing'
+grep CONFIG_PCIE_FUNC_RKEP /boot/config-$(uname -r)
+lsmod | grep pcie_rkep
+ls -l /dev/pcie-rkep-*
+```
+
+5. Ask the vendor to confirm the exact firmware/update package and sequence for
+   RK1828K:
+
+```text
+供电已修正，Host 侧 PCIe/RKEP/SMI 稳定。
+pcie_upgrade_tool -s 0000:01:00.0 td 返回：
+Soc=rk1820 Addr=0000:01:00.0 Mode=MaskROM [1d87:182a], Testing device OK。
+rknn3_transfer_proxy devices 返回：
+0000:01:00.0 b98e6c51 PCIE。
+但无 proxy、显式 tmp_dir 执行：
+pcie_upgrade_tool -s 0000:01:00.0 uf /lib/firmware/rknn3_rk1820.img /tmp/rk1828-fw
+1-2 秒后 RK3588 整机掉线。
+单独拆出 BOOT 后执行：
+pcie_upgrade_tool -s 0000:01:00.0 db /tmp/rk1828-fw/BOOT
+可以成功进入 Loader：
+Soc=rk1820 Addr=0000:01:00.0 Mode=Loader [1d87:182a]。
+但 Loader 后继续执行 rvd/SMI 交互会卡住并导致 RK3588 不可达。
+本地拆包显示该 img 的 RKAF manufacturer/model 为 RK1820，包含 rk1820_ddr_v1.15.bin。
+请确认：这个 img 是否适配 RK1828K？是否需要 RK1828K 专用 update.img/loader.bin？
+是否应先执行 db loader.bin，再 uf/run？`hw_reset,18,13` 和 obj_info magic=18,ver=49f76e1c 分别表示什么？
+```
+
+6. Do not enter Loader and then run `rvd`, `rknn-smi`, or model runtime again
+   without a new variable and local serial observation. The host became
+   unreachable after that exact state.
+7. If and only if a new runtime/firmware variable is introduced, repeat the
+   staged sequence under local console observation:
+   `stop-runtime -> load-driver -> firmware`.
+8. Only after firmware download returns successfully and the host remains
+   reachable should proxy and model runtime be retried:
+   `start-proxy -> devices -> vision-smoke`.
+9. After C API init succeeds, copy the full
    `/home/wq/edge-model-lab/models/artifacts/rk1828/qwen3-vl-4b` bundle from the
    home server to the RK3588 host.
-6. Start `rkllm3-server` with `--device-id 0000:01:00.0`.
-7. Run a small request against the OpenAI-compatible chat endpoint and record
+10. Start `rkllm3-server` with `--device-id 0000:01:00.0`.
+11. Run a small request against the OpenAI-compatible chat endpoint and record
    output, memory, power, and temperature observations.

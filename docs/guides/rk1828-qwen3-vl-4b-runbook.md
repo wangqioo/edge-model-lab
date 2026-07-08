@@ -81,7 +81,14 @@ docs/experiments/2026-07-02-rk1828-qwen3-vl-4b-rknn3-conversion.md
 
 The RK1828 card should not be expected to work from the RK3588 M.2 slot alone. Use separate 12V power before runtime checks.
 
-If the 12V supply is limited to 12V 1A, treat it as a cautious bring-up supply only until measured. It may be enough for idle or detection, but full Qwen3-VL runtime can exceed that depending on RK1828 load, fan, and carrier-board losses.
+The RK1820/RK1828 M.2-to-PCIe guide says the carrier requires independent 12V
+power and recommends `12V/3A` or above. The same guide lists the kit adapter as
+`12V/5A`, while the RM182XMC0 hardware design guide says the module requires an
+additional `12V/3A` supply from the baseboard.
+
+If the 12V supply is limited to `12V/1A`, treat it as insufficient for anything
+beyond cautious detection. It may let PCIe enumerate, but it is not a valid
+power basis for firmware download, endpoint boot, SMI liveness, or model tests.
 
 ## Required Power Sequence
 
@@ -269,7 +276,7 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
-EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py post-recovery-report
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
 ```
@@ -281,8 +288,111 @@ The wrapper takes a remote lock and refuses unsafe combinations:
 - model tests refuse to run while upgrade/model/server processes are present.
 - `status` does not invoke `rknn3_transfer_proxy`; use it first after a board
   recovery to check host state without touching the RK1828 runtime path.
+- `post-recovery-report` is read-only and should be the first evidence bundle
+  collected after physical recovery. It records PCIe state, module metadata,
+  userspace/firmware hashes, service state, `rknn-smi info -l`, and recent logs.
 - `devices` is the first transfer-layer query and should only be used after
   `status` shows no conflicting runtime processes.
+- `load-driver` waits 2 seconds after `insmod` before checking
+  `/dev/pcie-rkep-*`, matching vendor guidance for the RKEP device-node delay.
+- `firmware` waits 10 seconds after `pcie_upgrade_tool ... uf` returns, matching
+  vendor guidance for RK1828 post-firmware settling, but it now refuses to run
+  unless `--allow-firmware-hang` is passed. Use that override only with
+  serial/local recovery ready, because current firmware attempts have made the
+  RK3588 host unreachable.
+
+If `rknn-smi info` fails with `Failed to initialize rknnsmi`, first confirm that
+`/usr/lib/modules/pcie-rkep.ko` exists and that `/dev/pcie-rkep-0000:01:00.0`
+is present after `load-driver`. A delay in `/bin/rknn3_startup` cannot fix a
+missing module file. On 2026-07-07 the module was absent because it had been
+isolated during recovery, and restoring it was required before any delay test
+was meaningful.
+
+If `rknn-smi` logs show:
+
+```text
+pcie_rkep drv version 0x0 is not compatible, at least 0x30301
+```
+
+the module is still wrong even if `/dev/pcie-rkep-*` exists. Rebuild/install the
+matching Orange Pi `6.1.43-rockchip-rk3588` RKEP module with
+`RKEP_FUNC_DRV_VERSION=0x30301`. The known rebuilt module hash is:
+
+```text
+2343ebd6bf3826e3f1da747b3101826522ade509112725b26a4559f2dd9d16df
+```
+
+With that module, `rknn-smi info -l` can enumerate one PCIe device, but the
+device still reports `Offline` until firmware download / RK1828 boot handoff
+succeeds.
+
+After any physical recovery, re-check the live module hash. On 2026-07-08 the
+board came back with the old module in both live paths:
+
+```text
+d60794519a45e582d12e02ccfcd741acb374bcb82924678149c49fc1089ef656  /usr/lib/modules/pcie-rkep.ko
+d60794519a45e582d12e02ccfcd741acb374bcb82924678149c49fc1089ef656  /lib/modules/pcie-rkep.ko
+```
+
+Reinstalling the fixed module restored `/dev/pcie-rkep-0000:01:00.0` and
+`rknn-smi` initialization:
+
+```text
+2343ebd6bf3826e3f1da747b3101826522ade509112725b26a4559f2dd9d16df  /usr/lib/modules/pcie-rkep.ko
+2343ebd6bf3826e3f1da747b3101826522ade509112725b26a4559f2dd9d16df  /lib/modules/pcie-rkep.ko
+```
+
+Current healthy host-side but still-blocked state:
+
+```text
+lspci: 0000:01:00.0 [1d87:182a]
+/dev/pcie-rkep-0000:01:00.0 exists
+rknn3_transfer_proxy devices: 0000:01:00.0 b98e6c51 PCIE
+rknn-smi info -l: Device Count 1, Communication mode PCIe, Chip Count 0
+rknn-smi info: Device 0 Offline
+```
+
+In the SMI log, this state shows the host driver handshake is fixed but the
+endpoint side is not alive:
+
+```text
+rk pcie tiny version: 30301
+rc_cc_version=30301
+ep_cc_version=7bfdc9db
+hw_reset, 18, 13
+PCIe device 0 is not alive
+rknnsmi init success
+```
+
+## Vendor Escalation Summary
+
+As of 2026-07-07, the simple delay patch is not enough to claim the issue fixed.
+It was applied to `/bin/rknn3_startup`, and the same delay windows are present in
+the guarded wrapper, but the observed failure moved deeper:
+
+```text
+fixed:      rknn-smi initializes after RKEP driver version 0x30301
+remaining: rknn-smi sees one PCIe device but reports Offline
+blocking:  pcie_upgrade_tool ... uf hangs and the RK3588 host drops from LAN
+```
+
+Send the vendor these concrete asks instead of only asking about sleep timing:
+
+1. Confirm the exact RK1828 M.2 firmware image hash for RKNN3 SDK `1.0.4`.
+2. Provide the matching `pcie-rkep.ko` source or binary for
+   `6.1.43-rockchip-rk3588`, with `RKEP_FUNC_DRV_VERSION >= 0x30301`.
+3. Confirm whether `/bin/rknn3_startup` must start
+   `rknn3_transfer_proxy` before `pcie_upgrade_tool ... uf` for this M.2 card.
+4. Provide expected `rknn-smi info -l` output immediately before and after
+   firmware download.
+5. Explain what host-kernel panic/reset conditions are known during
+   `pcie_upgrade_tool -s 0000:01:00.0 uf /lib/firmware/rknn3_rk1820.img`.
+6. Explain why the endpoint connect version can read as an invalid-looking value
+   while the RC side is `30301`, followed by `hw_reset, 18, 13` and
+   `PCIe device 0 is not alive`.
+7. Confirm whether `12V/1A` can ever be valid for firmware download. The local
+   RK1820_M2_TO_PCIE guide recommends `12V/3A+`, the kit adapter is `12V/5A`,
+   and the hardware design guide says RM182XMC0 needs additional `12V/3A`.
 
 Do not bypass this wrapper with hand-written SSH one-liners unless the command is
 strictly read-only.

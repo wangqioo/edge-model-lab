@@ -65,7 +65,7 @@ assets:
     workload: vision-language-encoder
     source: lckfb-taishanpi-ai-app
     path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/Qwen3-VL-2B-Instruct/2025-12-31/qwen3-vl_vision_rk3576.rknn
-    size_bytes: null
+    size_bytes: 873568285
     smoke_input: vendor-app
     notes:
       - Pairs with qwen3-vl-2b-instruct_w8a8_rk3576.rkllm in the same directory.
@@ -76,10 +76,108 @@ assets:
     workload: vision-language-llm
     source: lckfb-taishanpi-ai-app
     path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/立创·泰山派RK3576开发板资料/8.【立创·泰山派3】Ai应用/Qwen3-VL-2B-Instruct/2025-12-31/qwen3-vl-2b-instruct_w8a8_rk3576.rkllm
-    size_bytes: null
+    size_bytes: 2385677036
     smoke_input: vendor-app
     notes:
-      - Candidate for later RKLLM validation after basic RKNN smoke tests.
+      - Used by edgectl llm-deploy on lckfb-rk3576 and linaro-rk3576.
+
+  orangepi_rk3588_qwen1_5_rkllm:
+    kind: rkllm
+    platform: rk3588
+    workload: text-generation-llm
+    source: orangepi-rkllm-toolkit
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/香橙派RK3588S/官方工具/RKLLM工具包/转换后的模型/Qwen1_5.rkllm
+    size_bytes: 795100644
+    smoke_input: interactive-text
+    notes:
+      - Smallest provided RK3588 RKLLM text model; used by edgectl llm-deploy on orange-rk3588.
+
+  orangepi_rk3588_deepseek_r1_distill_qwen_1_5b_rkllm:
+    kind: rkllm
+    platform: rk3588
+    workload: text-generation-llm
+    source: orangepi-rkllm-toolkit
+    path: /Users/wq/Documents/ZSPACE/sata11-15850752485/百度网盘下载/香橙派RK3588S/官方工具/RKLLM工具包/转换后的模型/DeepSeek-R1-Distill-Qwen-1.5B.rkllm
+    size_bytes: 2035400060
+    smoke_input: interactive-text
+    notes:
+      - Candidate follow-up model after the Qwen1_5 RKLLM smoke path is stable.
+
+  orangepi_rk3588_qwen3_5_4b_vision:
+    kind: rknn
+    platform: rk3588
+    workload: vision-language-encoder
+    source: Qwen/Qwen3.5-4B
+    path: /home/orangepi/edge-model-lab/qwen35-4b-rk3588/models/qwen3.5_vision_rk3588.rknn
+    size_bytes: 704579761
+    smoke_input: demo-and-user-image
+    notes:
+      - Converted with Rockchip rknn-llm release-v1.3.0 multimodal demo flow.
+      - Server source artifact at /home/wq/edge-workspaces/rkllm-qwen35-4b-rk3588-v130/rknn/qwen3.5_vision_rk3588.rknn.
+      - RKNN export log reported REGTASK warnings, but Orange Pi RK3588S board-side loading and inference passed.
+
+  orangepi_rk3588_qwen3_5_4b_llm:
+    kind: rkllm
+    platform: rk3588
+    workload: vision-language-llm
+    source: Qwen/Qwen3.5-4B
+    path: /home/orangepi/edge-model-lab/qwen35-4b-rk3588/models/qwen3.5-4b_w8a8_rk3588.rkllm
+    size_bytes: 5540941884
+    smoke_input: demo-and-user-image
+    notes:
+      - Converted with rkllm-toolkit 1.3.0, W8A8, target rk3588, 3 NPU cores, max context 4096.
+      - Server source artifact at /home/wq/edge-workspaces/rkllm-qwen35-4b-rk3588-v130/rkllm/qwen3.5-4b_w8a8_rk3588.rkllm.
+      - Deployed with RKLLM runtime 1.3.0 demo under /home/orangepi/edge-model-lab/qwen35-4b-rk3588.
+
+  rk1828_qwen3_vl_4b_vision_rknn3:
+    kind: rknn3
+    platform: rk1828
+    workload: vision-language-encoder
+    source: Qwen/Qwen3-VL-4B-Instruct
+    path: /home/wq/edge-model-lab/models/artifacts/rk1828/qwen3-vl-4b/vision/Qwen3-VL-4B-vision-rk1828-prune.rknn
+    weight_path: /home/wq/edge-model-lab/models/artifacts/rk1828/qwen3-vl-4b/vision/Qwen3-VL-4B-vision-rk1828-prune.weight
+    size_bytes: 4293032
+    weight_size_bytes: 244912128
+    smoke_input: rkep-runtime-blocked
+    notes:
+      - Converted with rknn3-toolkit 1.0.4 for RK1828.
+      - Artifact metadata lives under models/artifacts/rk1828/qwen3-vl-4b/manifest.yaml.
+      - PCIe enumeration works with RK1828 12V powered before RK3588 boot; RKNN3 runtime validation is still blocked by the RK3588 host RKEP/runtime stack.
+
+  rk1828_qwen3_vl_4b_llm_rknn3:
+    kind: rknn3
+    platform: rk1828
+    workload: vision-language-llm
+    source: Qwen/Qwen3-VL-4B-Instruct
+    path: /home/wq/edge-model-lab/models/artifacts/rk1828/qwen3-vl-4b/llm/Qwen3-VL-4B-llm-rk1828.rknn
+    weight_path: /home/wq/edge-model-lab/models/artifacts/rk1828/qwen3-vl-4b/llm/Qwen3-VL-4B-llm-rk1828.weight
+    config_path: /home/wq/edge-model-lab/models/artifacts/rk1828/qwen3-vl-4b/llm/Qwen3-VL-4B-llm.config.pkl
+    tokenizer_path: /home/wq/edge-model-lab/models/artifacts/rk1828/qwen3-vl-4b/llm/Qwen3-VL-4B-llm.tokenizer.gguf
+    embed_path: /home/wq/edge-model-lab/models/artifacts/rk1828/qwen3-vl-4b/llm/Qwen3-VL-4B-llm.embed.bin
+    size_bytes: 25448008
+    weight_size_bytes: 2432394240
+    smoke_input: rkep-runtime-blocked
+    notes:
+      - Converted with rknn3-toolkit 1.0.4 for RK1828.
+      - LLM RKNN build completed with RKNN Compiler All stages completed successfully.
+      - PCIe enumeration works with RK1828 12V powered before RK3588 boot; RKNN3 runtime validation is still blocked by the RK3588 host RKEP/runtime stack.
+
+  rk1828_qwen35_4b_vision_rknn3:
+    kind: rknn3
+    platform: rk1828
+    workload: vision-language-encoder
+    source: Qwen/Qwen3.5-4B
+    path: /home/wq/edge-model-lab/models/artifacts/rk1828/qwen35-4b/vision/qwen3.5_vision_rk1828.rknn
+    weight_path: /home/wq/edge-model-lab/models/artifacts/rk1828/qwen35-4b/vision/qwen3.5_vision_rk1828.weight
+    size_bytes: 4722496
+    weight_size_bytes: 197836800
+    smoke_input: partial-vision-only-rkep-runtime-blocked
+    notes:
+      - Converted with rknn3-toolkit 1.0.4 for RK1828 from the existing Qwen3.5 vision ONNX export.
+      - Artifact metadata lives under models/artifacts/rk1828/qwen35-4b/manifest.yaml.
+      - LLM ONNX/config/embed/tokenizer intermediate files were exported after an exporter-local Qwen3.5 mask patch.
+      - LLM RKNN3 artifact is not ready; rknn.load_llm reached about 29 GiB RSS plus swap on the 32 GiB server and exited before build/export.
+      - PCIe enumeration works with RK1828 12V powered before RK3588 boot; RKNN3 runtime validation is still blocked by the RK3588 host RKEP/runtime stack.
 
   taishan_yolo11n_onnx:
     kind: onnx

@@ -88,7 +88,8 @@ Runtime access rules:
 - Do not hot-plug the RK1828 M.2 card.
 - Do not run `rknn3_transfer_proxy`, `pcie_upgrade_tool`, `rknn3_model_test`,
   `rknn3_vlm_demo`, `rknn3_llm_demo`, or `rkllm3-server` concurrently.
-- Do not run `pcie_upgrade_tool ... uf` while `rknn3_transfer_proxy` is running.
+- Do not hand-run `pcie_upgrade_tool ... uf`; it has repeatedly made the RK3588
+  host unreachable on the current runtime stack.
 - Do not use `systemctl start rknn3` or `/bin/rknn3_startup start` for bring-up.
 - After any RK3588 recovery, the first command must be a read-only status check.
 
@@ -99,15 +100,18 @@ EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py status
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py devices
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py stop-runtime
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py load-driver
-EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py firmware
+EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py post-recovery-report
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py start-proxy
 EDGE_ORANGE_RK3588_PASSWORD=orangepi ./scripts/rk1828_safe_runtime.py vision-smoke
 ```
 
 `status` does not call `rknn3_transfer_proxy`; it is safe as the first check
-after the board comes back. `devices`, `firmware`, `start-proxy`, and
-`vision-smoke` touch the RK1828 runtime path and must remain serialized through
-the wrapper.
+after the board comes back. `post-recovery-report` is also read-only and is the
+preferred evidence bundle after a physical recovery. `devices`, `start-proxy`,
+and `vision-smoke` touch the RK1828 runtime path and must remain serialized
+through the wrapper. `firmware` is intentionally omitted above: the wrapper now
+refuses it unless `--allow-firmware-hang` is passed with local serial/console
+recovery ready.
 
 Detailed records:
 

@@ -1,0 +1,79 @@
+artifact:
+  name: qwen35-4b-rk1828-rknn3
+  source_model: Qwen/Qwen3.5-4B
+  source_model_path: /home/wq/edge-model-sources/huggingface/Qwen/Qwen3.5-4B
+  target_platform: rk1828
+  toolkit: rknn3-toolkit
+  toolkit_version: 1.0.4
+  converted_at: 2026-07-02
+  runtime_validation: rkep-runtime-blocked
+  status: partial-vision-and-llm-intermediates-converted-rknn3-llm-blocked
+
+files:
+  vision_rknn:
+    path: vision/qwen3.5_vision_rk1828.rknn
+    size_bytes: 4722496
+    sha256: 70aabb8720443afd0d9a3224e2e2fc33ae07bb6c638edd705aa366819275be6c
+  vision_weight:
+    path: vision/qwen3.5_vision_rk1828.weight
+    size_bytes: 197836800
+    sha256: 4e094c2d21141c13f14614fb10d8bbf94c699cb278db2e2730067140cdf418d4
+  llm_onnx:
+    path: llm/Qwen3.5-4B-llm.onnx
+    size_bytes: 43501807
+    sha256: a580e122646a5d4d28fa5c45ae2088f8cade78b8376f10df0c2524902d4686f3
+    notes:
+      - Uses ONNX external data files in the same llm directory; total llm directory size was about 20 GiB after export.
+  llm_config:
+    path: llm/Qwen3.5-4B-llm.config.pkl
+    size_bytes: 11235
+    sha256: 06de64a29767649e7ac8cbbd7e011830a21cc6fc884a3bee59aeac3be82bc099
+  llm_embed:
+    path: llm/Qwen3.5-4B-llm.embed.bin
+    size_bytes: 1271398400
+    sha256: c78988d979f52a340f39cd69edd8e4b0a80218a5fa8d95b6158bfce4a3de2a34
+  llm_tokenizer:
+    path: llm/Qwen3.5-4B-llm.tokenizer.gguf
+    size_bytes: 10942307
+    sha256: f03a90db3a1668834a6d7fae34fb2ace2c2ed2fec4dcbe73c7e01be475f397a7
+    notes:
+      - Exported with a local convert_hf_to_gguf hash mapping for the Qwen3.5 BPE pre-tokenizer.
+
+logs:
+  vision_export_log:
+    path: logs/01_export_vision_rknn3.log
+    sha256: b4526cf5eef7643e7ffb06a0c0ce4d8fbc1255a9aa69e281f484a68abb062890
+  llm_export_log:
+    path: logs/02_export_llm_onnx.log
+    sha256: 7c458c6c2900f6ab843e41eec0a8b15e8eb981f61273cad5375e51901e5fd2bd
+  llm_tokenizer_failed_log:
+    path: logs/03_export_llm_tokenizer_gguf.log
+    sha256: f54ecfa6c9f5716aa1469744ea8d10f64b6ca52d894d6ada59859dca1aeff3e9
+  llm_rknn_build_attempt_log:
+    path: logs/04_build_llm_rknn3.log
+    sha256: 5bd61b387a4ac7f02a52b53f1c354c77810af6129951c2ae6b504efacd77c1ea
+  llm_tokenizer_patched_log:
+    path: logs/05_export_llm_tokenizer_gguf_qwen35_patch.log
+    sha256: d9f71f1635260ab80f46ad2cdf25c3868fb31c09100569c9bad9e1d42709a9b2
+  llm_chunk16_export_log:
+    path: logs/06_export_llm_onnx_chunk16.log
+    sha256: null
+    notes:
+      - Experimental ONNX export with Qwen3.5 GatedDeltaNet chunk size forced to 16.
+  llm_chunk16_node_probe_log:
+    path: logs/07_probe_chunk16_nodes.log
+    sha256: null
+    notes:
+      - Default ONNX had 212293 nodes; chunk16 ONNX had 70478 nodes.
+  llm_chunk16_load_probe_log:
+    path: logs/08_probe_chunk16_load_llm.log
+    sha256: null
+    notes:
+      - load_llm-only probe for chunk16 ONNX also filled memory and swap before reaching build.
+
+blockers:
+  llm_rknn3_build:
+    stage: rknn-load-llm
+    summary: Qwen3.5 LLM ONNX export now succeeds, but RKNN3 load_llm consumes the 32 GiB server memory plus swap before build/export. Reducing fallback GatedDeltaNet chunk size from 64 to 16 lowered node count from 212293 to 70478, but load_llm still exhausted memory.
+    log: logs/04_build_llm_rknn3.log
+    attempted_script: export_qwen35_llm_rknn.py

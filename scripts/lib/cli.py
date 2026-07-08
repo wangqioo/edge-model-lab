@@ -6,10 +6,16 @@ import sys
 from .assets import asset_exists, asset_size_label, load_assets
 from .bootstrap import bootstrap_rknn_lite
 from .config import Device, load_devices
-from .deploy import bench_all, bench_device, deploy_all, deploy_device
+from .deploy import bench_all, bench_device, deploy_all, deploy_device, deploy_llm_device, run_rk3588_qwen3_vl_smoke
 from .health import print_health
 from .rknn import run_rknn_smoke
 from .rknn_service import bench_rknn_service, deploy_rknn_service
+from .rkllm_conversion import (
+    DEFAULT_QWEN3_VL_4B_HF_PATH,
+    print_download_qwen3_vl_4b_source,
+    print_prepare_rk3588_qwen3_vl_workspace,
+    print_rk3588_qwen3_vl_conversion_check,
+)
 from .services import DEFAULT_UNIT, print_service_logs, print_service_status
 from .yolo import run_yolo_deploy, run_yolo_smoke
 
@@ -76,7 +82,7 @@ def run(argv: list[str] | None = None) -> int:
     health_parser = subparsers.add_parser("health", help="Run read-only device health checks")
     health_parser.add_argument("target", help="Device id or 'all'")
     models_parser = subparsers.add_parser("models", help="List registered model assets")
-    models_parser.add_argument("--platform", choices=("rk3576", "rk3588", "portable"), help="Filter assets by target platform")
+    models_parser.add_argument("--platform", choices=("rk3576", "rk3588", "rk1828", "portable"), help="Filter assets by target platform")
     smoke_parser = subparsers.add_parser("rknn-smoke", help="Upload a registered RKNN asset and initialize RKNN Lite runtime")
     smoke_parser.add_argument("device", help="Device id")
     smoke_parser.add_argument("asset", help="Registered RKNN asset id")
@@ -102,6 +108,24 @@ def run(argv: list[str] | None = None) -> int:
     deploy_parser.add_argument("target", help="Device id or 'all'")
     bench_parser = subparsers.add_parser("bench", help="Run the current project's benchmarks on a device or all devices")
     bench_parser.add_argument("target", help="Device id or 'all'")
+    llm_deploy_parser = subparsers.add_parser("llm-deploy", help="Deploy the TaishanPi RKLLM Qwen3-VL smoke demo")
+    llm_deploy_parser.add_argument("device", help="Device id")
+    rk3588_qwen3_vl_parser = subparsers.add_parser("rk3588-qwen3-vl-smoke", help="Run the deployed RK3588 Qwen3-VL-4B multimodal smoke")
+    rk3588_qwen3_vl_parser.add_argument("device", help="Device id")
+    subparsers.add_parser("rkllm-conversion-check", help="Check local materials for RK3588 Qwen3-VL conversion")
+    download_qwen3_source_parser = subparsers.add_parser(
+        "rkllm-download-qwen3-vl-source",
+        help="Download the Qwen3-VL-4B-Instruct Hugging Face source model",
+    )
+    download_qwen3_source_parser.add_argument(
+        "--target",
+        default=str(DEFAULT_QWEN3_VL_4B_HF_PATH),
+        help="Output model directory",
+    )
+    download_qwen3_source_parser.add_argument("--chunk-mb", type=int, default=64, help="Chunk size for large files")
+    download_qwen3_source_parser.add_argument("--workers", type=int, default=4, help="Concurrent chunk downloads")
+    conversion_workspace_parser = subparsers.add_parser("rkllm-prepare-conversion", help="Prepare a Linux x86_64 RK3588 Qwen3-VL conversion workspace")
+    conversion_workspace_parser.add_argument("workspace", help="Output workspace directory")
     rknn_service_parser = subparsers.add_parser("rknn-service-deploy", help="Deploy the RK3576 Python RKNN inference service")
     rknn_service_parser.add_argument("device", help="Device id")
     rknn_bench_parser = subparsers.add_parser("rknn-service-bench", help="Run a synthetic benchmark against the RK3576 Python RKNN inference service")
@@ -190,6 +214,35 @@ def run(argv: list[str] | None = None) -> int:
         if not device:
             parser.error(f"Unknown device: {args.target}")
         return bench_device(device)
+
+    if args.command == "llm-deploy":
+        device = devices.get(args.device)
+        if not device:
+            parser.error(f"Unknown device: {args.device}")
+        return deploy_llm_device(device)
+
+    if args.command == "rk3588-qwen3-vl-smoke":
+        device = devices.get(args.device)
+        if not device:
+            parser.error(f"Unknown device: {args.device}")
+        return run_rk3588_qwen3_vl_smoke(device)
+
+    if args.command == "rkllm-conversion-check":
+        return print_rk3588_qwen3_vl_conversion_check()
+
+    if args.command == "rkllm-download-qwen3-vl-source":
+        from pathlib import Path
+
+        return print_download_qwen3_vl_4b_source(
+            Path(args.target),
+            chunk_size=args.chunk_mb * 1024 * 1024,
+            workers=args.workers,
+        )
+
+    if args.command == "rkllm-prepare-conversion":
+        from pathlib import Path
+
+        return print_prepare_rk3588_qwen3_vl_workspace(Path(args.workspace))
 
     if args.command == "rknn-service-deploy":
         device = devices.get(args.device)

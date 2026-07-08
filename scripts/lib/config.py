@@ -49,10 +49,23 @@ def load_devices() -> dict[str, Device]:
     if not isinstance(local_auth, dict):
         raise ValueError("devices.local.yaml auth must be a mapping")
 
+    local_devices = local.get("devices", {})
+    if local_devices is None:
+        local_devices = {}
+    if not isinstance(local_devices, dict):
+        raise ValueError("devices.local.yaml devices must be a mapping")
+
     devices: dict[str, Device] = {}
     for device_id, values in raw_devices.items():
         if not isinstance(values, dict):
             raise ValueError(f"Device {device_id} must be a mapping")
+        local_values = local_devices.get(device_id, {})
+        if local_values is None:
+            local_values = {}
+        if not isinstance(local_values, dict):
+            raise ValueError(f"Device override for {device_id} must be a mapping")
+        merged_values = {**values, **local_values}
+
         auth_values = local_auth.get(device_id, {})
         if auth_values is None:
             auth_values = {}
@@ -61,15 +74,14 @@ def load_devices() -> dict[str, Device]:
 
         devices[device_id] = Device(
             id=device_id,
-            host=str(values["host"]),
-            port=int(values["port"]),
-            user=str(values["user"]),
-            role=str(values["role"]),
-            platform=str(values["platform"]),
-            board=str(values["board"]),
-            deployment_backend=str(values["deployment_backend"]),
-            report=str(values["report"]),
+            host=str(merged_values["host"]),
+            port=int(merged_values["port"]),
+            user=str(merged_values["user"]),
+            role=str(merged_values["role"]),
+            platform=str(merged_values["platform"]),
+            board=str(merged_values["board"]),
+            deployment_backend=str(merged_values["deployment_backend"]),
+            report=str(merged_values["report"]),
             password_env=auth_values.get("password_env"),
         )
     return devices
-

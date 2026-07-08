@@ -14,12 +14,15 @@ from .ssh import run_scp_to_device, run_ssh
 
 SERVICE_APP = PROJECT_ROOT / "deploy/apps/rknn_service/edge_rknn_service.py"
 SERVICE_UNIT = PROJECT_ROOT / "deploy/systemd/rk3576/edge-rknn-python.service"
-MODEL_ASSET_ID = "rk3576_resnet18_lite2"
 REMOTE_TMP = "/tmp/edge-model-lab-rknn-service"
 REMOTE_APP_DIR = "/opt/edge/apps/rknn_service"
-REMOTE_MODEL = "/opt/edge/models/rk3576_resnet18_lite2.rknn"
 REMOTE_UNIT = "/etc/systemd/system/edge-rknn-python.service"
 SERVICE_URL = "http://127.0.0.1:18080"
+
+MODEL_ASSET_BY_PLATFORM = {
+    "rk3576": "rk3576_resnet18_lite2",
+    "rk3588": "rk3588_resnet18_lite2",
+}
 
 
 BENCH_REMOTE_SCRIPT = r"""
@@ -51,12 +54,14 @@ snapshot "after"
 
 
 def deploy_rknn_service(device: Device) -> int:
-    if device.platform != "rk3576":
-        print(f"RKNN Python service deploy targets rk3576, device {device.id} is {device.platform}")
+    model_asset_id = MODEL_ASSET_BY_PLATFORM.get(device.platform)
+    if not model_asset_id:
+        print(f"RKNN Python service deploy targets rk3576/rk3588, device {device.id} is {device.platform}")
         return 2
 
     assets = load_assets()
-    asset = assets[MODEL_ASSET_ID]
+    asset = assets[model_asset_id]
+    remote_model = f"/opt/edge/models/{model_asset_id}.rknn"
     with tempfile.TemporaryDirectory(prefix="edge-rknn-service-") as temp_name:
         temp_dir = Path(temp_name)
         try:
@@ -73,7 +78,7 @@ def deploy_rknn_service(device: Device) -> int:
         uploads = [
             (SERVICE_APP, f"{REMOTE_TMP}/edge_rknn_service.py"),
             (SERVICE_UNIT, f"{REMOTE_TMP}/edge-rknn-python.service"),
-            (model_path, f"{REMOTE_TMP}/rk3576_resnet18_lite2.rknn"),
+            (model_path, f"{REMOTE_TMP}/{model_asset_id}.rknn"),
         ]
         for local_path, remote_path in uploads:
             scp_code, scp_output = run_scp_to_device(device, Path(local_path), remote_path)
@@ -101,7 +106,7 @@ if id -nG edge | tr ' ' '\\n' | grep -qx render; then :; else run_sudo usermod -
 echo "## install"
 run_sudo install -d -o edge -g edge /opt/edge /opt/edge/apps /opt/edge/models /opt/edge/logs /opt/edge/run {shlex.quote(REMOTE_APP_DIR)}
 run_sudo cp {shlex.quote(REMOTE_TMP)}/edge_rknn_service.py {shlex.quote(REMOTE_APP_DIR)}/edge_rknn_service.py
-run_sudo cp {shlex.quote(REMOTE_TMP)}/rk3576_resnet18_lite2.rknn {shlex.quote(REMOTE_MODEL)}
+run_sudo cp {shlex.quote(REMOTE_TMP)}/{model_asset_id}.rknn {shlex.quote(remote_model)}
 run_sudo chmod 0755 {shlex.quote(REMOTE_APP_DIR)}/edge_rknn_service.py
 run_sudo chown -R edge:edge /opt/edge/apps /opt/edge/models /opt/edge/logs /opt/edge/run
 
@@ -114,7 +119,7 @@ fi
 "$VENV_PYTHON" -c 'import numpy; from rknnlite.api import RKNNLite; print("venv_import=ok")'
 
 echo "## systemd"
-sed -e "s#__EDGE_VENV_PYTHON__#$VENV_PYTHON#g" -e "s#__EDGE_SERVICE_USER__#{shlex.quote(device.user)}#g" {shlex.quote(REMOTE_TMP)}/edge-rknn-python.service > /tmp/edge-rknn-python.service.rendered
+sed -e "s#__EDGE_VENV_PYTHON__#$VENV_PYTHON#g" -e "s#__EDGE_SERVICE_USER__#{shlex.quote(device.user)}#g" -e "s#__EDGE_MODEL_PATH__#{shlex.quote(remote_model)}#g" {shlex.quote(REMOTE_TMP)}/edge-rknn-python.service > /tmp/edge-rknn-python.service.rendered
 run_sudo install -m 0644 /tmp/edge-rknn-python.service.rendered {shlex.quote(REMOTE_UNIT)}
 run_sudo systemctl daemon-reload
 run_sudo systemctl restart edge-rknn-python.service

@@ -3,4 +3,13 @@ devices.local.yaml
 *.pyc
 __pycache__/
 .venv/
+.cache/
+tmp/
 
+# Large converted model artifacts live under the repo tree for operations, but
+# git should only track their small metadata files.
+models/artifacts/**
+!models/artifacts/
+!models/artifacts/**/
+!models/artifacts/**/README.md
+!models/artifacts/**/manifest.yaml

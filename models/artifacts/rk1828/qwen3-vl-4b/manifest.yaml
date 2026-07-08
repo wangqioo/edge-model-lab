@@ -1,0 +1,46 @@
+artifact:
+  name: qwen3-vl-4b-rk1828-rknn3
+  source_model: Qwen/Qwen3-VL-4B-Instruct
+  source_model_path: /home/wq/edge-model-sources/huggingface/Qwen/Qwen3-VL-4B-Instruct
+  target_platform: rk1828
+  toolkit: rknn3-toolkit
+  toolkit_version: 1.0.4
+  python_env: /home/wq/edge-tools/rknn3-qwen3vl-py310
+  model_zoo: /home/wq/lincaigui/rknn3-model-zoo
+  converted_at: 2026-07-02
+  runtime_validation: rkep-runtime-blocked
+
+files:
+  vision_rknn:
+    path: vision/Qwen3-VL-4B-vision-rk1828-prune.rknn
+    size_bytes: 4293032
+    sha256: 33de410ff5299f49ff2558a8d652419c8316e59a0586fcf6391c7575e7cb2530
+  vision_weight:
+    path: vision/Qwen3-VL-4B-vision-rk1828-prune.weight
+    size_bytes: 244912128
+    sha256: ec4c3ea71c223a511ed4a772ecbeb2b85fcad1e6b779c298868ab1dd8f0fd7a0
+  llm_rknn:
+    path: llm/Qwen3-VL-4B-llm-rk1828.rknn
+    size_bytes: 25448008
+    sha256: 9d6eac0867f03813d6a0b405049537b5b5f9f6d4f0ec1c41e288fc2f8915223a
+  llm_weight:
+    path: llm/Qwen3-VL-4B-llm-rk1828.weight
+    size_bytes: 2432394240
+    sha256: bf24b466108ad75aac2bf9b660baa1e9f0a86dbff45cd70f6d843c7ad8d0eab0
+  llm_config:
+    path: llm/Qwen3-VL-4B-llm.config.pkl
+    size_bytes: 10839
+    sha256: c45bd4edd17edbf1975b22f5533ff7dd26c8b600bb76acaa2cc3417cf1126653
+  llm_tokenizer:
+    path: llm/Qwen3-VL-4B-llm.tokenizer.gguf
+    size_bytes: 5934249
+    sha256: f2ce6e2c7f4e7c17b4249eda879a125ce9830fe6ae98f3db0111c52882ec23eb
+  llm_embed:
+    path: llm/Qwen3-VL-4B-llm.embed.bin
+    size_bytes: 777912320
+    sha256: 4e813a3ede3816e3b8d2a92378b22e9c11982faadc965151ad4fc5de41dfad65
+
+logs:
+  directory: logs
+  llm_export_log: logs/export_llm_rknn.log
+  vision_export_log: logs/export_vision_rknn.log
