@@ -21,6 +21,7 @@ DEFAULT_FIRMWARE = "/lib/firmware/rknn3_rk1820.img"
 DEFAULT_VISION_DIR = "/home/orangepi/edge-model-lab/rk1828-vision-smoke"
 DEFAULT_VISION_MODEL = "Qwen3-VL-4B-vision-rk1828-prune.rknn"
 DEFAULT_VISION_WEIGHT = "Qwen3-VL-4B-vision-rk1828-prune.weight"
+DEFAULT_VISION_CORE_MASK = "0xff"
 FIRMWARE_RISK_TOKEN = "ALLOW_RK1828_FIRMWARE_RISK"
 
 
@@ -36,6 +37,7 @@ vision_model="${6:-Qwen3-VL-4B-vision-rk1828-prune.rknn}"
 vision_weight="${7:-Qwen3-VL-4B-vision-rk1828-prune.weight}"
 source_module="${8:-}"
 firmware_risk_token="${9:-}"
+vision_core_mask="${10:-0xff}"
 
 lock_file=/tmp/rk1828-runtime.lock
 exec 9>"$lock_file"
@@ -354,7 +356,7 @@ vision_smoke() {
   cd "$vision_dir"
   LD_LIBRARY_PATH="/lib:${LD_LIBRARY_PATH:-}" \
     RKNN3_NETWORK_SOCKET_FILE=/tmp/rk-mdns.ini \
-    run_timeout 180 /bin/rknn3_model_test "$vision_model" "$vision_weight" none none 0x3 1
+    run_timeout 180 /bin/rknn3_model_test "$vision_model" "$vision_weight" none none "$vision_core_mask" 1
 }
 
 case "$action" in
@@ -414,6 +416,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--vision-dir", default=DEFAULT_VISION_DIR)
     parser.add_argument("--vision-model", default=DEFAULT_VISION_MODEL)
     parser.add_argument("--vision-weight", default=DEFAULT_VISION_WEIGHT)
+    parser.add_argument("--vision-core-mask", default=DEFAULT_VISION_CORE_MASK)
     parser.add_argument(
         "--allow-firmware-risk",
         action="store_true",
@@ -444,6 +447,7 @@ def run_remote(args: argparse.Namespace) -> int:
         args.vision_weight,
         args.source_module,
         FIRMWARE_RISK_TOKEN if args.allow_firmware_risk else "",
+        args.vision_core_mask,
     ]
     remote_cmd = textwrap.dedent(
         f"""

@@ -414,6 +414,147 @@ This means the failure is not only caused by the startup script or by skipping
 the bootloader stage. Even after `db BOOT` succeeds and `td` reports
 `Mode=Loader`, `uf rknn3_rk1820.img` still makes the RK3588 host unreachable.
 
+## Working Adapted Vendor Driver
+
+The vendor `pcie-rkep` source did not compile directly against the matching
+Orange Pi `6.1.43-rockchip-rk3588` kernel tree, even on the home build server:
+
+```text
+error: implicit declaration of function 'rockchip_dw_pcie_pm_ctrl_for_user'
+error: 'ROCKCHIP_PCIE_PM_CTRL_RESET' undeclared
+```
+
+The matching kernel tree was:
+
+```text
+/home/wq/edge-tools/orangepi-kernel/linux-orangepi-6.1.43-full
+git commit: 752c0d0a12fdce201da45852287b48382caa8c0f
+```
+
+The vendor driver was minimally adapted for this kernel:
+
+```text
+DRV_VERSION changed from 0x00030300 to 0x00030301
+PCIE_EP_RESET_CTRL external PM reset call disabled for this 6.1.43 kernel
+PCIE_EP_RESET_SLOT left using rkep_ep_slot_reset()
+```
+
+The adapted module built successfully:
+
+```text
+filename: pcie-rkep.ko
+vermagic: 6.1.43-rockchip-rk3588 SMP mod_unload aarch64
+sha256: 58b4cd6664953d560aa8fc72b6295caec2634793ba17246f32e66108fcb913b2
+size: 250256 bytes
+```
+
+It was first loaded from `/tmp` without replacing the installed module:
+
+```text
+insmod /tmp/rknn-vendor-module/pcie-rkep-vendor-v30301-no-pm-reset.ko
+INSMOD_RC=0
+pcie-rkep 0000:01:00.0: func_ver=30301
+/dev/pcie-rkep-0000:01:00.0 exists
+pcie_upgrade_tool td -> Mode=MaskROM, Testing device OK
+rknn3_transfer_proxy devices -> 0000:01:00.0 b98e6c51 PCIE
+```
+
+With this adapted vendor driver loaded, full firmware download succeeded for
+the first time:
+
+```text
+pcie_upgrade_tool -s 0000:01:00.0 uf /lib/firmware/rknn3_rk1820.img /tmp/rk1828-fw
+
+Downloading bootloader OK
+Running ddr code...OK
+Write subsoc_os... (100%)
+Write node2_os... (100%)
+Write node4_os... (100%)
+Running subsoc_os code...OK
+Downloading firmware OK
+UF_RC=0
+```
+
+The host stayed reachable:
+
+```text
+10 packets transmitted, 10 packets received, 0.0% packet loss
+```
+
+`rknn-smi info` then showed the accelerator online:
+
+```text
+Device 0 Status: Online
+Health: OK
+Chip 0 Name: RK1828
+Bus-Id: 0000:01:00.0
+Temp: 33-35 C
+Memory-Usage: 32 / 5120 MB
+```
+
+The adapted module was then installed persistently:
+
+```text
+backup: /root/pcie-rkep-before-vendor-adapted-20260708-133536.ko
+old sha256: 2343ebd6bf3826e3f1da747b3101826522ade509112725b26a4559f2dd9d16df
+new sha256: 58b4cd6664953d560aa8fc72b6295caec2634793ba17246f32e66108fcb913b2
+installed path: /usr/lib/modules/pcie-rkep.ko
+```
+
+`rknn3.service` and `rknn-mdns.service` remain disabled intentionally; firmware
+startup is still run manually until reboot behavior is validated.
+
+## Runtime Smoke Result
+
+After firmware download, RKNN3 runtime checks reached model initialization:
+
+```text
+rknn3_transfer_proxy devices:
+0000:01:00.0        b98e6c51    PCIE
+
+rknn3_model_test ... core_mask 0xff:
+Found 1 RK182X devices
+Device 0: transfer_type=PCIE, id=0000:01:00.0
+rknn3_init success
+rknn3_load_model_from_data success
+Core number: 8
+rknn3_model_init success
+```
+
+The Qwen3-VL vision smoke model reported:
+
+```text
+Input:  [576, 1536], FP16
+Output: [144, 2560] x 4, FP16
+```
+
+The first `rknn3_model_test` failure with `core_mask 0x3` was only a test
+argument mismatch:
+
+```text
+Core number: 8
+Error: core_mask 0x3 does not match core number 8
+```
+
+Using `core_mask 0xff` fixed that and reached model init. A later run with a
+zero `.npy` input failed in the test tool's numpy parser:
+
+```text
+Invalid numpy dtype f2
+```
+
+This does not indicate a device bring-up failure; by that point device init,
+firmware download, proxy, model load, and model init had all succeeded. Existing
+C smoke programs also confirmed API-level device discovery and model loading:
+
+```text
+find_devices ret=0 n_devices=1
+device[0] id=0000:01:00.0 type=PCIE
+init device=0000:01:00.0 ret=0
+load_model ret=0
+destroy ret=0
+```
+
 Unsafe observed after entering Loader:
 
 ```text
