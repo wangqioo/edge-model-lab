@@ -505,6 +505,38 @@ Vision latency: 240.90 ms, 4.15 FPS
 Do not describe this as full audio-capable Omni deployment until the missing
 audio RKNN/weight pair is converted or supplied by the vendor.
 
+### Qwen2.5-Omni-3B VLM Test Console
+
+The Qwen2.5-Omni-3B VLM test console is intentionally separate from the public
+Qwen3-VL chat stack:
+
+```text
+service: qwen25-omni-vlm-web.service
+port:    8892
+app:     /home/orangepi/lincaigui/qwen25-omni-vlm-web/qwen25_omni_vlm_web.py
+repo:    deploy/apps/rk1828/qwen25_omni_vlm_web.py
+```
+
+It accepts one image and one prompt, then calls:
+
+```bash
+/home/orangepi/lincaigui/run-qwen25-omni-3b-vlm.sh <image> <prompt>
+```
+
+The RK1828 cannot run the current Qwen3-VL server and the Qwen2.5-Omni demo at
+the same time. The console serializes requests and, for each run, stops
+`rkllm3-server.service`, runs Qwen2.5-Omni, then starts `rkllm3-server.service`
+again. This keeps the default `8888` chat service intact, but a test run briefly
+interrupts model serving.
+
+Normal checks:
+
+```bash
+systemctl status qwen25-omni-vlm-web.service --no-pager -l
+curl -sS http://127.0.0.1:8892/health
+curl -sS http://127.0.0.1:8888/api/health
+```
+
 ## Do Not Repeat
 
 Avoid these patterns:

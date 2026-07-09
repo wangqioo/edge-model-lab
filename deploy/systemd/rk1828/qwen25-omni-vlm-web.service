@@ -1,0 +1,21 @@
+[Unit]
+Description=Qwen2.5-Omni-3B VLM test console
+After=rk1828-runtime.service network-online.target
+Requires=rk1828-runtime.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/orangepi/lincaigui/qwen25-omni-vlm-web
+Environment=QWEN25_OMNI_WEB_HOST=0.0.0.0
+Environment=QWEN25_OMNI_WEB_PORT=8892
+Environment=QWEN25_OMNI_RUN_SCRIPT=/home/orangepi/lincaigui/run-qwen25-omni-3b-vlm.sh
+Environment=QWEN25_OMNI_MODEL_SERVICE=rkllm3-server.service
+Environment=QWEN25_OMNI_TIMEOUT_SEC=420
+ExecStart=/usr/bin/python3 /home/orangepi/lincaigui/qwen25-omni-vlm-web/qwen25_omni_vlm_web.py
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=30
+
+[Install]
+WantedBy=multi-user.target
