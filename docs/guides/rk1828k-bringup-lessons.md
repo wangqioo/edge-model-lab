@@ -537,6 +537,28 @@ curl -sS http://127.0.0.1:8892/health
 curl -sS http://127.0.0.1:8888/api/health
 ```
 
+For camera and voice interaction, use the local computer bridge instead of
+opening the board URL directly. This keeps browser camera/microphone permission
+on `localhost`:
+
+```bash
+python3 deploy/apps/rk1828/qwen25_omni_camera_bridge.py \
+  --host 127.0.0.1 \
+  --port 8894 \
+  --board-base-url http://192.168.1.52:8892
+```
+
+Then open:
+
+```text
+http://localhost:8894
+```
+
+The camera and microphone are from the local computer browser. Speech
+recognition and speech synthesis are browser APIs. The RK1828 still receives
+only a captured image frame plus text prompt; it is not running the missing
+Qwen2.5-Omni audio RKNN branch.
+
 ## Do Not Repeat
 
 Avoid these patterns:

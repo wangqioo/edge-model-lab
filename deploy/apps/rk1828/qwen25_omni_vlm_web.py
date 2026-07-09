@@ -21,6 +21,7 @@ DEFAULT_PORT = 8892
 DEFAULT_PROMPT = "<image>请用中文简短描述这张图片。"
 DEFAULT_RUN_SCRIPT = "/home/orangepi/lincaigui/run-qwen25-omni-3b-vlm.sh"
 DEFAULT_MODEL_SERVICE = "rkllm3-server.service"
+DEFAULT_WEB_SERVICE = "rkclaw-web.service"
 DEFAULT_TIMEOUT_SEC = 420
 MAX_UPLOAD_BYTES = 12 * 1024 * 1024
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
@@ -69,6 +70,12 @@ def parse_demo_output(stdout: str) -> dict[str, Any]:
     for raw_line in stdout.splitlines():
         line = raw_line.strip()
         if not line:
+            continue
+        if set(line) == {"-"}:
+            continue
+        if "Finished" in line:
+            continue
+        if line.startswith("Stage") or "Total Time" in line or "Tokens per Second" in line:
             continue
         if line.startswith(("Prefill", "Generate", "Vision latency")):
             metrics.append(line)
@@ -231,11 +238,17 @@ class Qwen25Handler(BaseHTTPRequestHandler):
         self.send_error(HTTPStatus.NOT_FOUND)
 
     def do_POST(self) -> None:
-        if self.path != "/infer":
+        if self.path not in {"/infer", "/api/infer"}:
             self.send_error(HTTPStatus.NOT_FOUND)
             return
         if not inference_lock.acquire(blocking=False):
-            self.write_html(render_page(busy=True, error="Another inference request is already running."), HTTPStatus.CONFLICT)
+            if self.path == "/api/infer":
+                self.write_json({"ok": False, "error": "Another inference request is already running."}, HTTPStatus.CONFLICT)
+            else:
+                self.write_html(
+                    render_page(busy=True, error="Another inference request is already running."),
+                    HTTPStatus.CONFLICT,
+                )
             return
         try:
             self.handle_infer()
@@ -245,7 +258,7 @@ class Qwen25Handler(BaseHTTPRequestHandler):
     def handle_infer(self) -> None:
         content_length = int(self.headers.get("Content-Length", "0") or "0")
         if content_length <= 0 or content_length > MAX_UPLOAD_BYTES:
-            self.write_html(render_page(error="Upload is empty or larger than 12 MB."), HTTPStatus.BAD_REQUEST)
+            self.write_infer_error("Upload is empty or larger than 12 MB.", HTTPStatus.BAD_REQUEST)
             return
 
         body = self.rfile.read(content_length)
@@ -253,13 +266,13 @@ class Qwen25Handler(BaseHTTPRequestHandler):
         image_field = files.get("image")
         prompt = fields.get("prompt", DEFAULT_PROMPT) or DEFAULT_PROMPT
         if image_field is None or not image_field.filename:
-            self.write_html(render_page(error="Missing image upload."), HTTPStatus.BAD_REQUEST)
+            self.write_infer_error("Missing image upload.", HTTPStatus.BAD_REQUEST)
             return
 
         filename = Path(image_field.filename).name
         content_type = image_field.content_type
         if not allowed_upload(filename, content_type):
-            self.write_html(render_page(error=f"Unsupported upload type: {filename} ({content_type})."), HTTPStatus.BAD_REQUEST)
+            self.write_infer_error(f"Unsupported upload type: {filename} ({content_type}).", HTTPStatus.BAD_REQUEST)
             return
 
         with tempfile.TemporaryDirectory(prefix="qwen25-omni-vlm-") as tmpdir:
@@ -269,8 +282,17 @@ class Qwen25Handler(BaseHTTPRequestHandler):
             result = run_inference(str(image_path), prompt)
 
         status = HTTPStatus.OK if result["returncode"] == 0 else HTTPStatus.INTERNAL_SERVER_ERROR
-        error = None if result["returncode"] == 0 else f"Qwen2.5-Omni failed with return code {result['returncode']}."
-        self.write_html(render_page(result=parse_demo_output(result["stdout"]), error=error), status)
+        if self.path == "/api/infer":
+            self.write_json(build_infer_payload(result), status)
+        else:
+            error = None if result["returncode"] == 0 else f"Qwen2.5-Omni failed with return code {result['returncode']}."
+            self.write_html(render_page(result=parse_demo_output(result["stdout"]), error=error), status)
+
+    def write_infer_error(self, message: str, status: HTTPStatus) -> None:
+        if self.path == "/api/infer":
+            self.write_json({"ok": False, "error": message}, status)
+        else:
+            self.write_html(render_page(error=message), status)
 
     def write_html(self, body: str, status: HTTPStatus = HTTPStatus.OK) -> None:
         encoded = body.encode("utf-8")
@@ -299,8 +321,8 @@ def systemctl(action: str, service: str) -> subprocess.CompletedProcess[str]:
 def run_inference(image_path: str, prompt: str) -> dict[str, Any]:
     run_script = os.environ.get("QWEN25_OMNI_RUN_SCRIPT", DEFAULT_RUN_SCRIPT)
     model_service = os.environ.get("QWEN25_OMNI_MODEL_SERVICE", DEFAULT_MODEL_SERVICE)
+    web_service = os.environ.get("QWEN25_OMNI_WEB_SERVICE", DEFAULT_WEB_SERVICE)
     timeout = int(os.environ.get("QWEN25_OMNI_TIMEOUT_SEC", str(DEFAULT_TIMEOUT_SEC)))
-    started = False
 
     try:
         systemctl("stop", model_service)
@@ -323,10 +345,33 @@ def run_inference(image_path: str, prompt: str) -> dict[str, Any]:
             "stderr": f"Timed out after {timeout} seconds.",
         }
     finally:
-        start_proc = systemctl("start", model_service)
-        started = start_proc.returncode == 0
-        if not started:
-            print(start_proc.stderr, flush=True)
+        for service in services_to_start_after_inference(model_service, web_service):
+            start_proc = systemctl("start", service)
+            if start_proc.returncode != 0:
+                print(start_proc.stderr, flush=True)
+
+
+def services_to_start_after_inference(model_service: str, web_service: str | None) -> list[str]:
+    services = [model_service]
+    if web_service:
+        services.append(web_service)
+    return services
+
+
+def build_infer_payload(result: dict[str, Any]) -> dict[str, Any]:
+    returncode = int(result.get("returncode", 1))
+    parsed = parse_demo_output(str(result.get("stdout", "")))
+    payload: dict[str, Any] = {
+        "ok": returncode == 0,
+        "returncode": returncode,
+        "answer": parsed["answer"],
+        "metrics": parsed["metrics"],
+        "raw": parsed["raw"],
+        "stderr": str(result.get("stderr", "")),
+    }
+    if returncode != 0:
+        payload["error"] = f"Qwen2.5-Omni failed with return code {returncode}."
+    return payload
 
 
 def main() -> int:
